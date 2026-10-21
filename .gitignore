@@ -1,0 +1,13 @@
+# Real secret values (Docker secrets) – never commit
+/secrets/
+
+# Safety net – each Laravel project also has its own .gitignore
+.env
+vendor/
+node_modules/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
