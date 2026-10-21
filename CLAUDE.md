@@ -51,7 +51,7 @@ MoviePlatform/
 ## 3. Golden rules (always follow)
 
 1. **A service never reads or writes another service's database.** Get other data through that service's API or through events.
-2. **No foreign keys across services.** `user_id` = Identity `users.id`, `movie_id` = Catalog `movies.id` (never `tmdb_id`). Store them as plain `bigint` columns.
+2. **No foreign keys across services.** `user_id` = Identity `users.id`, `movie_id` = Catalog `movies.id` (never `tmdb_id`). Store them as plain `uuid` columns.
 3. **Validate inside each service** (FormRequest), even if the Gateway already validated.
 4. **Never return raw models.** Always use API Resources.
 5. **Never hardcode or commit secrets.** Read them with `secret('name')` in config files only.
@@ -106,7 +106,7 @@ resources/js/                  Echo (Reverb), Leaflet
 
 ### REST (sync, request/response)
 - Gateway → service: `Authorization: Bearer <JWT>` from the session.
-- JWT claims: `sub` (user id), `role` (`user`|`admin`), `name`, `exp` (2h).
+- JWT claims: `sub` (user UUID), `role` (`user`|`admin`), `name`, `exp` (2h).
 - Service → service internal calls: header `X-Service-Token`, only on `/api/internal/*` routes.
 - Every call carries `X-Correlation-ID`.
 - `BaseClient`: 3s timeout, 2 retries, throws `ServiceUnavailable` on connection errors.
@@ -154,7 +154,9 @@ The exact payload fields are in `docs/events.md`. Follow them exactly.
 ## 6. Database conventions
 
 - PostgreSQL 16, one database + one user per service (`identity_db`, `catalog_db`, …).
-- `bigint` auto-increment ids, plural snake_case tables, `created_at`/`updated_at` everywhere.
+- **UUID primary keys everywhere**: `$table->uuid('id')->primary()` + the `HasUuids` trait on models (time-ordered UUIDs).
+- Inside a service: `$table->foreignUuid('user_id')->constrained()`. References to another service: plain `$table->uuid('movie_id')` (no FK).
+- Plural snake_case tables, `created_at`/`updated_at` everywhere.
 - Use `jsonb` (`$table->jsonb()`) for flexible data.
 - Every schema change comes as a migration, and the ERD in `docs/erd/` is updated in the same PR.
 
