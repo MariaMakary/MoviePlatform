@@ -1,7 +1,7 @@
 # MoviePlatform – Project Guide for Claude Code
 
 Web2 course team project (Antonine University): a movie discovery and social platform.
-Team: **Maria** (lead), **Joy**, **Joe**, **Tonio**.
+Team: **Maria**, **Joy**, **Joe**, **Tonio**.
 Full reference: `docs/MoviePlatform-Service-Reference.docx` · Git workflow: `docs/MoviePlatform-Git-Workflow-Guide.docx`.
 
 ---
@@ -20,14 +20,14 @@ Full reference: `docs/MoviePlatform-Service-Reference.docx` · Git workflow: `do
 | `services/intelligence` | 8005 | Recommendations, sentiment, weather, calendar | Joe (recommendations: Maria) |
 | `services/notification` | 8006 | User notifications | Joe |
 
-Infrastructure: **PostgreSQL 16** (5432), **RabbitMQ** (5672, UI 15672), **Redis** (6379, cache/sessions only), **Reverb** (8080, WebSockets).
+Infrastructure: **PostgreSQL 16** (one container per service, host ports 5433–5438), **RabbitMQ** (5672, UI 15672), **Redis** (6379, cache/sessions only), **Reverb** (8080, WebSockets).
 
 ```
 MoviePlatform/
 ├── gateway/
 ├── services/{identity,catalog,engagement,social,intelligence,notification}/
 ├── docs/            ERDs, architecture, api/<service>.md, events.md, sprints/
-├── docker/          postgres init script, rabbitmq definitions
+├── docker/          rabbitmq definitions
 ├── secrets/         git-ignored – real secret values
 ├── secrets.example/ committed – empty files with the expected names
 ├── docker-compose.yml
@@ -153,7 +153,8 @@ The exact payload fields are in `docs/events.md`. Follow them exactly.
 
 ## 6. Database conventions
 
-- PostgreSQL 16, one database + one user per service (`identity_db`, `catalog_db`, …).
+- PostgreSQL 16, **one container per service** (`identity-db`, `catalog-db`, …), each holding only that service's database and user (`identity_db` / `identity_user`, …).
+- A service connects to `<service>-db:5432` inside Docker. From the host: identity 5433, catalog 5434, engagement 5435, social 5436, intelligence 5437, notification 5438.
 - **UUID primary keys everywhere**: `$table->uuid('id')->primary()` + the `HasUuids` trait on models (time-ordered UUIDs).
 - Inside a service: `$table->foreignUuid('user_id')->constrained()`. References to another service: plain `$table->uuid('movie_id')` (no FK).
 - Plural snake_case tables, `created_at`/`updated_at` everywhere.
