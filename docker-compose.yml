@@ -1,0 +1,108 @@
+name: movieplatform
+
+# Shared settings for every service database (one Postgres container per service)
+x-postgres: &postgres
+  image: postgres:16
+  restart: unless-stopped
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+    interval: 5s
+    timeout: 5s
+    retries: 10
+
+services:
+  identity-db:
+    <<: *postgres
+    environment:
+      POSTGRES_DB: identity_db
+      POSTGRES_USER: identity_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/identity_db_password
+    secrets: [identity_db_password]
+    volumes: [identity-db-data:/var/lib/postgresql/data]
+    ports: ["127.0.0.1:5433:5432"]
+
+  catalog-db:
+    <<: *postgres
+    environment:
+      POSTGRES_DB: catalog_db
+      POSTGRES_USER: catalog_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/catalog_db_password
+    secrets: [catalog_db_password]
+    volumes: [catalog-db-data:/var/lib/postgresql/data]
+    ports: ["127.0.0.1:5434:5432"]
+
+  engagement-db:
+    <<: *postgres
+    environment:
+      POSTGRES_DB: engagement_db
+      POSTGRES_USER: engagement_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/engagement_db_password
+    secrets: [engagement_db_password]
+    volumes: [engagement-db-data:/var/lib/postgresql/data]
+    ports: ["127.0.0.1:5435:5432"]
+
+  social-db:
+    <<: *postgres
+    environment:
+      POSTGRES_DB: social_db
+      POSTGRES_USER: social_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/social_db_password
+    secrets: [social_db_password]
+    volumes: [social-db-data:/var/lib/postgresql/data]
+    ports: ["127.0.0.1:5436:5432"]
+
+  intelligence-db:
+    <<: *postgres
+    environment:
+      POSTGRES_DB: intelligence_db
+      POSTGRES_USER: intelligence_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/intelligence_db_password
+    secrets: [intelligence_db_password]
+    volumes: [intelligence-db-data:/var/lib/postgresql/data]
+    ports: ["127.0.0.1:5437:5432"]
+
+  notification-db:
+    <<: *postgres
+    environment:
+      POSTGRES_DB: notification_db
+      POSTGRES_USER: notification_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/notification_db_password
+    secrets: [notification_db_password]
+    volumes: [notification-db-data:/var/lib/postgresql/data]
+    ports: ["127.0.0.1:5438:5432"]
+
+  # Cache, Gateway sessions and one-time login codes only – events go through RabbitMQ
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes: [redis-data:/data]
+    ports: ["127.0.0.1:6379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  identity-db-data:
+  catalog-db-data:
+  engagement-db-data:
+  social-db-data:
+  intelligence-db-data:
+  notification-db-data:
+  redis-data:
+
+secrets:
+  identity_db_password:
+    file: ./secrets/identity_db_password
+  catalog_db_password:
+    file: ./secrets/catalog_db_password
+  engagement_db_password:
+    file: ./secrets/engagement_db_password
+  social_db_password:
+    file: ./secrets/social_db_password
+  intelligence_db_password:
+    file: ./secrets/intelligence_db_password
+  notification_db_password:
+    file: ./secrets/notification_db_password
