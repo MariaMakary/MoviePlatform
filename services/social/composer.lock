@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "53b5d56b3b7e3cbac1713e68c8850f6c",
+    "content-hash": "651f59d3d139657df9b686ecf4b2ae51",
     "packages": [
         {
             "name": "brick/math",
@@ -2132,6 +2132,49 @@
                 }
             ],
             "time": "2026-09-29T19:21:12+00:00"
+        },
+        {
+            "name": "movieplatform/common",
+            "version": "1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "../../packages/common",
+                "reference": "ee02df8cedafe111003ae5d6d64c80cb70426b45"
+            },
+            "require": {
+                "illuminate/support": "^12.0",
+                "php": "^8.2",
+                "vlucas/phpdotenv": "^5.6"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.5.50"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "MoviePlatform\\Common\\": "src/"
+                },
+                "files": [
+                    "src/secret.php"
+                ]
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "MoviePlatform\\Common\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "phpunit"
+                ]
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Code shared by the MoviePlatform Gateway and services (secret() helper, and later middleware, events, health check).",
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "nesbot/carbon",

@@ -26,6 +26,7 @@ Infrastructure: **PostgreSQL 16** (one container per service, host ports 5433–
 MoviePlatform/
 ├── gateway/
 ├── services/{identity,catalog,engagement,social,intelligence,notification}/
+├── packages/common/ shared code (movieplatform/common), loaded by every project
 ├── docs/            ERDs, architecture, api/<service>.md, events.md, sprints/
 ├── docker/          config files for infrastructure containers
 ├── secrets/         git-ignored – real secret values
@@ -58,6 +59,7 @@ MoviePlatform/
 6. **Contracts first.** If you change an endpoint or an event, update `docs/api/<service>.md` or `docs/events.md` in the same change, and tell the services that use it.
 7. **Graceful fallback.** If a service is down, the Gateway shows `<x-service-unavailable/>` for that section. The page never crashes.
 8. Code, comments, commits and docs are in **English**.
+9. **Don't repeat code.** Logic needed in more than one place goes in one reusable place: inside a service, a `Services/` class, trait or base class; across projects, `packages/common`. Share **technical** code only (helpers, middleware, event plumbing, health check). Never share business logic, models or database access between services: each service owns its domain.
 
 ---
 
@@ -79,11 +81,12 @@ app/
 │   ├── EventPublisher.php
 │   └── Clients/              the ONLY place making HTTP calls to other services / external APIs
 ├── Console/Commands/         events:consume, events:replay-dlq, sync commands
-├── Exceptions/               JSON error rendering
-└── Support/secret.php        Docker secrets helper
+└── Exceptions/               JSON error rendering
 config/events.php             routing keys published / bound + handler map
 routes/api.php                grouped by middleware: jwt, admin, service
 ```
+
+**Shared code** lives once in `packages/common` (`movieplatform/common`, namespace `MoviePlatform\Common`): the `secret()` helper today, later the middleware, EventPublisher, consumer and health check. Every project requires it through a Composer `path` repository, so never copy shared code into a service. A change there affects every project: run their tests.
 
 **Request flow:** `routes/api.php → Middleware → FormRequest → Controller → Policy → Service → Model → EventPublisher → Resource`
 
@@ -176,6 +179,7 @@ The exact payload fields are in `docs/events.md`. Follow them exactly.
 ## 8. Running the project
 
 ```bash
+composer install                                       # (repo root) installs packages/common, the Gateway and every service
 docker compose up -d                                   # start everything
 docker compose ps                                      # check health
 docker compose logs -f <service>                       # logs
@@ -219,7 +223,8 @@ URLs: Gateway http://localhost:8000 · RabbitMQ UI http://localhost:15672 · ser
 - Work **only in the service the task belongs to**, plus its Gateway pages. If another service needs a change, say so instead of editing it silently.
 - **Never** add cross-service database queries or foreign keys, even as a "quick fix".
 - Follow the folder structure and naming above. Match the existing code style of the service.
-- Ask before changing an API contract, an event payload, `docker-compose.yml` or anything in the shared service template (middleware, EventPublisher, consumer, `secret()`).
+- Ask before changing an API contract, an event payload, `docker-compose.yml` or anything in `packages/common` (middleware, EventPublisher, consumer, `secret()`).
 - Prefer small, focused changes that fit one task and one pull request.
+- Before writing something, check whether it already exists in the service or in `packages/common`. If you are about to copy code, make it reusable instead (rule 9).
 - When you add or change an endpoint or event, update the docs in the same change.
 - Keep explanations short and suggest the commit message with `AB#<id>`.
