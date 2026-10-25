@@ -27,7 +27,7 @@ MoviePlatform/
 ├── gateway/
 ├── services/{identity,catalog,engagement,social,intelligence,notification}/
 ├── docs/            ERDs, architecture, api/<service>.md, events.md, sprints/
-├── docker/          rabbitmq definitions
+├── docker/          config files for infrastructure containers
 ├── secrets/         git-ignored – real secret values
 ├── secrets.example/ committed – empty files with the expected names
 ├── docker-compose.yml
@@ -120,6 +120,7 @@ resources/js/                  Echo (Reverb), Leaflet
 ### Events (async) – RabbitMQ
 - Topic exchange **`movieplatform.events`**. Routing key = event name in dot form (`review.created`).
 - One durable queue per service: `<service>.events`, plus a dead-letter queue `<service>.events.dlq`.
+- Each service declares the exchange, its own `<service>.events` queue, its DLQ and its bindings in code on startup (from `config/events.php`).
 - Envelope:
   ```json
   { "event": "ReviewCreated", "id": "uuid", "occurred_at": "2026-11-03T18:20:00Z",
