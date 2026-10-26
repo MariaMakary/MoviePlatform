@@ -1,0 +1,23 @@
+{
+    "name": "movieplatform/monorepo",
+    "description": "Repo root helper: `composer install` here installs the Gateway, every service and the shared package.",
+    "type": "project",
+    "license": "proprietary",
+    "require": {},
+    "scripts": {
+        "post-install-cmd": "@install-all",
+        "install-all": [
+            "@composer install --working-dir=packages/common",
+            "@composer install --working-dir=gateway",
+            "@composer install --working-dir=services/identity",
+            "@composer install --working-dir=services/catalog",
+            "@composer install --working-dir=services/engagement",
+            "@composer install --working-dir=services/social",
+            "@composer install --working-dir=services/intelligence",
+            "@composer install --working-dir=services/notification"
+        ]
+    },
+    "scripts-descriptions": {
+        "install-all": "Run composer install in packages/common, the Gateway and every service."
+    }
+}
