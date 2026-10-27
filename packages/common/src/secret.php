@@ -6,7 +6,8 @@ if (! function_exists('secret')) {
         $dir = rtrim(env('SECRETS_DIR', '/run/secrets'), '/\\');
 
         if (! preg_match('#^([a-zA-Z]:)?[/\\\\]#', $dir)) {
-            $dir = (function_exists('base_path') ? base_path() : getcwd()).DIRECTORY_SEPARATOR.$dir;
+            $laravel = function_exists('app') && app() instanceof \Illuminate\Contracts\Foundation\Application;
+            $dir = ($laravel ? base_path() : getcwd()).DIRECTORY_SEPARATOR.$dir;
         }
 
         $path = $dir.DIRECTORY_SEPARATOR.$name;
