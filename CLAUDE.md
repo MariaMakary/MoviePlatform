@@ -39,10 +39,10 @@ MoviePlatform/
 
 ## 2. Tech stack
 
-- **Laravel 12**, PHP 8.3, **Blade + Livewire + Tailwind** (Gateway only)
+- **Laravel 12**, PHP 8.2+ (runs on each laptop, extensions `pdo_pgsql` + `sockets`), **Blade + Livewire + Tailwind** (Gateway only)
 - **PostgreSQL 16**: use `jsonb`, `ILIKE` for case-insensitive search
 - **RabbitMQ** via `php-amqplib` for integration events (NOT Laravel queue jobs between services)
-- **Redis**: cache (TMDB, weather), Gateway sessions, one-time login codes. **Not for events.**
+- **Redis**: cache (TMDB, weather), Gateway sessions, one-time login codes. **Not for events.** Client: `predis` (`REDIS_CLIENT=predis`, no PHP extension needed).
 - **Laravel Reverb** + Echo for real time (chat, live votes, live notification bell)
 - **JWT RS256**: Identity signs with the private key, every service verifies with the public key
 - External APIs: TMDB, OpenWeatherMap, Hugging Face Inference API (sentiment), Leaflet + OpenStreetMap/Overpass (maps, browser-side), Laravel Socialite (Google/GitHub)
@@ -158,7 +158,7 @@ The exact payload fields are in `docs/events.md`. Follow them exactly.
 ## 6. Database conventions
 
 - PostgreSQL 16, **one container per service** (`identity-db`, `catalog-db`, …), each holding only that service's database and user (`identity_db` / `identity_user`, …).
-- A service connects to `<service>-db:5432` inside Docker. From the host: identity 5433, catalog 5434, engagement 5435, social 5436, intelligence 5437, notification 5438.
+- The apps run on your PC and reach their database at `127.0.0.1`: identity 5433, catalog 5434, engagement 5435, social 5436, intelligence 5437, notification 5438.
 - **UUID primary keys everywhere**: `$table->uuid('id')->primary()` + the `HasUuids` trait on models (time-ordered UUIDs).
 - Inside a service: `$table->foreignUuid('user_id')->constrained()`. References to another service: plain `$table->uuid('movie_id')` (no FK).
 - Plural snake_case tables, `created_at`/`updated_at` everywhere.
@@ -178,18 +178,35 @@ The exact payload fields are in `docs/events.md`. Follow them exactly.
 
 ## 8. Running the project
 
+Docker runs only the infrastructure (databases, Redis, RabbitMQ). The Laravel apps run on your PC.
+
 ```bash
-composer install                                       # (repo root) installs packages/common, the Gateway and every service
-docker compose up -d                                   # start everything
-docker compose ps                                      # check health
-docker compose logs -f <service>                       # logs
-docker compose exec <service> php artisan migrate      # migrations for one service
-docker compose exec <service> php artisan db:seed
-docker compose exec <service> php artisan events:consume     # (runs in the worker container)
-docker compose exec <service> php artisan events:replay-dlq
+composer install                          # (repo root) installs packages/common, the Gateway and every service
+docker compose up -d                      # infrastructure: 6 databases, Redis, RabbitMQ
+docker compose ps                         # check health
+
+# in each app folder (gateway → 8000, identity → 8001 … notification → 8006)
+php artisan serve --port=8001             # the API
+php artisan migrate                       # migrations for that service
+php artisan db:seed
+php artisan events:consume                # event worker (separate terminal; consuming services only)
+php artisan events:replay-dlq
+
+# gateway/ only: Tailwind / JS with hot reload
+npm run dev
 ```
 
 URLs: Gateway http://localhost:8000 · RabbitMQ UI http://localhost:15672 · services on ports 8001–8006.
+
+**Background processes start with their app, not in Docker.** Each project's `composer run dev` script (in its `composer.json`, Laravel's `concurrently` setup) starts the app **and** its background processes in one terminal, like a .NET API that hosts its own consumer:
+
+| Project | `composer run dev` starts |
+|---|---|
+| engagement, social, intelligence, notification | `php artisan serve --port=800X` + `php artisan events:consume` |
+| identity, catalog | `php artisan serve --port=800X` (they only publish events) |
+| gateway | `php artisan serve --port=8000` + `php artisan reverb:start` + `npm run dev` |
+
+Whoever adds `events:consume` or Reverb also adds it to that project's `dev` script. Never add worker or Reverb containers to `docker-compose.yml`. Remove `php artisan pail` from Laravel's default `dev` script: it needs the `pcntl` extension, which does not exist on Windows.
 
 ---
 
@@ -213,7 +230,7 @@ URLs: Gateway http://localhost:8000 · RabbitMQ UI http://localhost:15672 · ser
 - [ ] Gateway pages use the shared layout and components and handle a service being down
 - [ ] `docs/api/<service>.md`, `docs/events.md` or the ERD updated if something changed
 - [ ] No secrets, `.env`, `vendor/` or `node_modules/` committed
-- [ ] Runs with `docker compose up`
+- [ ] Runs with `docker compose up -d` + `php artisan serve` (see section 8)
 
 ---
 

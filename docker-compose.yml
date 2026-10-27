@@ -1,6 +1,5 @@
 name: movieplatform
 
-# Shared settings for every service database (one Postgres container per service)
 x-postgres: &postgres
   image: postgres:16
   restart: unless-stopped
@@ -71,7 +70,6 @@ services:
     volumes: [notification-db-data:/var/lib/postgresql/data]
     ports: ["127.0.0.1:5438:5432"]
 
-  # Cache, Gateway sessions and one-time login codes only – events go through RabbitMQ
   redis:
     image: redis:7
     restart: unless-stopped
@@ -84,10 +82,8 @@ services:
       timeout: 5s
       retries: 10
 
-  # Broker only – each service declares the exchange, its queue, DLQ and bindings in code
   rabbitmq:
     image: rabbitmq:3-management
-    # RabbitMQ stores its data under the node name (from the hostname): keep it fixed
     hostname: rabbitmq
     restart: unless-stopped
     entrypoint:
