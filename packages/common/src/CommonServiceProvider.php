@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 use MoviePlatform\Common\Auth\JwtDecoder;
+use MoviePlatform\Common\Http\Middleware\EnsureAdmin;
 use MoviePlatform\Common\Http\Middleware\VerifyJwt;
+use MoviePlatform\Common\Http\Middleware\VerifyServiceToken;
 use RuntimeException;
 use UnexpectedValueException;
 
@@ -17,10 +19,12 @@ class CommonServiceProvider extends ServiceProvider
     {
         if ($this->isLumen()) {
             $this->app->configure('jwt');
+            $this->app->configure('internal');
             $this->app->configure('auth');
         }
 
         $this->mergeConfigFrom(__DIR__.'/../config/jwt.php', 'jwt');
+        $this->mergeConfigFrom(__DIR__.'/../config/internal.php', 'internal');
 
         $this->app->singleton(JwtDecoder::class, function () {
             $path = config('jwt.public_key_path');
@@ -53,10 +57,18 @@ class CommonServiceProvider extends ServiceProvider
             }
         });
 
+        $middleware = [
+            'jwt' => VerifyJwt::class,
+            'admin' => EnsureAdmin::class,
+            'service' => VerifyServiceToken::class,
+        ];
+
         if ($this->isLumen()) {
-            $this->app->routeMiddleware(['jwt' => VerifyJwt::class]);
+            $this->app->routeMiddleware($middleware);
         } else {
-            $this->app['router']->aliasMiddleware('jwt', VerifyJwt::class);
+            foreach ($middleware as $name => $class) {
+                $this->app['router']->aliasMiddleware($name, $class);
+            }
         }
     }
 

@@ -2,6 +2,7 @@
 
 namespace MoviePlatform\Common\Tests;
 
+use Illuminate\Container\Container;
 use PHPUnit\Framework\TestCase;
 
 class SecretTest extends TestCase
@@ -11,6 +12,8 @@ class SecretTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        Container::setInstance(null);
 
         $this->dir = sys_get_temp_dir().DIRECTORY_SEPARATOR.'secrets_'.uniqid();
         mkdir($this->dir);
