@@ -1,10 +1,10 @@
 # MoviePlatform
 
-Movie discovery and social platform: a Laravel Gateway (web UI) and 6 Laravel microservices.
+Movie discovery and social platform: a Laravel 12 Gateway (web UI) and 6 Lumen 10 microservices.
 Architecture, conventions and rules: see [`CLAUDE.md`](CLAUDE.md).
 
 **How it runs:** Docker runs only the infrastructure (one PostgreSQL per service, Redis, RabbitMQ).
-The Laravel apps run on your PC with `php artisan serve`.
+The apps run on your PC: the services with `php -S`, the Gateway with `php artisan serve`.
 
 | App | Folder | URL | Database (host port) |
 |---|---|---|---|
@@ -34,14 +34,11 @@ Get the values from the team privately (never in the repo, never in chat channel
 local setup, generate your own:
 
 ```powershell
-New-Item -ItemType Directory -Force secrets | Out-Null
-Get-ChildItem secrets.example -File | Where-Object { $_.Name -ne 'jwt_private_key' -and -not (Test-Path "secrets/$($_.Name)") } | ForEach-Object {
-  $value = -join ((48..57)+(65..90)+(97..122) | Get-Random -Count 24 | ForEach-Object {[char]$_})
-  [IO.File]::WriteAllText("secrets/$($_.Name)", $value)
-}
+New-Item -ItemType Directory -Force secrets | Out-Null; Get-ChildItem secrets.example -File | Where-Object { $_.Name -ne 'jwt_private_key' -and (-not (Test-Path "secrets/$($_.Name)") -or (Get-Item "secrets/$($_.Name)").Length -eq 0) } | ForEach-Object { [IO.File]::WriteAllText("$PWD\secrets\$($_.Name)", -join ((48..57)+(65..90)+(97..122) | Get-Random -Count 24 | ForEach-Object {[char]$_})) }
 ```
 
-Each file holds one value on one line. Choose them before the first `docker compose up`: the databases and RabbitMQ
+It fills every missing or empty file (except `jwt_private_key`) and never overwrites a value. Don't edit these files
+in an editor: a trailing line break becomes part of the database password. Each file holds one value on one line. Choose them before the first `docker compose up`: the databases and RabbitMQ
 read them only on their very first start.
 
 **JWT private key.** `secrets/jwt_private_key` is not generated: it must match the public key committed in
@@ -66,11 +63,11 @@ cd gateway; npm install; cd ..
 **3. `.env` for each app.**
 
 ```powershell
-foreach ($p in "gateway","services/identity","services/catalog","services/engagement","services/social","services/intelligence","services/notification") {
-  Copy-Item "$p/.env.example" "$p/.env"
-  php "$p/artisan" key:generate
-}
+Copy-Item gateway/.env.example gateway/.env; php gateway/artisan key:generate
+foreach ($s in "identity","catalog","engagement","social","intelligence","notification") { (Get-Content "services/$s/.env.example") -replace '^APP_KEY=$', ('APP_KEY=' + -join ((48..57)+(65..90)+(97..122) | Get-Random -Count 32 | ForEach-Object {[char]$_})) | Set-Content "services/$s/.env" }
 ```
+
+Lumen has no `key:generate`, so the second line writes a random 32-character `APP_KEY` into each service's `.env`.
 
 No passwords go in `.env`: the apps read them from `secrets/` (`SECRETS_DIR` in `.env` points there), the same
 files the database and RabbitMQ containers use.
@@ -88,11 +85,12 @@ cd services/identity; php artisan migrate; cd ../..
 
 ```powershell
 docker compose up -d                       # infrastructure
-cd services/identity; php artisan serve --port=8001
+cd services/identity; php -S 127.0.0.1:8001 -t public
 ```
 
-Start each app you need in its own terminal with its port from the table above. For Gateway pages, also run
-`npm run dev` in `gateway/` (CSS/JS with hot reload). Check a service with `http://localhost:8001/api/health`.
+Start each service you need in its own terminal with its port from the table above (Lumen has no `artisan serve`).
+For the Gateway run `php artisan serve --port=8000` in `gateway/`, plus `npm run dev` for CSS/JS with hot reload.
+Check a service with `http://localhost:8001/api/health`.
 
 You don't need every database: `docker compose up -d identity-db redis rabbitmq` starts only what Identity needs.
 
@@ -106,4 +104,4 @@ docker compose down                        # remove the containers (data is kept
 docker compose down -v                     # remove the containers AND all data (fresh start)
 ```
 
-Inside an app folder: `php artisan migrate`, `php artisan test`, `php artisan route:list`.
+Inside a service folder: `php artisan migrate`, `vendor/bin/phpunit` (tests). Inside `gateway/`: `php artisan test`.

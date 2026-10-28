@@ -1,7 +1,13 @@
 # Social service
 
-**Port:** 8004 · **Health check:** `GET http://localhost:8004/api/health`
+Lumen 10 microservice. **Port:** 8004 Â· **Database:** `social-db` (host port 5436) Â· **Health check:** `GET http://localhost:8004/api/health`
 
 Follows, profiles, privacy, activity feed, movie nights and chat rooms.
 
-Part of MoviePlatform. See the root `CLAUDE.md` for the architecture, conventions and how to run the project.
+Run it from this folder:
+
+```powershell
+php -S 127.0.0.1:8004 -t public
+```
+
+Part of MoviePlatform. See the root `README.md` for setup and `CLAUDE.md` for the architecture and conventions.

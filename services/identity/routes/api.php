@@ -1,8 +1,6 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
-Route::get('/health', fn () => response()->json([
+$router->get('/health', fn () => response()->json([
     'status' => 'ok',
     'service' => 'identity',
 ]));
