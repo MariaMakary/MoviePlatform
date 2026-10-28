@@ -1,19 +1,40 @@
 <?php
 
-use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Configuration\Exceptions;
-use Illuminate\Foundation\Configuration\Middleware;
+require_once __DIR__.'/../vendor/autoload.php';
 
-return Application::configure(basePath: dirname(__DIR__))
-    ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        api: __DIR__.'/../routes/api.php',
-        commands: __DIR__.'/../routes/console.php',
-        health: '/up',
-    )
-    ->withMiddleware(function (Middleware $middleware): void {
-        //
-    })
-    ->withExceptions(function (Exceptions $exceptions): void {
-        //
-    })->create();
+(new Laravel\Lumen\Bootstrap\LoadEnvironmentVariables(
+    dirname(__DIR__)
+))->bootstrap();
+
+date_default_timezone_set(env('APP_TIMEZONE', 'UTC'));
+
+$app = new Laravel\Lumen\Application(
+    dirname(__DIR__)
+);
+
+$app->withFacades();
+
+$app->withEloquent();
+
+$app->singleton(
+    Illuminate\Contracts\Debug\ExceptionHandler::class,
+    App\Exceptions\Handler::class
+);
+
+$app->singleton(
+    Illuminate\Contracts\Console\Kernel::class,
+    App\Console\Kernel::class
+);
+
+$app->configure('app');
+
+$app->register(MoviePlatform\Common\CommonServiceProvider::class);
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api',
+], function ($router) {
+    require __DIR__.'/../routes/api.php';
+});
+
+return $app;

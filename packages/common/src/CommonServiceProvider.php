@@ -15,6 +15,11 @@ class CommonServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        if ($this->isLumen()) {
+            $this->app->configure('jwt');
+            $this->app->configure('auth');
+        }
+
         $this->mergeConfigFrom(__DIR__.'/../config/jwt.php', 'jwt');
 
         $this->app->singleton(JwtDecoder::class, function () {
@@ -48,6 +53,15 @@ class CommonServiceProvider extends ServiceProvider
             }
         });
 
-        $this->app['router']->aliasMiddleware('jwt', VerifyJwt::class);
+        if ($this->isLumen()) {
+            $this->app->routeMiddleware(['jwt' => VerifyJwt::class]);
+        } else {
+            $this->app['router']->aliasMiddleware('jwt', VerifyJwt::class);
+        }
+    }
+
+    private function isLumen(): bool
+    {
+        return method_exists($this->app, 'configure') && method_exists($this->app, 'routeMiddleware');
     }
 }
