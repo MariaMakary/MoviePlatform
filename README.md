@@ -35,7 +35,7 @@ local setup, generate your own:
 
 ```powershell
 New-Item -ItemType Directory -Force secrets | Out-Null
-Get-ChildItem secrets.example -File | ForEach-Object {
+Get-ChildItem secrets.example -File | Where-Object { $_.Name -ne 'jwt_private_key' -and -not (Test-Path "secrets/$($_.Name)") } | ForEach-Object {
   $value = -join ((48..57)+(65..90)+(97..122) | Get-Random -Count 24 | ForEach-Object {[char]$_})
   [IO.File]::WriteAllText("secrets/$($_.Name)", $value)
 }
@@ -43,6 +43,18 @@ Get-ChildItem secrets.example -File | ForEach-Object {
 
 Each file holds one value on one line. Choose them before the first `docker compose up`: the databases and RabbitMQ
 read them only on their very first start.
+
+**JWT private key.** `secrets/jwt_private_key` is not generated: it must match the public key committed in
+`keys/jwt_public.pem`, which every service uses to verify tokens. Get the file from the team privately and save it as
+`secrets/jwt_private_key`. Never generate your own: tokens signed with another key are rejected everywhere.
+
+Only if the private key ever leaks, one person creates a new pair, commits the new `keys/jwt_public.pem` and shares the
+new private key with the team (`openssl` comes with Git for Windows):
+
+```powershell
+& "C:\Program Files\Git\usr\bin\openssl.exe" genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out secrets/jwt_private_key
+& "C:\Program Files\Git\usr\bin\openssl.exe" pkey -in secrets/jwt_private_key -pubout -out keys/jwt_public.pem
+```
 
 **2. PHP and JS dependencies.**
 
