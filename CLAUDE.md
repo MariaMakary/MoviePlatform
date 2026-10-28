@@ -7,14 +7,17 @@ the details for that part.
 
 | Component | Port | Owns | Owner |
 |---|---|---|---|
-| `gateway/` | 8000 | All UI (Blade + Livewire + Tailwind), session, admin dashboard UI | Joy (everyone builds their own pages) |
-| `services/identity` | 8001 | Users, auth, social login, roles, JWT issuing | Maria (social login: Joy) |
-| `services/catalog` | 8002 | TMDB integration, local movie DB, search, genres, people | Joy (search: Tonio · genres/people/caching: Maria · internal endpoints: Joe) |
+| `gateway/` | 8000 | All UI (Blade + Livewire + Tailwind), session, admin dashboard UI | Joy |
+| `services/identity` | 8001 | Users, auth, social login, roles, JWT issuing | Maria |
+| `services/catalog` | 8002 | TMDB integration, local movie DB, search, genres, people | Joy |
 | `services/engagement` | 8003 | Ratings, reviews, watchlist, history, custom lists, moderation | Tonio |
-| `services/social` | 8004 | Follows, profiles, privacy, activity feed, movie nights, chat rooms | Maria (feed, movie nights) · Joe (follows, profiles, privacy, chat) |
-| `services/intelligence` | 8005 | Recommendations, sentiment, weather, calendar | Joe (recommendations: Maria) |
+| `services/social` | 8004 | Follows, profiles, privacy, activity feed, movie nights, chat rooms | Joe · Maria |
+| `services/intelligence` | 8005 | Recommendations, sentiment, weather, calendar | Joe |
 | `services/notification` | 8006 | User notifications | Joe |
 | `packages/common` | – | Shared technical code (`secret()`, JWT guard and middleware, later events and health) | everyone |
+
+**Tasks rotate:** over the five sprints everyone works in every service, so the whole team understands the whole
+system. Who does a task is on the board.
 
 Infrastructure in Docker: one **PostgreSQL 16** per service (host ports 5433–5438), **RabbitMQ** (5672, UI 15672, via
 `php-amqplib`; never Laravel queue jobs between services),

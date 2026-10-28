@@ -7,7 +7,7 @@ User notifications.
 ## Events
 
 - Publishes: nothing
-- Consumes: `user.registered`, `user.blocked`, `user.deleted`, `user.followed`, `movie_night.invite_sent`, `movie_night.invite_answered`, `movie_night.finalized`
+- Consumes: `user.registered`, `user.deleted`, `user.followed`, `movie_night.invite_sent`, `movie_night.invite_answered`, `movie_night.finalized`
 
 Payloads and rules: `docs/events.md`.
 

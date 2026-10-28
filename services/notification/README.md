@@ -1,6 +1,6 @@
 # Notification service
 
-Lumen 10 microservice. **Port:** 8006 Â· **Database:** `notification-db` (host port 5438) Â· **Health check:** `GET http://localhost:8006/api/health`
+Lumen 10 microservice. **Port:** 8006 · **Database:** `notification-db` (host port 5438) · **Health check:** `GET http://localhost:8006/api/health`
 
 User notifications.
 

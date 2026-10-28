@@ -1,6 +1,6 @@
 # Engagement service
 
-Lumen 10 microservice. **Port:** 8003 Â· **Database:** `engagement-db` (host port 5435) Â· **Health check:** `GET http://localhost:8003/api/health`
+Lumen 10 microservice. **Port:** 8003 · **Database:** `engagement-db` (host port 5435) · **Health check:** `GET http://localhost:8003/api/health`
 
 Ratings, reviews, watchlist, watch history, custom lists and moderation.
 

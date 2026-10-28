@@ -1,6 +1,6 @@
 # Social service
 
-Lumen 10 microservice. **Port:** 8004 Â· **Database:** `social-db` (host port 5436) Â· **Health check:** `GET http://localhost:8004/api/health`
+Lumen 10 microservice. **Port:** 8004 · **Database:** `social-db` (host port 5436) · **Health check:** `GET http://localhost:8004/api/health`
 
 Follows, profiles, privacy, activity feed, movie nights and chat rooms.
 
