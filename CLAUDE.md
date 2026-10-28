@@ -1,252 +1,77 @@
 # MoviePlatform – Project Guide for Claude Code
 
-Web2 course team project (Antonine University): a movie discovery and social platform.
-Team: **Maria**, **Joy**, **Joe**, **Tonio**.
-Full reference: `docs/MoviePlatform-Service-Reference.docx` · Git workflow: `docs/MoviePlatform-Git-Workflow-Guide.docx`.
-
----
-
-## 1. Architecture
-
-**Gateway (Laravel 12 MVC web app) + 6 Lumen 10 microservices.** Each service is a separate Lumen project (required by the course) with **its own PostgreSQL database**. The Gateway owns no business data. It only calls service APIs.
+Web2 course team project (Antonine University): a movie discovery and social platform. Team: **Maria**, **Joy**,
+**Joe**, **Tonio**. A **Laravel 12 Gateway** (web UI, owns no business data) calls **6 Lumen 10 microservices**
+(required by the course), each with **its own PostgreSQL database**. Every folder below has its own `CLAUDE.md` with
+the details for that part.
 
 | Component | Port | Owns | Owner |
 |---|---|---|---|
-| `gateway/` | 8000 | All UI (Blade + Livewire), session, admin dashboard UI | Joy (everyone builds their own pages) |
+| `gateway/` | 8000 | All UI (Blade + Livewire + Tailwind), session, admin dashboard UI | Joy (everyone builds their own pages) |
 | `services/identity` | 8001 | Users, auth, social login, roles, JWT issuing | Maria (social login: Joy) |
 | `services/catalog` | 8002 | TMDB integration, local movie DB, search, genres, people | Joy (search: Tonio · genres/people/caching: Maria · internal endpoints: Joe) |
 | `services/engagement` | 8003 | Ratings, reviews, watchlist, history, custom lists, moderation | Tonio |
 | `services/social` | 8004 | Follows, profiles, privacy, activity feed, movie nights, chat rooms | Maria (feed, movie nights) · Joe (follows, profiles, privacy, chat) |
 | `services/intelligence` | 8005 | Recommendations, sentiment, weather, calendar | Joe (recommendations: Maria) |
 | `services/notification` | 8006 | User notifications | Joe |
+| `packages/common` | – | Shared technical code (`secret()`, JWT guard and middleware, later events and health) | everyone |
 
-Infrastructure: **PostgreSQL 16** (one container per service, host ports 5433–5438), **RabbitMQ** (5672, UI 15672), **Redis** (6379, cache/sessions only), **Reverb** (8080, WebSockets).
+Infrastructure in Docker: one **PostgreSQL 16** per service (host ports 5433–5438), **RabbitMQ** (5672, UI 15672, via
+`php-amqplib`; never Laravel queue jobs between services),
+**Redis** (6379, cache and Gateway sessions, `predis` client, not for events). **Reverb** (8080) runs from the Gateway.
+Auth: **JWT RS256**, signed by Identity, verified in every service. PHP 8.2+ on each laptop.
 
-```
-MoviePlatform/
-├── gateway/
-├── services/{identity,catalog,engagement,social,intelligence,notification}/
-├── packages/common/ shared code (movieplatform/common), loaded by every project
-├── docs/            ERDs, architecture, api/<service>.md, events.md, sprints/
-├── docker/          config files for infrastructure containers
-├── secrets/         git-ignored – real secret values
-├── secrets.example/ committed – empty files with the expected names
-├── docker-compose.yml
-└── CLAUDE.md
-```
+## Golden rules (always follow)
 
----
-
-## 2. Tech stack
-
-- **Services: Lumen 10** (Laravel's micro-framework, Illuminate 10 components). **Gateway: Laravel 12** with **Blade + Livewire + Tailwind** (Lumen has no views, sessions or Livewire).
-- PHP 8.2+ on each laptop, extensions `pdo_pgsql` + `sockets`
-- **PostgreSQL 16**: use `jsonb`, `ILIKE` for case-insensitive search
-- **RabbitMQ** via `php-amqplib` for integration events (NOT Laravel queue jobs between services)
-- **Redis**: cache (TMDB, weather), Gateway sessions, one-time login codes. **Not for events.** Client: `predis` (`REDIS_CLIENT=predis`, no PHP extension needed).
-- **Laravel Reverb** + Echo for real time (chat, live votes, live notification bell)
-- **JWT RS256**: Identity signs with the private key, every service verifies with the public key
-- External APIs: TMDB, OpenWeatherMap, Hugging Face Inference API (sentiment), Leaflet + OpenStreetMap/Overpass (maps, browser-side), Laravel Socialite (Google/GitHub)
-
----
-
-## 3. Golden rules (always follow)
-
-1. **A service never reads or writes another service's database.** Get other data through that service's API or through events.
-2. **No foreign keys across services.** `user_id` = Identity `users.id`, `movie_id` = Catalog `movies.id` (never `tmdb_id`). Store them as plain `uuid` columns.
-3. **Validate inside each service**, even if the Gateway already validated. Lumen has no FormRequests: one request class per action in `Http/Requests` with a static `rules()`, used as `$data = $this->validate($request, StoreReviewRequest::rules());`.
+1. **A service never reads or writes another service's database.** Get other data through its API or through events.
+2. **No foreign keys across services.** `user_id` = Identity `users.id`, `movie_id` = Catalog `movies.id` (never `tmdb_id`), stored as plain `uuid` columns.
+3. **Validate inside each service**, even if the Gateway already validated (how: `docs/lumen.md`).
 4. **Never return raw models.** Always use API Resources.
-5. **Never hardcode or commit secrets.** Read them with `secret('name')` in config files only.
-6. **Contracts first.** If you change an endpoint or an event, update `docs/api/<service>.md` or `docs/events.md` in the same change, and tell the services that use it.
+5. **Never hardcode or commit secrets.** Values live only in `secrets/`, read with `secret('name')` in config files. `.env` holds non-secret settings only.
+6. **Contracts first.** Changing an endpoint or an event updates `docs/api/<service>.md` or `docs/events.md` in the same change, and the services that use it are told.
 7. **Graceful fallback.** If a service is down, the Gateway shows `<x-service-unavailable/>` for that section. The page never crashes.
-8. Code, comments, commits and docs are in **English**.
-9. **Don't repeat code.** Logic needed in more than one place goes in one reusable place: inside a service, a `Services/` class, trait or base class; across projects, `packages/common`. Share **technical** code only (helpers, middleware, event plumbing, health check). Never share business logic, models or database access between services: each service owns its domain.
+8. Code, commits and docs are in **English**.
+9. **Don't repeat code.** Reusable logic goes in one place: a `Services/` class, trait or base class inside a service; `packages/common` across projects. Share **technical** code only, never business logic, models or database access.
 
----
+## Where the rules are
 
-## 4. Service internal structure (identical in every service)
-
-```
-app/
-├── Http/
-│   ├── Controllers/Api/      thin: ~10 lines per method, no queries, no business logic
-│   ├── Requests/             validation rules (one class per action, static rules())
-│   ├── Resources/            JSON output = the "View" of an API
-│   └── Middleware/           service-specific only (jwt, admin, service, correlation come from packages/common)
-├── Models/                   Eloquent: relationships, casts, scopes
-├── Services/                 business logic lives here
-├── Policies/                 ownership / role checks
-├── Integration/
-│   ├── Events/               outgoing events (one class per event)
-│   ├── Handlers/             incoming event handlers (must be idempotent)
-│   ├── EventPublisher.php
-│   └── Clients/              the ONLY place making HTTP calls to other services / external APIs
-├── Console/Commands/         events:consume, events:replay-dlq, sync commands
-└── Exceptions/               JSON error rendering
-config/events.php             routing keys published / bound + handler map
-routes/api.php                grouped by middleware: jwt, admin, service
-```
-
-**Shared code** lives once in `packages/common` (`movieplatform/common`, namespace `MoviePlatform\Common`): the `secret()` helper and the `jwt` guard and middleware today, later the other middleware, EventPublisher, consumer and health check (see `packages/common/README.md`). Every project requires it through a Composer `path` repository, so never copy shared code into a service. A change there affects every project: run their tests. It must work in **both** Lumen 10 (services) and Laravel 12 (Gateway).
-
-**Lumen rules:** how to write service code in Lumen (routes, controllers, validation, models, Resources, policies, tests, what Lumen lacks) is in **`docs/lumen.md`**. Follow it in every service.
-
-**Request flow:** `routes/api.php → Middleware → Request rules → Controller → Policy → Service → Model → EventPublisher → Resource`
-
-### Gateway structure
-
-```
-app/Livewire/<Module>/         Auth, Catalog, Engagement, Social, Intelligence, Notifications, Admin
-app/Services/Clients/          BaseClient + one client per service (IdentityClient, CatalogClient, …)
-app/Services/Aggregators/      combine several services for one page (e.g. MoviePageAggregator)
-resources/views/components/    shared: x-movie-card, x-rating-stars, x-avatar, x-button, x-modal, x-empty-state, x-service-unavailable
-resources/views/livewire/<module>/
-resources/js/                  Echo (Reverb), Leaflet
-```
-
-**Gateway rule:** a Livewire component never calls `Http::` directly. Use a Client (or an Aggregator). Always reuse the shared Blade components and layout.
-
----
-
-## 5. Communication
-
-### REST (sync, request/response)
-- Gateway → service: `Authorization: Bearer <JWT>` from the session.
-- JWT claims: `sub` (user UUID), `role` (`user`|`admin`), `name`, `exp` (2h).
-- Service → service internal calls: header `X-Service-Token`, only on `/api/internal/*` routes.
-- Every call carries `X-Correlation-ID`.
-- `BaseClient`: 3s timeout, 2 retries, throws `ServiceUnavailable` on connection errors.
-
-### API conventions
-- JSON only. Errors: `{"message": "...", "errors": {"field": ["..."]}}` with 401/403/404/422/503.
-- Pagination: `{"data": [...], "meta": {"current_page", "last_page", "total"}}`.
-- Dates: ISO-8601 (UTC).
-- Every service exposes `GET /api/health`.
-
-### Events (async) – RabbitMQ
-- Topic exchange **`movieplatform.events`**. Routing key = event name in dot form (`review.created`).
-- One durable queue per service: `<service>.events`, plus a dead-letter queue `<service>.events.dlq`.
-- Each service declares the exchange, its own `<service>.events` queue, its DLQ and its bindings in code on startup (from `config/events.php`).
-- Envelope:
-  ```json
-  { "event": "ReviewCreated", "id": "uuid", "occurred_at": "2026-11-03T18:20:00Z",
-    "correlation_id": "uuid", "data": { } }
-  ```
-- Publish **after** the DB transaction commits. Handlers ack on success, retry 3×, then go to the DLQ.
-- Handlers are **idempotent**: skip event ids already in `processed_events`.
-
-| Event (routing key) | Publisher | Consumers |
-|---|---|---|
-| `user.registered` | Identity | Notification |
-| `user.genres_updated` | Identity | Intelligence |
-| `user.blocked` / `user.deleted` | Identity | Engagement, Social, Notification |
-| `movie.updated` | Catalog | Intelligence |
-| `rating.added` | Engagement | Intelligence, Social |
-| `review.created` / `review.updated` | Engagement | Intelligence, Social |
-| `movie.watched` | Engagement | Intelligence, Social |
-| `list.created` | Engagement | Social |
-| `review.analyzed` | Intelligence | Engagement |
-| `user.followed` | Social | Notification |
-| `movie_night.invite_sent` / `invite_answered` / `finalized` | Social | Notification |
-
-The exact payload fields are in `docs/events.md`. Follow them exactly.
-
-### Real time – Reverb
-- Social broadcasts `MessageSent` on `room.{id}` and `VotesUpdated` on `movie-night.{id}`.
-- Notification broadcasts `NotificationCreated` on `user.{id}`.
-- Private channels are authorized by the Gateway's `/broadcasting/auth`.
-
----
-
-## 6. Database conventions
-
-- PostgreSQL 16, **one container per service** (`identity-db`, `catalog-db`, …), each holding only that service's database and user (`identity_db` / `identity_user`, …).
-- The apps run on your PC and reach their database at `127.0.0.1`: identity 5433, catalog 5434, engagement 5435, social 5436, intelligence 5437, notification 5438.
-- **UUID primary keys everywhere**: `$table->uuid('id')->primary()` + the `HasUuids` trait on models (time-ordered UUIDs).
-- Inside a service: `$table->foreignUuid('user_id')->constrained()`. References to another service: plain `$table->uuid('movie_id')` (no FK).
-- Plural snake_case tables, `created_at`/`updated_at` everywhere.
-- Use `jsonb` (`$table->jsonb()`) for flexible data.
-- Every schema change comes as a migration, and the ERD in `docs/erd/` is updated in the same PR.
-
----
-
-## 7. Secrets and configuration
-
-- Secrets are **Docker secrets**, mounted at `/run/secrets/<name>`. Values live in the git-ignored `secrets/` folder.
-- Read them only in `config/*.php` with `secret('tmdb_api_key')`. Containers get them as Docker secrets; the apps on your PC read the **same files** from `secrets/` through `SECRETS_DIR` in `.env` (`../../secrets`, Gateway `../secrets`). `secrets/` is the only place a secret value lives: never put one in `.env`.
-- `.env` holds **non-secret** settings only (URLs, ports, DB names, `APP_DEBUG`).
-- Never print, log or commit secret values. Never add real keys to `.env.example` or `secrets.example/`.
-
----
-
-## 8. Running the project
-
-Docker runs only the infrastructure (databases, Redis, RabbitMQ). The apps run on your PC.
-
-```bash
-composer install                          # (repo root) installs packages/common, the Gateway and every service
-docker compose up -d                      # infrastructure: 6 databases, Redis, RabbitMQ
-docker compose ps                         # check health
-
-# in a service folder (identity → 8001 … notification → 8006), Lumen has no artisan serve
-php -S 127.0.0.1:8001 -t public           # the API
-php artisan migrate                       # migrations for that service
-php artisan db:seed
-php artisan events:consume                # event worker (separate terminal; consuming services only)
-php artisan events:replay-dlq
-vendor/bin/phpunit                        # tests
-
-# gateway/ (Laravel 12)
-php artisan serve --port=8000
-npm run dev                               # Tailwind / JS with hot reload
-```
-
-URLs: Gateway http://localhost:8000 · RabbitMQ UI http://localhost:15672 · services on ports 8001–8006.
-
-**Background processes start with their app, not in Docker.** Each project's `composer run dev` script (in its `composer.json`, using `npx concurrently`) starts the app **and** its background processes in one terminal, like a .NET API that hosts its own consumer:
-
-| Project | `composer run dev` starts |
+| Before you… | Read |
 |---|---|
-| engagement, social, intelligence, notification | `php -S 127.0.0.1:800X -t public` + `php artisan events:consume` |
-| identity, catalog | `php -S 127.0.0.1:800X -t public` (they only publish events) |
-| gateway | `php artisan serve --port=8000` + `php artisan reverb:start` + `npm run dev` |
+| write any service code | `docs/lumen.md` (structure, routes, validation, models, policies, tests) |
+| add or change an endpoint | `docs/api/conventions.md` and `docs/api/<service>.md` |
+| publish or consume an event | `docs/events.md` |
+| write a migration or a model | `docs/database.md` |
+| touch shared code | `packages/common/README.md` |
+| set up or run the project | `README.md` |
 
-Whoever adds `events:consume` or Reverb also adds it to that project's `dev` script (Lumen projects have none yet: add it). Never add worker or Reverb containers to `docker-compose.yml`. Remove `php artisan pail` from the Gateway's default `dev` script: it needs the `pcntl` extension, which does not exist on Windows.
+## Running
 
----
+Docker runs only the infrastructure (`docker compose up -d`). Services run with `php -S 127.0.0.1:800X -t public`, the
+Gateway with `php artisan serve --port=8000`. Background processes (`events:consume`, `reverb:start`) start from each
+project's `composer run dev` script, never as Docker containers. Details: `README.md`.
 
-## 9. Git workflow
+## Git workflow
 
-- Branches are created **from the Azure DevOps task** ("Create a GitHub branch"), always **based on `develop`**.
-- Branch names: `feature/<taskId>-short-name`, `fix/…`, `docs/…`, `chore/…`.
-- Commit messages include `AB#<taskId>`, e.g. `Add login form validation AB#1045`.
-- Pull requests target **`develop`** and their description ends with **`Fixes AB#<taskId>`**.
-- 1 approval from a member who owns a different service. Use **Squash and merge**, then delete the branch.
+- Branches are created from the Azure DevOps task, **based on `develop`**: `feature/<taskId>-short-name`, `fix/…`, `docs/…`, `chore/…`.
+- Commit messages include `AB#<taskId>`. Pull requests target `develop` and end with `Fixes AB#<taskId>`.
+- 1 approval from a member who owns a different service. Squash and merge (merge commit for chained branches), then delete the branch.
 - **Never push directly to `main` or `develop`.** `main` is updated only at the end of a sprint.
 
----
-
-## 10. Definition of done (check before opening a PR)
+## Definition of done (before opening a PR)
 
 - [ ] The task's "Done when" criteria in Azure Boards are met
-- [ ] Follows the service structure (Request rules, Services, Resources, Policies, Integration)
-- [ ] Inputs validated, ownership checked, no raw models returned
+- [ ] Follows `docs/lumen.md` (or `gateway/CLAUDE.md`); inputs validated, ownership checked, no raw models returned
 - [ ] Events match `docs/events.md`; handlers are idempotent
-- [ ] Gateway pages use the shared layout and components and handle a service being down
 - [ ] `docs/api/<service>.md`, `docs/events.md` or the ERD updated if something changed
-- [ ] No secrets, `.env`, `vendor/` or `node_modules/` committed
-- [ ] Runs with `docker compose up -d` + `php -S` (services) / `php artisan serve` (Gateway), see section 8
+- [ ] Tests pass; no secrets, `.env`, `vendor/` or `node_modules/` committed
 
----
+## Instructions for Claude
 
-## 11. Instructions for Claude
-
-- Before coding, **read the task description** (the user will paste it or give the Azure task id) and the relevant `docs/api/<service>.md` / `docs/events.md`. Before writing service code, read **`docs/lumen.md`**.
-- Work **only in the service the task belongs to**, plus its Gateway pages. If another service needs a change, say so instead of editing it silently.
+- Before coding, read the task (the user pastes it or gives the Azure task id) and the docs from "Where the rules are".
+- Work **only in the service the task belongs to**, plus its Gateway pages. If another service needs a change, say so instead of editing it.
 - **Never** add cross-service database queries or foreign keys, even as a "quick fix".
-- Follow the folder structure and naming above. Match the existing code style of the service.
-- Ask before changing an API contract, an event payload, `docker-compose.yml` or anything in `packages/common` (middleware, EventPublisher, consumer, `secret()`).
-- Prefer small, focused changes that fit one task and one pull request.
-- Before writing something, check whether it already exists in the service or in `packages/common`. If you are about to copy code, make it reusable instead (rule 9).
-- When you add or change an endpoint or event, update the docs in the same change.
+- Ask before changing an API contract, an event payload, `docker-compose.yml` or anything in `packages/common`.
+- Before writing something, check whether it already exists in the service or in `packages/common` (rule 9).
+- Follow the folder structure and naming, and match the existing code style of the service.
+- Prefer small changes that fit one task and one pull request. Update the docs in the same change.
 - Keep explanations short and suggest the commit message with `AB#<id>`.

@@ -63,6 +63,8 @@ Message properties: persistent (`delivery_mode` 2), `content_type: application/j
 - On success: ack. On failure: retry up to 3 times, then reject without requeue, so the message goes to the DLQ.
   `php artisan events:replay-dlq` moves dead letters back after a fix.
 - **Ignore fields you don't know.** That is what makes adding a field safe.
+- The `events:consume` worker starts from the service's `composer run dev` script, next to its `php -S` server.
+  Never as a Docker container.
 
 **Changing a contract**
 
