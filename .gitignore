@@ -5,6 +5,7 @@
 .env
 vendor/
 node_modules/
+**/bootstrap/cache/*.php
 
 # OS / IDE
 .DS_Store
