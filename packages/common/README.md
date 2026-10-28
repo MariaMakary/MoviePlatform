@@ -32,6 +32,27 @@ are picked up by every project without copying files.
 | `src/Auth/JwtUser.php` | The authenticated user from the token: `id`, `role`, `name`, `isAdmin()`. |
 | `config/jwt.php` | `public_key_path` (`JWT_PUBLIC_KEY_PATH`) and `leeway` defaults, merged with the project's own `config/jwt.php`. |
 | `config/internal.php` | `service_token`, read with `secret('service_token')` (file `secrets/service_token`, the same value in every service). |
+| `src/Integration/EventPublisher.php` | `publish($routingKey, $data)`: wraps `$data` in the envelope of `docs/events.md` (`event` built from the routing key, new `id`, `occurred_at` in UTC) and sends it, persistent, to the `movieplatform.events` exchange. Returns the envelope. |
+| `src/Integration/RabbitMqConnection.php` | One connection per process, opened on first use; declares the exchange (topic, durable). Shared by the publisher and the consumer. |
+| `config/rabbitmq.php` | `host` and `port` (`RABBITMQ_HOST`, `RABBITMQ_PORT`), `user` and `password` from `secret('rabbitmq_user')` and `secret('rabbitmq_password')`, `exchange`. |
+
+## Publishing an event
+
+Publish **after** the transaction commits, so an event never describes data that was rolled back. The payload is
+exactly the one in `docs/events.md`.
+
+```php
+$user = DB::transaction(fn () => User::create($validated));
+
+$this->events->publish('user.registered', [
+    'user_id' => $user->id,
+    'name' => $user->name,
+    'email' => $user->email,
+]);
+```
+
+`$this->events` is an `EventPublisher` injected in the constructor. PHP's `sockets` extension must be enabled
+(`README.md`, Requirements).
 
 ## Rules
 
