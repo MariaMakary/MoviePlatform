@@ -15,9 +15,9 @@ exactly these fields.
 
 | Queue | Bound routing keys |
 |---|---|
-| `engagement.events` | `user.blocked`, `user.deleted`, `review.analyzed` |
-| `social.events` | `user.blocked`, `user.deleted`, `rating.added`, `review.created`, `review.updated`, `movie.watched`, `list.created` |
-| `intelligence.events` | `user.genres_updated`, `movie.updated`, `rating.added`, `review.created`, `review.updated`, `movie.watched` |
+| `engagement.events` | `user.blocked`, `user.unblocked`, `user.deleted`, `movie.deleted`, `review.analyzed` |
+| `social.events` | `user.blocked`, `user.unblocked`, `user.deleted`, `movie.deleted`, `rating.added`, `review.created`, `review.updated`, `movie.watched`, `list.created` |
+| `intelligence.events` | `user.genres_updated`, `movie.updated`, `movie.deleted`, `rating.added`, `review.created`, `review.updated`, `movie.watched` |
 | `notification.events` | `user.registered`, `user.blocked`, `user.deleted`, `user.followed`, `movie_night.invite_sent`, `movie_night.invite_answered`, `movie_night.finalized` |
 
 Dead letters: each `<service>.events` queue is declared with `x-dead-letter-exchange: ""` and
@@ -81,8 +81,10 @@ Message properties: persistent (`delivery_mode` 2), `content_type: application/j
 | [UserRegistered](#userregistered) | `user.registered` | Identity | Notification |
 | [UserGenresUpdated](#usergenresupdated) | `user.genres_updated` | Identity | Intelligence |
 | [UserBlocked](#userblocked) | `user.blocked` | Identity | Engagement, Social, Notification |
+| [UserUnblocked](#userunblocked) | `user.unblocked` | Identity | Engagement, Social |
 | [UserDeleted](#userdeleted) | `user.deleted` | Identity | Engagement, Social, Notification |
 | [MovieUpdated](#movieupdated) | `movie.updated` | Catalog | Intelligence |
+| [MovieDeleted](#moviedeleted) | `movie.deleted` | Catalog | Engagement, Social, Intelligence |
 | [RatingAdded](#ratingadded) | `rating.added` | Engagement | Intelligence, Social |
 | [ReviewCreated](#reviewcreated) | `review.created` | Engagement | Intelligence, Social |
 | [ReviewUpdated](#reviewupdated) | `review.updated` | Engagement | Intelligence, Social |
@@ -125,8 +127,21 @@ Message properties: persistent (`delivery_mode` 2), `content_type: application/j
 
 #### UserBlocked
 
-`user.blocked` · an admin blocked the user · → Engagement (hide their reviews), Social (hide their activity),
-Notification (stop sending to them)
+`user.blocked` · an admin blocked the user · → Engagement (set `author_blocked` on their reviews and lists), Social (hide their
+activity), Notification (stop sending to them)
+
+| Field | Type | Notes |
+|---|---|---|
+| `user_id` | uuid | |
+
+```json
+{"user_id": "0193a7c0-1111-7aaa-8bbb-000000000001"}
+```
+
+#### UserUnblocked
+
+`user.unblocked` · an admin unblocked the user · → Engagement (clear `author_blocked` on their reviews and lists; reviews an admin
+hid with `is_hidden` stay hidden), Social (show their activity again)
 
 | Field | Type | Notes |
 |---|---|---|
@@ -165,6 +180,20 @@ Notification (stop sending to them)
 
 ```json
 {"movie_id": "0193a7c1-3333-7aaa-8bbb-000000000100", "title": "Inception", "release_date": "2010-07-16", "genre_ids": ["0193a7b0-2222-7aaa-8bbb-000000000010"], "person_ids": ["0193a7b5-4444-7aaa-8bbb-000000000200"]}
+```
+
+#### MovieDeleted
+
+`movie.deleted` · an admin deleted a movie from the local database · → Engagement (remove its ratings, reviews,
+watchlist and history entries and list items), Social (remove its chat room and messages, open shortlist candidates
+and feed entries), Intelligence (remove it from recommendations and taste profiles)
+
+| Field | Type | Notes |
+|---|---|---|
+| `movie_id` | uuid | Catalog `movies.id` of the deleted movie |
+
+```json
+{"movie_id": "0193a7c1-3333-7aaa-8bbb-000000000100"}
 ```
 
 ### Engagement

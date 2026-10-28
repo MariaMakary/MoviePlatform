@@ -6,7 +6,7 @@ TMDB integration, the local movie database, search, genres and people.
 
 ## Events
 
-- Publishes: `movie.updated`
+- Publishes: `movie.updated`, `movie.deleted`
 - Consumes: nothing
 
 Payloads and rules: `docs/events.md`.
@@ -20,7 +20,7 @@ Payloads and rules: `docs/events.md`.
 ## Before coding
 
 Read `docs/lumen.md` (how to write Lumen code here), `docs/api/catalog.md` (this service's endpoints),
-`docs/database.md` and the ERD in `docs/erd/`.
+`docs/database.md` and its ERD in `docs/erd/catalog-erd.drawio`.
 
 ## Running
 

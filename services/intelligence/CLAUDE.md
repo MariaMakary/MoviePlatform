@@ -7,7 +7,7 @@ Recommendations, review sentiment, weather and calendar.
 ## Events
 
 - Publishes: `review.analyzed`
-- Consumes: `user.genres_updated`, `movie.updated`, `rating.added`, `review.created`, `review.updated`, `movie.watched`
+- Consumes: `user.genres_updated`, `movie.updated`, `movie.deleted`, `rating.added`, `review.created`, `review.updated`, `movie.watched`
 
 Payloads and rules: `docs/events.md`.
 
@@ -19,7 +19,7 @@ Payloads and rules: `docs/events.md`.
 ## Before coding
 
 Read `docs/lumen.md` (how to write Lumen code here), `docs/api/intelligence.md` (this service's endpoints),
-`docs/database.md` and the ERD in `docs/erd/`.
+`docs/database.md` and its ERD in `docs/erd/intelligence-erd.drawio`.
 
 ## Running
 

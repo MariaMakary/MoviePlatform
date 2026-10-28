@@ -37,10 +37,11 @@ Auth: **JWT RS256**, signed by Identity, verified in every service. PHP 8.2+ on 
 
 | Before you… | Read |
 |---|---|
+| need the big picture (every service's role, tables, endpoints, events) | `docs/MoviePlatform-Service-Reference.docx` |
 | write any service code | `docs/lumen.md` (structure, routes, validation, models, policies, tests) |
 | add or change an endpoint | `docs/api/conventions.md` and `docs/api/<service>.md` |
 | publish or consume an event | `docs/events.md` |
-| write a migration or a model | `docs/database.md` |
+| write a migration or a model | `docs/database.md` and the service's ERD in `docs/erd/<service>-erd.drawio` |
 | touch shared code | `packages/common/README.md` |
 | set up or run the project | `README.md` |
 
