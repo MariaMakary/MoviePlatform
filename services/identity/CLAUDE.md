@@ -6,7 +6,7 @@ Users, authentication, social login (Google/GitHub), roles and JWT issuing.
 
 ## Events
 
-- Publishes: `user.registered`, `user.genres_updated`, `user.blocked`, `user.deleted`
+- Publishes: `user.registered`, `user.genres_updated`, `user.blocked`, `user.unblocked`, `user.deleted`
 - Consumes: nothing
 
 Payloads and rules: `docs/events.md`.
@@ -20,7 +20,7 @@ Payloads and rules: `docs/events.md`.
 ## Before coding
 
 Read `docs/lumen.md` (how to write Lumen code here), `docs/api/identity.md` (this service's endpoints),
-`docs/database.md` and the ERD in `docs/erd/`.
+`docs/database.md` and its ERD in `docs/erd/identity-erd.drawio`.
 
 ## Running
 

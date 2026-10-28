@@ -18,7 +18,12 @@ Rules for every service's database, migrations and models.
 - Inside a service: `$table->foreignUuid('user_id')->constrained()`.
 - References to another service's data: a plain `$table->uuid('movie_id')`, **never a foreign key**. `user_id` always
   means Identity `users.id`, `movie_id` always means Catalog `movies.id` (never `tmdb_id`).
-- Plural snake_case table names, `created_at` / `updated_at` on every table.
+- Plural snake_case table names. Every table has `created_at` / `updated_at` (`$table->timestamps()`), named exactly
+  that (not `added_at`). Exceptions: rows that are never updated (follows, activities, messages, processed_events,
+  pure pivot tables like `movie_genre`) may keep only `created_at` or their own time column
+  (`watched_at`, `processed_at`).
+- CHECK constraints, UNIQUE keys and the important indexes are written in the **"Constraints & indexes"** box of the
+  service's ERD, and implemented in the migration.
 - Flexible data in `jsonb` (`$table->jsonb('settings')`). Case-insensitive search with `ILIKE`.
 
 ## Changing the schema

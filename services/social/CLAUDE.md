@@ -7,7 +7,7 @@ Follows, profiles, privacy, the activity feed, movie nights and chat rooms.
 ## Events
 
 - Publishes: `user.followed`, `movie_night.invite_sent`, `movie_night.invite_answered`, `movie_night.finalized`
-- Consumes: `user.blocked`, `user.deleted`, `rating.added`, `review.created`, `review.updated`, `movie.watched`, `list.created`
+- Consumes: `user.blocked`, `user.unblocked`, `user.deleted`, `movie.deleted`, `rating.added`, `review.created`, `review.updated`, `movie.watched`, `list.created`
 
 Payloads and rules: `docs/events.md`.
 
@@ -19,7 +19,7 @@ Payloads and rules: `docs/events.md`.
 ## Before coding
 
 Read `docs/lumen.md` (how to write Lumen code here), `docs/api/social.md` (this service's endpoints),
-`docs/database.md` and the ERD in `docs/erd/`.
+`docs/database.md` and its ERD in `docs/erd/social-erd.drawio`.
 
 ## Running
 
