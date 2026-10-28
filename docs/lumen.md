@@ -4,6 +4,31 @@ The 6 services are **Lumen 10** projects (required by the course). The Gateway i
 parts removed: Eloquent, routing, validation and the container are the same code, but setup is manual and some tools
 are missing. Follow these rules so every service is built the same way.
 
+## 0. Folder structure (identical in every service)
+
+```
+app/
+├── Http/
+│   ├── Controllers/Api/      thin: ~10 lines per method, no queries, no business logic
+│   ├── Requests/             validation rules (one class per action, static rules())
+│   ├── Resources/            JSON output = the "View" of an API
+│   └── Middleware/           service-specific only (jwt, admin, service, correlation come from packages/common)
+├── Models/                   Eloquent: relationships, casts, scopes
+├── Services/                 business logic lives here
+├── Policies/                 ownership / role checks
+├── Integration/
+│   ├── Events/               outgoing events (one class per event)
+│   ├── Handlers/             incoming event handlers (must be idempotent)
+│   └── Clients/              the ONLY place making HTTP calls to other services / external APIs
+├── Console/Commands/         service-specific commands (sync jobs, …)
+└── Exceptions/               JSON error rendering (uses packages/common)
+config/events.php             routing keys published / bound + handler map
+routes/api.php                grouped by middleware: jwt, admin, service
+```
+
+**Request flow:** `routes/api.php → Middleware → Request rules → Controller → Policy → Service → Model →
+EventPublisher (after commit) → Resource`
+
 ## 1. What Lumen does not have
 
 | Missing | Use instead |
