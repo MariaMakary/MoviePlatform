@@ -18,8 +18,7 @@ resources/js/                  Echo (Reverb), Leaflet
 ## Rules
 
 - A Livewire component **never calls `Http::` directly**: it uses a Client or an Aggregator.
-- Clients send the session's JWT (`Authorization: Bearer`) and `X-Correlation-ID`, with a 3-second timeout and
-  2 retries, and throw `ServiceUnavailable` when a service is down (`docs/api/conventions.md`, section 10).
+- Clients send the session's JWT (`Authorization: Bearer`), with a 3-second timeout and 2 retries for `GET` only, and throw `ServiceUnavailable` when a service is down (`docs/api/conventions.md`, section 10).
 - **Graceful fallback:** a section whose service is down shows `<x-service-unavailable/>`; the page never crashes.
 - Always reuse the shared layout and Blade components. Escape output with `{{ }}`, never `{!! !!}` with user input.
 

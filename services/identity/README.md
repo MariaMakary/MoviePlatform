@@ -1,6 +1,6 @@
 # Identity service
 
-Lumen 10 microservice. **Port:** 8001 Â· **Database:** `identity-db` (host port 5433) Â· **Health check:** `GET http://localhost:8001/api/health`
+Lumen 10 microservice. **Port:** 8001 · **Database:** `identity-db` (host port 5433) · **Health check:** `GET http://localhost:8001/api/health`
 
 Users, authentication, social login (Google/GitHub), roles and JWT issuing (RS256).
 
