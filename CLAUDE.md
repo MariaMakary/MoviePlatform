@@ -170,7 +170,7 @@ The exact payload fields are in `docs/events.md`. Follow them exactly.
 ## 7. Secrets and configuration
 
 - Secrets are **Docker secrets**, mounted at `/run/secrets/<name>`. Values live in the git-ignored `secrets/` folder.
-- Read them only in `config/*.php` with `secret('tmdb_api_key')`. It falls back to `.env` outside Docker.
+- Read them only in `config/*.php` with `secret('tmdb_api_key')`. Containers get them as Docker secrets; the apps on your PC read the **same files** from `secrets/` through `SECRETS_DIR` in `.env` (`../../secrets`, Gateway `../secrets`). `secrets/` is the only place a secret value lives: never put one in `.env`.
 - `.env` holds **non-secret** settings only (URLs, ports, DB names, `APP_DEBUG`).
 - Never print, log or commit secret values. Never add real keys to `.env.example` or `secrets.example/`.
 

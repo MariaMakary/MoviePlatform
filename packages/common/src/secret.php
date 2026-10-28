@@ -1,17 +1,15 @@
 <?php
 
 if (! function_exists('secret')) {
-    /**
-     * Read a Docker secret: the trimmed content of /run/secrets/<name>.
-     *
-     * Falls back to env('<NAME>') when the file is missing or empty, so the app also runs
-     * without Docker. SECRETS_DIR overrides the folder (used by the tests).
-     *
-     * Only call this from config/*.php files, so `php artisan config:cache` keeps working.
-     */
     function secret(string $name, mixed $default = null): mixed
     {
-        $path = rtrim(env('SECRETS_DIR', '/run/secrets'), '/\\').DIRECTORY_SEPARATOR.$name;
+        $dir = rtrim(env('SECRETS_DIR', '/run/secrets'), '/\\');
+
+        if (! preg_match('#^([a-zA-Z]:)?[/\\\\]#', $dir)) {
+            $dir = (function_exists('base_path') ? base_path() : getcwd()).DIRECTORY_SEPARATOR.$dir;
+        }
+
+        $path = $dir.DIRECTORY_SEPARATOR.$name;
 
         if (is_file($path) && is_readable($path)) {
             $value = trim((string) file_get_contents($path));

@@ -53,4 +53,21 @@ class SecretTest extends TestCase
     {
         $this->assertSame('fallback', secret('test_secret', 'fallback'));
     }
+
+    public function test_resolves_a_relative_secrets_dir_from_the_project_folder(): void
+    {
+        $project = $this->dir.DIRECTORY_SEPARATOR.'project';
+        mkdir($project);
+        file_put_contents($this->dir.DIRECTORY_SEPARATOR.'test_secret', 'from-repo-secrets');
+        $_SERVER['SECRETS_DIR'] = '..';
+        $cwd = getcwd();
+        chdir($project);
+
+        try {
+            $this->assertSame('from-repo-secrets', secret('test_secret'));
+        } finally {
+            chdir($cwd);
+            rmdir($project);
+        }
+    }
 }

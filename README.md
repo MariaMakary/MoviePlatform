@@ -60,9 +60,8 @@ foreach ($p in "gateway","services/identity","services/catalog","services/engage
 }
 ```
 
-Then, in each **service's** `.env`, set the database password to the same value as its secret file, e.g.
-`IDENTITY_DB_PASSWORD=` ← content of `secrets/identity_db_password`. (The database container reads the secret file;
-the app runs outside Docker, so `secret()` falls back to `.env`.)
+No passwords go in `.env`: the apps read them from `secrets/` (`SECRETS_DIR` in `.env` points there), the same
+files the database and RabbitMQ containers use.
 
 **4. Start the infrastructure and run the migrations.**
 
