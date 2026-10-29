@@ -60,6 +60,9 @@ Message properties: persistent (`delivery_mode` 2), `content_type: application/j
 - Handlers are **idempotent**: an envelope `id` already in `processed_events` is acknowledged and skipped.
 - On success: ack. On failure: retry up to 3 times, then reject without requeue, so the message goes to the DLQ.
   `php artisan events:replay-dlq` moves dead letters back after a fix.
+- An event with no handler in `config/events.php` is acknowledged and skipped. A message that is not valid JSON or has
+  no uuid `id` goes straight to the DLQ, without retries.
+- How to write a handler: `packages/common/README.md`, "Consuming an event".
 - **Ignore fields you don't know.** That is what makes adding a field safe.
 - The `events:consume` worker starts from the service's `composer run dev` script, next to its `php -S` server.
   Never as a Docker container.

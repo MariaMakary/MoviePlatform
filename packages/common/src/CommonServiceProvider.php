@@ -8,10 +8,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Lumen\Routing\Controller as LumenController;
 use MoviePlatform\Common\Auth\JwtDecoder;
+use MoviePlatform\Common\Console\ConsumeEvents;
+use MoviePlatform\Common\Console\ReplayDeadLetters;
 use MoviePlatform\Common\Exceptions\JsonExceptionRenderer;
 use MoviePlatform\Common\Http\Middleware\EnsureAdmin;
 use MoviePlatform\Common\Http\Middleware\VerifyJwt;
 use MoviePlatform\Common\Http\Middleware\VerifyServiceToken;
+use MoviePlatform\Common\Integration\EventConsumer;
 use MoviePlatform\Common\Integration\RabbitMqConnection;
 use RuntimeException;
 use UnexpectedValueException;
@@ -34,6 +37,13 @@ class CommonServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/health.php', 'health');
 
         $this->app->singleton(RabbitMqConnection::class, fn () => new RabbitMqConnection(config('rabbitmq')));
+
+        $this->app->singleton(EventConsumer::class, fn ($app) => new EventConsumer(
+            $app->make(RabbitMqConnection::class),
+            $app->make('db')->connection(),
+            $app,
+            (array) config('events'),
+        ));
 
         $this->app->singleton(JwtDecoder::class, function () {
             $path = config('jwt.public_key_path');
@@ -71,6 +81,11 @@ class CommonServiceProvider extends ServiceProvider
             'admin' => EnsureAdmin::class,
             'service' => VerifyServiceToken::class,
         ];
+
+        if (config('events.queue')) {
+            $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+            $this->commands([ConsumeEvents::class, ReplayDeadLetters::class]);
+        }
 
         if ($this->isLumen()) {
             $this->app->routeMiddleware($middleware);

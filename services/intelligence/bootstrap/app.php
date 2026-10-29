@@ -27,6 +27,7 @@ $app->singleton(
 );
 
 $app->configure('app');
+$app->configure('events');
 
 $app->register(MoviePlatform\Common\CommonServiceProvider::class);
 
