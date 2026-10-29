@@ -4,5 +4,5 @@
         <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"/>
     </svg>
     <input id="search-{{ $searchId }}" type="search" name="q" placeholder="Search movies, people…" autocomplete="off"
-           class="w-full rounded-lg border border-white/10 bg-white/5 py-2 pr-3 pl-9 text-sm text-gray-100 placeholder:text-gray-500 focus:border-amber-400/60 focus:ring-2 focus:ring-amber-400/30 focus:outline-none">
+           class="w-full rounded-lg border border-white/10 bg-white/5 py-2 pr-3 pl-9 text-sm text-gray-100 placeholder:text-gray-500 focus:border-cerulean focus:ring-2 focus:ring-cerulean/40 focus:outline-none">
 </form>

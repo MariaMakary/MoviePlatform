@@ -13,7 +13,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
-<body class="flex min-h-full flex-col bg-gray-950 font-sans text-gray-100 antialiased">
+<body class="flex min-h-full flex-col bg-jet font-sans text-gray-100 antialiased">
     @include('layouts.partials.navigation')
 
     <main class="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
