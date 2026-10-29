@@ -105,4 +105,4 @@ docker compose down                        # remove the containers (data is kept
 docker compose down -v                     # remove the containers AND all data (fresh start)
 ```
 
-Inside a service folder: `php artisan migrate`, `vendor/bin/phpunit` (tests). Inside `gateway/`: `php artisan test`.
+Inside a service folder: `php artisan migrate`, `vendor/bin/phpunit` (tests). The Gateway has no automated tests: its pages are checked by hand.
