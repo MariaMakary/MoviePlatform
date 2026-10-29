@@ -39,6 +39,8 @@ are picked up by every project without copying files.
 | `src/Testing/FakesHealthDependencies.php` | Test trait: `fakeDatabase(bool $up)` (in-memory SQLite, or a missing file) and `fakeBroker(bool $up)`, so health tests need no Postgres or RabbitMQ. |
 | `config/health.php` | `service` (`SERVICE_NAME`, default: the project folder name) and the per-check `timeout` (2 s). |
 | `config/rabbitmq.php` | `host`, `port` and `vhost` (`RABBITMQ_HOST`, `RABBITMQ_PORT`, `RABBITMQ_VHOST`), `user` and `password` from `secret('rabbitmq_user')` and `secret('rabbitmq_password')` (empty when the file is missing, never a default), `exchange`. Used by the publisher, the consumer and the health check. |
+| `src/Exceptions/JsonExceptionRenderer.php` | Turns any exception into the error JSON of `docs/api/conventions.md`, section 6: 401, 403, 404 (`"<Model> not found."` for `findOrFail`), 405, 422 with `errors`, any `HttpException` with its status and message, everything else `500 {"message": "Server error."}`. Every service's `app/Exceptions/Handler.php` calls it. In Lumen, the provider also hooks `Controller::buildResponseUsing()` so `$this->validate()` returns `message` + `errors`. |
+| `src/Http/Resources/PaginatedCollection.php` | List responses: `PaginatedCollection::fromQuery($query, XyzResource::class, $request)` gives `{"data": […], "meta": {current_page, last_page, total}}`, reading `?page` and `?per_page` (default 20, max 100). |
 
 ## Publishing an event
 
