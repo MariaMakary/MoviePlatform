@@ -72,7 +72,7 @@ When you add:
 ```php
 <?php
 
-$router->get('/health', fn () => response()->json(['status' => 'ok', 'service' => 'engagement']));
+$router->get('/health', '\MoviePlatform\Common\Http\Controllers\HealthController');
 
 $router->get('/movies/{movieId}/reviews', 'Api\ReviewController@index');
 

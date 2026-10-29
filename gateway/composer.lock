@@ -2212,11 +2212,12 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/common",
-                "reference": "dad2348e04c500b0d88b4e572039d2a3bc038522"
+                "reference": "66e1819519ac8024deaecc90bc6398ede7cae684"
             },
             "require": {
                 "firebase/php-jwt": "^7.2",
                 "illuminate/auth": "^10.0|^12.0",
+                "illuminate/database": "^10.0|^12.0",
                 "illuminate/http": "^10.0|^12.0",
                 "illuminate/routing": "^10.0|^12.0",
                 "illuminate/support": "^10.0|^12.0",
@@ -2257,7 +2258,7 @@
             "license": [
                 "proprietary"
             ],
-            "description": "Code shared by the MoviePlatform Gateway and services (secret() helper, and later middleware, events, health check).",
+            "description": "Code shared by the MoviePlatform Gateway and services (secret() helper, JWT and service-token middleware, health check, and later events).",
             "transport-options": {
                 "relative": true
             }
