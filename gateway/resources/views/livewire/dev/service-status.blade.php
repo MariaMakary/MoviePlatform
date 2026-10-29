@@ -24,7 +24,11 @@
                 @else
                     <dl class="flex flex-wrap gap-2 text-xs">
                         @foreach ($status ?? [] as $key => $value)
-                            <div class="rounded-md bg-cerulean/15 px-2 py-1 text-sky-100">
+                            <div @class([
+                                'rounded-md px-2 py-1',
+                                'bg-neon-rose/15 text-pink-100' => in_array($value, ['fail', 'degraded'], true),
+                                'bg-cerulean/15 text-sky-100' => ! in_array($value, ['fail', 'degraded'], true),
+                            ])>
                                 <dt class="inline text-gray-400">{{ $key }}</dt>
                                 <dd class="inline font-semibold">{{ is_scalar($value) ? $value : json_encode($value) }}</dd>
                             </div>

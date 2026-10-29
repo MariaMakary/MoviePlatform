@@ -28,7 +28,7 @@ abstract class BaseClient
 
     public function health(): ?array
     {
-        return $this->send('GET', '/api/health', [], retry: false);
+        return $this->send('GET', '/api/health', [], retry: false, accept: [503]);
     }
 
     protected function get(string $path, array $query = []): ?array
@@ -56,7 +56,7 @@ abstract class BaseClient
         return $this->send('DELETE', $path, ['json' => $data]);
     }
 
-    private function send(string $method, string $path, array $options, bool $retry = false): ?array
+    private function send(string $method, string $path, array $options, bool $retry = false, array $accept = []): ?array
     {
         try {
             $response = $this->request($retry)->send($method, $path, $options);
@@ -64,7 +64,7 @@ abstract class BaseClient
             throw $this->unavailable($method, $path, $e);
         }
 
-        if ($response->successful()) {
+        if ($response->successful() || (in_array($response->status(), $accept, true) && is_array($response->json()))) {
             return $response->status() === 204 ? null : $response->json();
         }
 

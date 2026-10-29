@@ -31,6 +31,9 @@ resources/js/                  Echo (Reverb), Leaflet
   | 422 | `ValidationException`: errors show under the form fields (`@error('score')`) |
   | other 4xx | `ServiceRequestException` (status + the service's message; renders the 403/404 page) |
   | no connection or 5xx | `ServiceUnavailable` (logged as a warning) |
+
+  Exception: `health()` returns the body of a `503` too (`status: degraded` and the part that failed), so the admin
+  dashboard can show what is wrong; only a connection error throws.
 - **Graceful fallback:** a section whose service is down shows `<x-service-unavailable/>`; the page never crashes.
   In a Livewire component, `use WithServiceFallback` and load data **in `render()`** (so "Try again" reloads it):
 
