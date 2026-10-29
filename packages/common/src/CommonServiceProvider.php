@@ -20,11 +20,15 @@ class CommonServiceProvider extends ServiceProvider
         if ($this->isLumen()) {
             $this->app->configure('jwt');
             $this->app->configure('internal');
+            $this->app->configure('rabbitmq');
+            $this->app->configure('health');
             $this->app->configure('auth');
         }
 
         $this->mergeConfigFrom(__DIR__.'/../config/jwt.php', 'jwt');
         $this->mergeConfigFrom(__DIR__.'/../config/internal.php', 'internal');
+        $this->mergeConfigFrom(__DIR__.'/../config/rabbitmq.php', 'rabbitmq');
+        $this->mergeConfigFrom(__DIR__.'/../config/health.php', 'health');
 
         $this->app->singleton(JwtDecoder::class, function () {
             $path = config('jwt.public_key_path');

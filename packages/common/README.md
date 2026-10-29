@@ -32,6 +32,11 @@ are picked up by every project without copying files.
 | `src/Auth/JwtUser.php` | The authenticated user from the token: `id`, `role`, `name`, `isAdmin()`. |
 | `config/jwt.php` | `public_key_path` (`JWT_PUBLIC_KEY_PATH`) and `leeway` defaults, merged with the project's own `config/jwt.php`. |
 | `config/internal.php` | `service_token`, read with `secret('service_token')` (file `secrets/service_token`, the same value in every service). |
+| `src/Http/Controllers/HealthController.php` | `GET /api/health` (route it with `'\MoviePlatform\Common\Http\Controllers\HealthController'` in Lumen): `200` when everything is ok, `503` otherwise, body `{status, service, database, rabbitmq}` (`docs/api/conventions.md` §9). |
+| `src/Health/HealthCheck.php` | Runs the checks: `select 1` on a temporary copy of the default database connection, then an AMQP connect and close (`AmqpConnector`). Each check times out after 2 s; a failure answers `fail` and logs the real error (class and message only, no stack trace) as a warning, never in the response. |
+| `src/Testing/FakesHealthDependencies.php` | Test trait: `fakeDatabase(bool $up)` (in-memory SQLite, or a missing file) and `fakeBroker(bool $up)`, so health tests need no Postgres or RabbitMQ. |
+| `config/rabbitmq.php` | `host`, `port`, `vhost` (`RABBITMQ_HOST`, `RABBITMQ_PORT`, `RABBITMQ_VHOST`), `user` and `password` read with `secret('rabbitmq_user')` and `secret('rabbitmq_password')`. |
+| `config/health.php` | `service` (`SERVICE_NAME`, default: the project folder name) and the per-check `timeout` (2 s). |
 
 ## Rules
 
