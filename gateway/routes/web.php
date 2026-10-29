@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Dev\ServiceStatus;
 use App\Livewire\Home;
 use Illuminate\Support\Facades\Route;
 
@@ -10,3 +11,5 @@ Route::get('/dev/components', function () {
 
     return view('dev.components', ['title' => 'Components']);
 })->name('dev.components');
+
+Route::get('/dev/services', ServiceStatus::class)->name('dev.services');
