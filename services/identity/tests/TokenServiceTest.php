@@ -44,7 +44,7 @@ class TokenServiceTest extends TestCase
         $this->assertSame('0193a7c0-1111-7aaa-8bbb-000000000001', $claims->sub);
         $this->assertSame('admin', $claims->role);
         $this->assertSame('Maria Makary', $claims->name);
-        $this->assertSame(7200, $claims->exp - $claims->iat);
+        $this->assertSame(1800, $claims->exp - $claims->iat);
         $this->assertEqualsWithDelta(time(), $claims->iat, 5);
     }
 

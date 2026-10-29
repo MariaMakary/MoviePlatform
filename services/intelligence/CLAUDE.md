@@ -1,13 +1,13 @@
 # Intelligence service
 
-Lumen 10 service on port **8005**. Database: `intelligence-db` (`intelligence_db`, host port 5437). Owner: Joe (recommendations: Maria).
+Lumen 10 service on port **8005**. Database: `intelligence-db` (`intelligence_db`, host port 5437). Owner: Joe.
 
 Recommendations, review sentiment, weather and calendar.
 
 ## Events
 
 - Publishes: `review.analyzed`
-- Consumes: `user.genres_updated`, `movie.updated`, `movie.deleted`, `rating.added`, `review.created`, `review.updated`, `movie.watched`
+- Consumes: `user.genres_updated`, `user.deleted`, `movie.deleted`, `rating.added`, `review.created`, `review.updated`, `movie.watched`
 
 Payloads and rules: `docs/events.md`.
 

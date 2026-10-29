@@ -1,12 +1,12 @@
 # Catalog service
 
-Lumen 10 service on port **8002**. Database: `catalog-db` (`catalog_db`, host port 5434). Owner: Joy (search: Tonio · genres/people/caching: Maria · internal endpoints: Joe).
+Lumen 10 service on port **8002**. Database: `catalog-db` (`catalog_db`, host port 5434). Owner: Joy.
 
 TMDB integration, the local movie database, search, genres and people.
 
 ## Events
 
-- Publishes: `movie.updated`, `movie.deleted`
+- Publishes: `movie.deleted`
 - Consumes: nothing
 
 Payloads and rules: `docs/events.md`.

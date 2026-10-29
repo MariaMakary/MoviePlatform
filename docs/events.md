@@ -17,8 +17,8 @@ exactly these fields.
 |---|---|
 | `engagement.events` | `user.blocked`, `user.unblocked`, `user.deleted`, `movie.deleted`, `review.analyzed` |
 | `social.events` | `user.blocked`, `user.unblocked`, `user.deleted`, `movie.deleted`, `rating.added`, `review.created`, `review.updated`, `movie.watched`, `list.created` |
-| `intelligence.events` | `user.genres_updated`, `movie.updated`, `movie.deleted`, `rating.added`, `review.created`, `review.updated`, `movie.watched` |
-| `notification.events` | `user.registered`, `user.blocked`, `user.deleted`, `user.followed`, `movie_night.invite_sent`, `movie_night.invite_answered`, `movie_night.finalized` |
+| `intelligence.events` | `user.genres_updated`, `user.deleted`, `movie.deleted`, `rating.added`, `review.created`, `review.updated`, `movie.watched` |
+| `notification.events` | `user.registered`, `user.deleted`, `user.followed`, `movie_night.invite_sent`, `movie_night.invite_answered`, `movie_night.finalized` |
 
 Dead letters: each `<service>.events` queue is declared with `x-dead-letter-exchange: ""` and
 `x-dead-letter-routing-key: <service>.events.dlq`, so a rejected message moves to that service's DLQ.
@@ -32,7 +32,6 @@ Every message has the same envelope. Only `data` changes per event.
   "event": "ReviewCreated",
   "id": "0193a7d4-2c1b-7e5f-8a9b-0c1d2e3f4a5b",
   "occurred_at": "2026-11-03T18:20:00Z",
-  "correlation_id": "0193a7d4-2b00-7a1c-9d8e-7f6a5b4c3d2e",
   "data": { }
 }
 ```
@@ -42,7 +41,6 @@ Every message has the same envelope. Only `data` changes per event.
 | `event` | string | The event name in PascalCase |
 | `id` | uuid | Unique per message; consumers use it to skip duplicates |
 | `occurred_at` | ISO-8601 UTC | When it happened |
-| `correlation_id` | uuid | The `X-Correlation-ID` of the request that caused it (see `docs/api/conventions.md`) |
 | `data` | object | The event's fields below |
 
 Message properties: persistent (`delivery_mode` 2), `content_type: application/json`, `message_id` = the envelope `id`.
@@ -80,10 +78,9 @@ Message properties: persistent (`delivery_mode` 2), `content_type: application/j
 |---|---|---|---|
 | [UserRegistered](#userregistered) | `user.registered` | Identity | Notification |
 | [UserGenresUpdated](#usergenresupdated) | `user.genres_updated` | Identity | Intelligence |
-| [UserBlocked](#userblocked) | `user.blocked` | Identity | Engagement, Social, Notification |
+| [UserBlocked](#userblocked) | `user.blocked` | Identity | Engagement, Social |
 | [UserUnblocked](#userunblocked) | `user.unblocked` | Identity | Engagement, Social |
-| [UserDeleted](#userdeleted) | `user.deleted` | Identity | Engagement, Social, Notification |
-| [MovieUpdated](#movieupdated) | `movie.updated` | Catalog | Intelligence |
+| [UserDeleted](#userdeleted) | `user.deleted` | Identity | Engagement, Social, Intelligence, Notification |
 | [MovieDeleted](#moviedeleted) | `movie.deleted` | Catalog | Engagement, Social, Intelligence |
 | [RatingAdded](#ratingadded) | `rating.added` | Engagement | Intelligence, Social |
 | [ReviewCreated](#reviewcreated) | `review.created` | Engagement | Intelligence, Social |
@@ -128,7 +125,8 @@ Message properties: persistent (`delivery_mode` 2), `content_type: application/j
 #### UserBlocked
 
 `user.blocked` · an admin blocked the user · → Engagement (set `author_blocked` on their reviews and lists), Social (hide their
-activity), Notification (stop sending to them)
+activity). Notification does not consume it: a blocked user cannot log in, and their notifications are still there
+after an unblock.
 
 | Field | Type | Notes |
 |---|---|---|
@@ -153,7 +151,8 @@ hid with `is_hidden` stay hidden), Social (show their activity again)
 
 #### UserDeleted
 
-`user.deleted` · the account was deleted · → Engagement, Social, Notification (delete or anonymise that user's data)
+`user.deleted` · the account was deleted · → Engagement, Social, Intelligence (taste profile and recommendations),
+Notification (delete or anonymise that user's data)
 
 | Field | Type | Notes |
 |---|---|---|
@@ -164,23 +163,6 @@ hid with `is_hidden` stay hidden), Social (show their activity again)
 ```
 
 ### Catalog
-
-#### MovieUpdated
-
-`movie.updated` · a movie was added to the local database or its data changed (e.g. TMDB sync) · → Intelligence
-(recommendations)
-
-| Field | Type | Notes |
-|---|---|---|
-| `movie_id` | uuid | Catalog `movies.id` |
-| `title` | string | |
-| `release_date` | date (`YYYY-MM-DD`) or null | |
-| `genre_ids` | uuid[] | Catalog `genres.id` |
-| `person_ids` | uuid[] | Catalog `people.id`: main cast and directors |
-
-```json
-{"movie_id": "0193a7c1-3333-7aaa-8bbb-000000000100", "title": "Inception", "release_date": "2010-07-16", "genre_ids": ["0193a7b0-2222-7aaa-8bbb-000000000010"], "person_ids": ["0193a7b5-4444-7aaa-8bbb-000000000200"]}
-```
 
 #### MovieDeleted
 

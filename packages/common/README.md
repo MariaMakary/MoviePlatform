@@ -32,8 +32,33 @@ are picked up by every project without copying files.
 | `src/Auth/JwtUser.php` | The authenticated user from the token: `id`, `role`, `name`, `isAdmin()`. |
 | `config/jwt.php` | `public_key_path` (`JWT_PUBLIC_KEY_PATH`) and `leeway` defaults, merged with the project's own `config/jwt.php`. |
 | `config/internal.php` | `service_token`, read with `secret('service_token')` (file `secrets/service_token`, the same value in every service). |
-| `src/Exceptions/JsonExceptionRenderer.php` | Turns any exception into the error JSON of `docs/api/conventions.md` §6: 401, 403, 404 (`"<Model> not found."` for `findOrFail`), 405, 422 with `errors`, any `HttpException` with its status and message, everything else `500 {"message": "Server error."}`. Every service's `app/Exceptions/Handler.php` calls it. In Lumen, the provider also hooks `Controller::buildResponseUsing()` so `$this->validate()` returns `message` + `errors`. |
+| `src/Integration/EventPublisher.php` | `publish($routingKey, $data)`: wraps `$data` in the envelope of `docs/events.md` (`event` built from the routing key, new `id`, `occurred_at` in UTC) and sends it, persistent, to the `movieplatform.events` exchange. Returns the envelope. |
+| `src/Integration/RabbitMqConnection.php` | One connection per process, opened on first use; declares the exchange (topic, durable). Shared by the publisher and the consumer. |
+| `src/Http/Controllers/HealthController.php` | `GET /api/health` (route it with `'\MoviePlatform\Common\Http\Controllers\HealthController'` in Lumen): `200` when everything is ok, `503` otherwise, body `{status, service, database, rabbitmq}` (`docs/api/conventions.md`, section 9). |
+| `src/Health/HealthCheck.php` | Runs the checks: `select 1` on a temporary copy of the default database connection, then an AMQP connect and close (`AmqpConnector`). Each check times out after 2 s; a failure answers `fail` and logs the real error (class and message only, no stack trace) as a warning, never in the response. |
+| `src/Testing/FakesHealthDependencies.php` | Test trait: `fakeDatabase(bool $up)` (in-memory SQLite, or a missing file) and `fakeBroker(bool $up)`, so health tests need no Postgres or RabbitMQ. |
+| `config/health.php` | `service` (`SERVICE_NAME`, default: the project folder name) and the per-check `timeout` (2 s). |
+| `config/rabbitmq.php` | `host`, `port` and `vhost` (`RABBITMQ_HOST`, `RABBITMQ_PORT`, `RABBITMQ_VHOST`), `user` and `password` from `secret('rabbitmq_user')` and `secret('rabbitmq_password')` (empty when the file is missing, never a default), `exchange`. Used by the publisher, the consumer and the health check. |
+| `src/Exceptions/JsonExceptionRenderer.php` | Turns any exception into the error JSON of `docs/api/conventions.md`, section 6: 401, 403, 404 (`"<Model> not found."` for `findOrFail`), 405, 422 with `errors`, any `HttpException` with its status and message, everything else `500 {"message": "Server error."}`. Every service's `app/Exceptions/Handler.php` calls it. In Lumen, the provider also hooks `Controller::buildResponseUsing()` so `$this->validate()` returns `message` + `errors`. |
 | `src/Http/Resources/PaginatedCollection.php` | List responses: `PaginatedCollection::fromQuery($query, XyzResource::class, $request)` gives `{"data": […], "meta": {current_page, last_page, total}}`, reading `?page` and `?per_page` (default 20, max 100). |
+
+## Publishing an event
+
+Publish **after** the transaction commits, so an event never describes data that was rolled back. The payload is
+exactly the one in `docs/events.md`.
+
+```php
+$user = DB::transaction(fn () => User::create($validated));
+
+$this->events->publish('user.registered', [
+    'user_id' => $user->id,
+    'name' => $user->name,
+    'email' => $user->email,
+]);
+```
+
+`$this->events` is an `EventPublisher` injected in the constructor. PHP's `sockets` extension must be enabled
+(`README.md`, Requirements).
 
 ## Rules
 

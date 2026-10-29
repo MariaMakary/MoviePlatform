@@ -12,7 +12,7 @@ app/
 │   ├── Controllers/Api/      thin: ~10 lines per method, no queries, no business logic
 │   ├── Requests/             validation rules (one class per action, static rules())
 │   ├── Resources/            JSON output = the "View" of an API
-│   └── Middleware/           service-specific only (jwt, admin, service, correlation come from packages/common)
+│   └── Middleware/           service-specific only (jwt, admin, service come from packages/common)
 ├── Models/                   Eloquent: relationships, casts, scopes
 ├── Services/                 business logic lives here
 ├── Policies/                 ownership / role checks
@@ -72,7 +72,7 @@ When you add:
 ```php
 <?php
 
-$router->get('/health', fn () => response()->json(['status' => 'ok', 'service' => 'engagement']));
+$router->get('/health', '\MoviePlatform\Common\Http\Controllers\HealthController');
 
 $router->get('/movies/{movieId}/reviews', 'Api\ReviewController@index');
 
