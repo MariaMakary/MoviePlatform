@@ -63,6 +63,10 @@ $this->events->publish('user.registered', [
 
 ```powershell
 cd packages/common
-composer install
+composer update
 composer test
 ```
+
+This folder's `composer.lock` is not committed (it is a library), so use `composer update` here, not `composer install`:
+an old local lock file makes `install` fail as soon as someone adds a dependency. The root `composer install` already
+does this for you.
