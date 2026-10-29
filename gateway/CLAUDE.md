@@ -20,7 +20,33 @@ resources/js/                  Echo (Reverb), Leaflet
 
 - A Livewire component **never calls `Http::` directly**: it uses a Client or an Aggregator.
 - Clients send the session's JWT (`Authorization: Bearer`), with a 3-second timeout and 2 retries for `GET` only, and throw `ServiceUnavailable` when a service is down (`docs/api/conventions.md`, section 10).
+- **Clients** (`app/Services/Clients`): add one public method per endpoint to that service's client, built on the
+  protected `get` / `post` / `put` / `patch` / `delete` of `BaseClient`. They return the decoded JSON (`null` for 204).
+  Service URLs come from `IDENTITY_URL` … `NOTIFICATION_URL` in `.env`. The JWT is read from `session('jwt')`
+  (`BaseClient::SESSION_TOKEN`): login stores it there.
+
+  | Service answers | You get |
+  |---|---|
+  | 2xx | the JSON as an array |
+  | 422 | `ValidationException`: errors show under the form fields (`@error('score')`) |
+  | other 4xx | `ServiceRequestException` (status + the service's message; renders the 403/404 page) |
+  | no connection or 5xx | `ServiceUnavailable` (logged as a warning) |
+
+  Exception: `health()` returns the body of a `503` too (`status: degraded` and the part that failed), so the admin
+  dashboard can show what is wrong; only a connection error throws.
 - **Graceful fallback:** a section whose service is down shows `<x-service-unavailable/>`; the page never crashes.
+  In a Livewire component, `use WithServiceFallback` and load data **in `render()`** (so "Try again" reloads it):
+
+  ```php
+  $movies = $this->fromService('trending', fn () => $catalog->trending(), []);
+  ```
+  ```blade
+  @if ($this->isUnavailable('trending'))
+      <x-service-unavailable :service="$unavailable['trending']" :retry="true" />
+  @else …
+  ```
+  An uncaught `ServiceUnavailable` shows the 503 page in the layout. `/dev/services` (local only) shows every
+  service's health this way.
 - Always reuse the shared layout and Blade components. Escape output with `{{ }}`, never `{!! !!}` with user input.
   Every component, with its props and example data, is shown at **http://localhost:8000/dev/components** (only when
   `APP_ENV=local`). Check it before building UI; add a section there when you add a shared component.
