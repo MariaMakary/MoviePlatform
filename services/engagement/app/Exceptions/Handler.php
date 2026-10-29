@@ -3,9 +3,11 @@
 namespace App\Exceptions;
 
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
+use MoviePlatform\Common\Exceptions\JsonExceptionRenderer;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
@@ -17,6 +19,7 @@ class Handler extends ExceptionHandler
      * @var array
      */
     protected $dontReport = [
+        AuthenticationException::class,
         AuthorizationException::class,
         HttpException::class,
         ModelNotFoundException::class,
@@ -39,7 +42,7 @@ class Handler extends ExceptionHandler
     }
 
     /**
-     * Render an exception into an HTTP response.
+     * Render an exception as JSON in the format of docs/api/conventions.md.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Throwable  $exception
@@ -49,6 +52,6 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        return parent::render($request, $exception);
+        return app(JsonExceptionRenderer::class)->render($request, $exception);
     }
 }
