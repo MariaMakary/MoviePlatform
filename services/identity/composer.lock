@@ -2627,11 +2627,13 @@
             "dist": {
                 "type": "path",
                 "url": "../../packages/common",
-                "reference": "dad2348e04c500b0d88b4e572039d2a3bc038522"
+                "reference": "2fdb22a6b58efef0b873e43f231baab71b8ea4e0"
             },
             "require": {
                 "firebase/php-jwt": "^7.2",
                 "illuminate/auth": "^10.0|^12.0",
+                "illuminate/console": "^10.0|^12.0",
+                "illuminate/database": "^10.0|^12.0",
                 "illuminate/http": "^10.0|^12.0",
                 "illuminate/routing": "^10.0|^12.0",
                 "illuminate/support": "^10.0|^12.0",
