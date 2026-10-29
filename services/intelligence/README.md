@@ -1,6 +1,6 @@
 # Intelligence service
 
-Lumen 10 microservice. **Port:** 8005 Â· **Database:** `intelligence-db` (host port 5437) Â· **Health check:** `GET http://localhost:8005/api/health`
+Lumen 10 microservice. **Port:** 8005 · **Database:** `intelligence-db` (host port 5437) · **Health check:** `GET http://localhost:8005/api/health`
 
 Recommendations, review sentiment, weather and calendar.
 

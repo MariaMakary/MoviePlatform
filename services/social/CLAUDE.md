@@ -1,6 +1,6 @@
 # Social service
 
-Lumen 10 service on port **8004**. Database: `social-db` (`social_db`, host port 5436). Owner: Maria (feed, movie nights) · Joe (follows, profiles, privacy, chat).
+Lumen 10 service on port **8004**. Database: `social-db` (`social_db`, host port 5436). Owner: Joe · Maria.
 
 Follows, profiles, privacy, the activity feed, movie nights and chat rooms.
 

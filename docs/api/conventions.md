@@ -99,7 +99,7 @@ Every error uses the same shape. `errors` is present only for validation errors.
 | `sub` | the user's UUID (Identity `users.id`) |
 | `role` | `user` or `admin` |
 | `name` | the user's display name |
-| `exp` | expiry, 2 hours after issuing |
+| `exp` | expiry, 30 minutes after issuing |
 
 - Each endpoint in `docs/api/<service>.md` states who may call it: **guest** (no token), **user**, **admin**,
   or **service**.
@@ -115,7 +115,6 @@ Every error uses the same shape. `errors` is present only for validation errors.
 |---|---|---|
 | `Authorization: Bearer …` | request | User calls (see 7) |
 | `X-Service-Token` | request | Internal calls only (see 7) |
-| `X-Correlation-ID` | request and response | Every call carries one. If missing, the service creates a UUID. It is passed on to every outgoing call and published event, and returned in the response, so one user action can be followed across all service logs. |
 | `Accept: application/json` | request | Always |
 
 ## 9. Health
@@ -135,5 +134,42 @@ shared `HealthController` from `packages/common`, and the service name comes fro
 ## 10. Calling another service
 
 - Only through a Client class (`app/Integration/Clients` in services, `app/Services/Clients` in the Gateway).
-- 3-second timeout, 2 retries; a connection failure becomes a `ServiceUnavailable` exception.
+- 3-second timeout. Retry twice only for `GET` requests and only on connection errors; never retry a `POST`, `PUT`,
+  `PATCH` or `DELETE` (the first call may have worked) or a `4xx`. A connection failure becomes a `ServiceUnavailable`
+  exception.
 - The Gateway shows `<x-service-unavailable/>` for that section instead of failing the whole page.
+
+## 11. Documenting an endpoint
+
+Each service lists its endpoints in `docs/api/<service>.md`, in the same PR as the code, grouped by resource. Copy this
+layout for every endpoint:
+
+````markdown
+### POST /api/ratings
+
+Creates or updates the current user's rating of a movie (one rating per user and movie).
+
+**Who:** user
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `movie_id` | uuid | required, Catalog `movies.id` |
+| `score` | integer | required, 1–5 |
+
+**Response** `200`
+
+```json
+{"data": {"id": "0193a7d0-5555-7aaa-8bbb-000000000300", "movie_id": "0193a7c1-3333-7aaa-8bbb-000000000100", "score": 4, "created_at": "2026-11-03T18:20:00Z"}}
+```
+
+**Errors:** `401` no or invalid token · `422` invalid `movie_id` or `score`
+
+**Events:** publishes `RatingAdded`
+````
+
+- **Who** is one of `guest` (no token), `user`, `admin` or `service` (section 7).
+- Query parameters go in the same table as body fields, with the rule `query`.
+- List endpoints show one item in `data` and the `meta` block (section 5).
+- Leave out **Events** when the endpoint publishes none.

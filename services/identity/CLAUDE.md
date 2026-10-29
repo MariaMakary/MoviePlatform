@@ -1,6 +1,6 @@
 # Identity service
 
-Lumen 10 service on port **8001**. Database: `identity-db` (`identity_db`, host port 5433). Owner: Maria (social login: Joy).
+Lumen 10 service on port **8001**. Database: `identity-db` (`identity_db`, host port 5433). Owner: Maria.
 
 Users, authentication, social login (Google/GitHub), roles and JWT issuing.
 

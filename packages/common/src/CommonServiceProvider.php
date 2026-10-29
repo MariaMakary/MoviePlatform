@@ -10,6 +10,7 @@ use MoviePlatform\Common\Auth\JwtDecoder;
 use MoviePlatform\Common\Http\Middleware\EnsureAdmin;
 use MoviePlatform\Common\Http\Middleware\VerifyJwt;
 use MoviePlatform\Common\Http\Middleware\VerifyServiceToken;
+use MoviePlatform\Common\Integration\RabbitMqConnection;
 use RuntimeException;
 use UnexpectedValueException;
 
@@ -29,6 +30,8 @@ class CommonServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/internal.php', 'internal');
         $this->mergeConfigFrom(__DIR__.'/../config/rabbitmq.php', 'rabbitmq');
         $this->mergeConfigFrom(__DIR__.'/../config/health.php', 'health');
+
+        $this->app->singleton(RabbitMqConnection::class, fn () => new RabbitMqConnection(config('rabbitmq')));
 
         $this->app->singleton(JwtDecoder::class, function () {
             $path = config('jwt.public_key_path');

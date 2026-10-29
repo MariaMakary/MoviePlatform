@@ -1,6 +1,6 @@
 # Catalog service
 
-Lumen 10 microservice. **Port:** 8002 Â· **Database:** `catalog-db` (host port 5434) Â· **Health check:** `GET http://localhost:8002/api/health`
+Lumen 10 microservice. **Port:** 8002 · **Database:** `catalog-db` (host port 5434) · **Health check:** `GET http://localhost:8002/api/health`
 
 TMDB integration, local movie database, search, genres and people.
 
