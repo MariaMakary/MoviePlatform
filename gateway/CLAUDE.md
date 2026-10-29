@@ -10,7 +10,7 @@ services. Sessions and cache are in Redis (`predis`).
 app/Livewire/<Module>/         Auth, Catalog, Engagement, Social, Intelligence, Notifications, Admin
 app/Services/Clients/          BaseClient + one client per service (IdentityClient, CatalogClient, …)
 app/Services/Aggregators/      combine several services for one page (e.g. MoviePageAggregator)
-resources/views/components/    shared: x-date, x-flash, x-movie-card, x-rating-stars, x-avatar, x-button, x-modal, x-empty-state, x-service-unavailable
+resources/views/components/    shared: x-logo, x-nav-link, x-date, x-flash, x-movie-card, x-rating-stars, x-avatar, x-button, x-modal, x-empty-state, x-service-unavailable
 resources/views/layouts/       app.blade.php (navbar, flash area, footer) + partials/ (navigation, search, user-menu, notification-bell, footer)
 resources/views/livewire/<module>/
 resources/js/                  Echo (Reverb), Leaflet
@@ -39,6 +39,7 @@ resources/js/                  Echo (Reverb), Leaflet
 
 ## Running
 
-`composer run dev` starts `php artisan serve --port=8000`, `php artisan reverb:start` and `npm run dev`. Remove
-`php artisan pail` from Laravel's default `dev` script: it needs `pcntl`, which does not exist on Windows.
-Tests: `php artisan test`.
+`composer run dev` starts `php artisan serve --port=8000` and `npm run dev`; `php artisan reverb:start` is added
+when Reverb is installed. Never add `php artisan pail`: it needs `pcntl`, which does not exist on Windows.
+
+No automated tests in the Gateway: each task's "Done when" in Azure Boards is checked by hand in the browser.

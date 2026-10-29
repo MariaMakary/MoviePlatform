@@ -67,16 +67,6 @@ return [
 
     'timezone' => 'UTC',
 
-    /*
-    |--------------------------------------------------------------------------
-    | Display Timezone
-    |--------------------------------------------------------------------------
-    |
-    | Services send and receive dates in UTC. Pages show them in this timezone
-    | (App\Services\DisplayTime), and dates typed in forms are read in it.
-    |
-    */
-
     'display_timezone' => env('APP_DISPLAY_TIMEZONE', 'Asia/Beirut'),
 
     /*
