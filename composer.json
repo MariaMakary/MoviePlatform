@@ -7,7 +7,7 @@
     "scripts": {
         "post-install-cmd": "@install-all",
         "install-all": [
-            "@composer install --working-dir=packages/common",
+            "@composer update --working-dir=packages/common",
             "@composer install --working-dir=gateway",
             "@composer install --working-dir=services/identity",
             "@composer install --working-dir=services/catalog",
@@ -18,6 +18,6 @@
         ]
     },
     "scripts-descriptions": {
-        "install-all": "Run composer install in packages/common, the Gateway and every service."
+        "install-all": "Run composer update in packages/common (its lock file is not committed) and composer install in the Gateway and every service."
     }
 }

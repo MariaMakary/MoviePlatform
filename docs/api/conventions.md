@@ -127,6 +127,10 @@ Every service exposes `GET /api/health`, without authentication:
 
 `200` when everything is ok, `503` with `"status": "degraded"` and the failing part set to `"fail"` otherwise.
 
+It checks the service's own database (`select 1`) and its RabbitMQ connection (connect and close), each with a
+2-second timeout (so a degraded answer can take about 4 seconds). The response never contains error details; the real error is logged. Every service routes it to the
+shared `HealthController` from `packages/common`, and the service name comes from `SERVICE_NAME` in `.env`.
+
 ## 10. Calling another service
 
 - Only through a Client class (`app/Integration/Clients` in services, `app/Services/Clients` in the Gateway).

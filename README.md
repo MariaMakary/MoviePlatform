@@ -91,8 +91,10 @@ cd services/identity; php -S 127.0.0.1:8001 -t public
 Start each service you need in its own terminal with its port from the table above (Lumen has no `artisan serve`).
 Engagement, social, intelligence and notification also consume events: start them with `composer run dev` instead,
 which runs the server and the `events:consume` worker together (it uses `npx concurrently`, so Node.js is needed).
+If RabbitMQ is down, the worker restarts every 5 seconds until it is back; the server keeps running.
 For the Gateway run `php artisan serve --port=8000` in `gateway/`, plus `npm run dev` for CSS/JS with hot reload.
-Check a service with `http://localhost:8001/api/health`.
+Check a service with `http://localhost:8001/api/health`: `200` when its database and RabbitMQ are reachable, `503`
+with the failing part set to `"fail"` otherwise.
 
 You don't need every database: `docker compose up -d identity-db redis rabbitmq` starts only what Identity needs.
 
@@ -106,4 +108,4 @@ docker compose down                        # remove the containers (data is kept
 docker compose down -v                     # remove the containers AND all data (fresh start)
 ```
 
-Inside a service folder: `php artisan migrate`, `vendor/bin/phpunit` (tests). Inside `gateway/`: `php artisan test`.
+Inside a service folder: `php artisan migrate`, `vendor/bin/phpunit` (tests). The Gateway has no automated tests: its pages are checked by hand.

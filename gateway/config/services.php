@@ -35,4 +35,15 @@ return [
         ],
     ],
 
+    'tmdb' => [
+        'image_url' => env('TMDB_IMAGE_URL', 'https://image.tmdb.org/t/p'),
+    ],
+
+    'identity' => ['url' => env('IDENTITY_URL', 'http://127.0.0.1:8001')],
+    'catalog' => ['url' => env('CATALOG_URL', 'http://127.0.0.1:8002')],
+    'engagement' => ['url' => env('ENGAGEMENT_URL', 'http://127.0.0.1:8003')],
+    'social' => ['url' => env('SOCIAL_URL', 'http://127.0.0.1:8004')],
+    'intelligence' => ['url' => env('INTELLIGENCE_URL', 'http://127.0.0.1:8005')],
+    'notification' => ['url' => env('NOTIFICATION_URL', 'http://127.0.0.1:8006')],
+
 ];

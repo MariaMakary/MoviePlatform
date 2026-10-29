@@ -25,3 +25,12 @@ Read `docs/lumen.md` (how to write Lumen code here), `docs/api/catalog.md` (this
 ## Running
 
 `composer run dev` starts `php -S 127.0.0.1:8002 -t public` (it only publishes events). Tests: `vendor/bin/phpunit`.
+The tests use the real `catalog-db` (CHECK constraints, full-text index, cascades), so run `docker compose up -d` and
+`php artisan migrate` first. They use `DatabaseTransactions`, so they leave no rows behind.
+
+## Models
+
+`Movie`, `Genre`, `Person` (table `people`) with factories in `database/factories`. Credits live in `movie_person`
+through the `Credit` pivot (its own UUID `id`): use `$movie->cast()` (ordered by `cast_order`, with `character`) and
+`$movie->directors()`. They set `role` on attach, so `$movie->cast()->attach($personId, ['character' => …,
+'cast_order' => 0])` is all you need.

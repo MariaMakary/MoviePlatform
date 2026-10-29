@@ -1,6 +1,6 @@
 {
     "name": "movieplatform/common",
-    "description": "Code shared by the MoviePlatform Gateway and services (secret() helper, and later middleware, events, health check).",
+    "description": "Code shared by the MoviePlatform Gateway and services (secret() helper, JWT and service-token middleware, health check, and later events).",
     "type": "library",
     "version": "1.0.0",
     "license": "proprietary",
@@ -12,9 +12,9 @@
         "illuminate/auth": "^10.0|^12.0",
         "illuminate/http": "^10.0|^12.0",
         "illuminate/routing": "^10.0|^12.0",
-        "php-amqplib/php-amqplib": "^3.7",
+        "illuminate/database": "^10.0|^12.0",
         "illuminate/console": "^10.0|^12.0",
-        "illuminate/database": "^10.0|^12.0"
+        "php-amqplib/php-amqplib": "^3.7"
     },
     "require-dev": {
         "phpunit/phpunit": "^11.5.50",

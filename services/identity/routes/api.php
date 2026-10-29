@@ -1,6 +1,3 @@
 <?php
 
-$router->get('/health', fn () => response()->json([
-    'status' => 'ok',
-    'service' => 'identity',
-]));
+$router->get('/health', '\MoviePlatform\Common\Http\Controllers\HealthController');

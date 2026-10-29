@@ -29,7 +29,7 @@
     "scripts": {
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "npx concurrently@9 -k -c \"#93c5fd,#fdba74\" -n server,events \"php -S 127.0.0.1:8004 -t public\" \"php artisan events:consume\""
+            "npx concurrently@9 --restart-tries -1 --restart-after 5000 -c \"#93c5fd,#fdba74\" -n server,events \"php -S 127.0.0.1:8004 -t public\" \"php artisan events:consume\""
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""

@@ -2627,7 +2627,7 @@
             "dist": {
                 "type": "path",
                 "url": "../../packages/common",
-                "reference": "2fdb22a6b58efef0b873e43f231baab71b8ea4e0"
+                "reference": "f5034085dc82bb42f8f08ecb0aa0a320537f4edd"
             },
             "require": {
                 "firebase/php-jwt": "^7.2",
@@ -2674,7 +2674,7 @@
             "license": [
                 "proprietary"
             ],
-            "description": "Code shared by the MoviePlatform Gateway and services (secret() helper, and later middleware, events, health check).",
+            "description": "Code shared by the MoviePlatform Gateway and services (secret() helper, JWT and service-token middleware, health check, and later events).",
             "transport-options": {
                 "relative": true
             }

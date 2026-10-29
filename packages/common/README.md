@@ -38,7 +38,13 @@ are picked up by every project without copying files.
 | `src/Integration/EventConsumer.php` | Declares the service's queue `<service>.events` (dead-lettering to `<service>.events.dlq`) and its bindings from `config/events.php`, consumes with prefetch 10 and manual acks. Per message: not JSON or no uuid `id` → DLQ; no handler → ack; `id` already in `processed_events` → ack; otherwise runs the handler in a transaction that also inserts into `processed_events`, retrying 3 times before rejecting to the DLQ. |
 | `src/Console/ConsumeEvents.php`, `src/Console/ReplayDeadLetters.php` | `php artisan events:consume` and `php artisan events:replay-dlq`. Registered, together with the `processed_events` migration, only in a service whose `config/events.php` has a `queue`. |
 | `database/migrations/…_create_processed_events_table.php` | `processed_events`: `event_id` (uuid, primary key), `event` (varchar 100), `processed_at` (timestamp), as in the ERDs. |
-| `config/rabbitmq.php` | `host` and `port` (`RABBITMQ_HOST`, `RABBITMQ_PORT`), `user` and `password` from `secret('rabbitmq_user')` and `secret('rabbitmq_password')`, `exchange`. |
+| `src/Http/Controllers/HealthController.php` | `GET /api/health` (route it with `'\MoviePlatform\Common\Http\Controllers\HealthController'` in Lumen): `200` when everything is ok, `503` otherwise, body `{status, service, database, rabbitmq}` (`docs/api/conventions.md`, section 9). |
+| `src/Health/HealthCheck.php` | Runs the checks: `select 1` on a temporary copy of the default database connection, then an AMQP connect and close (`AmqpConnector`). Each check times out after 2 s; a failure answers `fail` and logs the real error (class and message only, no stack trace) as a warning, never in the response. |
+| `src/Testing/FakesHealthDependencies.php` | Test trait: `fakeDatabase(bool $up)` (in-memory SQLite, or a missing file) and `fakeBroker(bool $up)`, so health tests need no Postgres or RabbitMQ. |
+| `config/health.php` | `service` (`SERVICE_NAME`, default: the project folder name) and the per-check `timeout` (2 s). |
+| `config/rabbitmq.php` | `host`, `port` and `vhost` (`RABBITMQ_HOST`, `RABBITMQ_PORT`, `RABBITMQ_VHOST`), `user` and `password` from `secret('rabbitmq_user')` and `secret('rabbitmq_password')` (empty when the file is missing, never a default), `exchange`. Used by the publisher, the consumer and the health check. |
+| `src/Exceptions/JsonExceptionRenderer.php` | Turns any exception into the error JSON of `docs/api/conventions.md`, section 6: 401, 403, 404 (`"<Model> not found."` for `findOrFail`), 405, 422 with `errors`, any `HttpException` with its status and message, everything else `500 {"message": "Server error."}`. Every service's `app/Exceptions/Handler.php` calls it. In Lumen, the provider also hooks `Controller::buildResponseUsing()` so `$this->validate()` returns `message` + `errors`. |
+| `src/Http/Resources/PaginatedCollection.php` | List responses: `PaginatedCollection::fromQuery($query, XyzResource::class, $request)` gives `{"data": […], "meta": {current_page, last_page, total}}`, reading `?page` and `?per_page` (default 20, max 100). |
 
 ## Publishing an event
 
@@ -61,7 +67,7 @@ $this->events->publish('user.registered', [
 ## Consuming an event
 
 Only engagement, social, intelligence and notification consume. Each has a `config/events.php` (loaded with
-`$app->configure('events')`) with its queue, the routing keys bound to it (`docs/events.md` §1) and the handler of
+`$app->configure('events')`) with its queue, the routing keys bound to it (`docs/events.md`, section 1) and the handler of
 each event, keyed by event name:
 
 ```php
@@ -104,6 +110,10 @@ back to the main queue. Run `php artisan migrate` once to create `processed_even
 
 ```powershell
 cd packages/common
-composer install
+composer update
 composer test
 ```
+
+This folder's `composer.lock` is not committed (it is a library), so use `composer update` here, not `composer install`:
+an old local lock file makes `install` fail as soon as someone adds a dependency. The root `composer install` already
+does this for you.
