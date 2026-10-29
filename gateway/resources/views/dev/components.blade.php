@@ -17,6 +17,26 @@
         </header>
 
         <section class="space-y-4">
+            <h2 class="text-lg font-semibold text-white"><code>&lt;x-logo /&gt;</code> and <code>&lt;x-nav-link href="…" :active="true" mobile&gt;</code></h2>
+            <div class="flex flex-wrap items-start gap-8">
+                <x-logo />
+                <div class="flex items-center gap-1">
+                    <x-nav-link href="#" :active="true">Active</x-nav-link>
+                    <x-nav-link href="#">Inactive</x-nav-link>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <x-nav-link href="#" :active="true" mobile>Mobile active</x-nav-link>
+                    <x-nav-link href="#" mobile>Mobile inactive</x-nav-link>
+                </div>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <h2 class="text-lg font-semibold text-white"><code>&lt;x-icons.star class="h-4 w-4 text-neon-rose" /&gt;</code></h2>
+            <x-icons.star class="h-6 w-6 text-neon-rose" />
+        </section>
+
+        <section class="space-y-4">
             <h2 class="text-lg font-semibold text-white"><code>&lt;x-movie-card :movie="$movie" href="…" /&gt;</code></h2>
             <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
                 @foreach ($movies as $movie)

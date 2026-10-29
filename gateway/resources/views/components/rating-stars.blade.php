@@ -10,12 +10,12 @@
 <span role="img" aria-label="{{ $label }} out of {{ $max }} stars" {{ $attributes->class('relative inline-flex shrink-0') }}>
     <span class="flex text-white/20" aria-hidden="true">
         @for ($i = 0; $i < $max; $i++)
-            <svg class="{{ $starSize }}" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.9l-5.2 2.7 1-5.8L1.5 7.7l5.9-.9L10 1.5z"/></svg>
+            <x-icons.star :class="$starSize" />
         @endfor
     </span>
     <span class="absolute inset-y-0 left-0 flex overflow-hidden text-neon-rose" style="width: {{ $percent }}%" aria-hidden="true">
         @for ($i = 0; $i < $max; $i++)
-            <svg class="{{ $starSize }} shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.9l-5.2 2.7 1-5.8L1.5 7.7l5.9-.9L10 1.5z"/></svg>
+            <x-icons.star :class="$starSize.' shrink-0'" />
         @endfor
     </span>
 </span>
