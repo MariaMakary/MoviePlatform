@@ -72,7 +72,7 @@ When you add:
 ```php
 <?php
 
-$router->get('/health', fn () => response()->json(['status' => 'ok', 'service' => 'engagement']));
+$router->get('/health', '\MoviePlatform\Common\Http\Controllers\HealthController');
 
 $router->get('/movies/{movieId}/reviews', 'Api\ReviewController@index');
 
@@ -137,10 +137,14 @@ class ReviewController extends Controller
 }
 ```
 
-`$this->validate()` returns only the validated fields. On failure it stops with **422**. Lumen's own body is only the
-errors (`{"email": ["…"]}`); the standard `{"message": …, "errors": …}` format of `docs/api/conventions.md` comes from
-the shared JSON error handling (task 1121, through Lumen's `Controller::buildResponseUsing()` hook). Don't format
-validation errors by hand in controllers.
+`$this->validate()` returns only the validated fields. On failure it stops with **422** and
+`{"message": "The given data was invalid.", "errors": {…}}`: `packages/common` registers Lumen's
+`Controller::buildResponseUsing()` hook. Don't format validation errors by hand in controllers.
+
+All other errors are rendered by `MoviePlatform\Common\Exceptions\JsonExceptionRenderer`, which every service's
+`app/Exceptions/Handler.php` calls. Just throw: `abort(404, 'Movie not found.')`, `findOrFail()` (gives
+`"Movie not found."`), `$this->authorize()` (403). Anything unexpected becomes `500 {"message": "Server error."}` and
+the real error is logged. Policies need the logged-in user, so call `$this->authorize()` only on `jwt` routes.
 
 ## 5. Models, migrations and Resources
 
@@ -166,16 +170,15 @@ class Review extends Model
 
 - Never return a model: always an API Resource from `app/Http/Resources` (`extends JsonResource`). Dates with
   `->toIso8601ZuluString()`.
-- Lists use exactly the pagination format of `docs/api/conventions.md`:
+- Every list endpoint returns a `MoviePlatform\Common\Http\Resources\PaginatedCollection`. It reads `?page` and
+  `?per_page` (default 20, capped at 100) and outputs exactly the pagination format of `docs/api/conventions.md`:
 
 ```php
-$page = Review::where('movie_id', $movieId)->paginate($request->integer('per_page', 20));
-
-return response()->json([
-    'data' => ReviewResource::collection($page->items()),
-    'meta' => ['current_page' => $page->currentPage(), 'last_page' => $page->lastPage(), 'total' => $page->total()],
-]);
+return PaginatedCollection::fromQuery(Review::where('movie_id', $movieId), ReviewResource::class, $request);
 ```
+
+  When a Service already built the paginator, use `new PaginatedCollection($paginator, ReviewResource::class)` and get
+  the sizes with `PaginatedCollection::perPage($request)` and `PaginatedCollection::page($request)`.
 
 ## 6. Authentication and policies
 

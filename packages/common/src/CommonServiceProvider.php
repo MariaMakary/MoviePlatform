@@ -6,7 +6,9 @@ use DomainException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Lumen\Routing\Controller as LumenController;
 use MoviePlatform\Common\Auth\JwtDecoder;
+use MoviePlatform\Common\Exceptions\JsonExceptionRenderer;
 use MoviePlatform\Common\Http\Middleware\EnsureAdmin;
 use MoviePlatform\Common\Http\Middleware\VerifyJwt;
 use MoviePlatform\Common\Http\Middleware\VerifyServiceToken;
@@ -22,12 +24,14 @@ class CommonServiceProvider extends ServiceProvider
             $this->app->configure('jwt');
             $this->app->configure('internal');
             $this->app->configure('rabbitmq');
+            $this->app->configure('health');
             $this->app->configure('auth');
         }
 
         $this->mergeConfigFrom(__DIR__.'/../config/jwt.php', 'jwt');
         $this->mergeConfigFrom(__DIR__.'/../config/internal.php', 'internal');
         $this->mergeConfigFrom(__DIR__.'/../config/rabbitmq.php', 'rabbitmq');
+        $this->mergeConfigFrom(__DIR__.'/../config/health.php', 'health');
 
         $this->app->singleton(RabbitMqConnection::class, fn () => new RabbitMqConnection(config('rabbitmq')));
 
@@ -70,6 +74,7 @@ class CommonServiceProvider extends ServiceProvider
 
         if ($this->isLumen()) {
             $this->app->routeMiddleware($middleware);
+            LumenController::buildResponseUsing(fn (Request $request, array $errors) => JsonExceptionRenderer::validationResponse($errors));
         } else {
             foreach ($middleware as $name => $class) {
                 $this->app['router']->aliasMiddleware($name, $class);

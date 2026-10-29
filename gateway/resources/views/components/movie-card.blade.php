@@ -1,10 +1,7 @@
 @props(['movie', 'href' => null, 'posterSize' => 'w342'])
 
 @php
-    $poster = $movie['poster_path'] ?? null;
-    if ($poster && str_starts_with($poster, '/')) {
-        $poster = rtrim(config('services.tmdb.image_url'), '/').'/'.$posterSize.$poster;
-    }
+    $poster = \App\Services\TmdbImage::url($movie['poster_path'] ?? null, $posterSize);
     $year = isset($movie['release_date']) ? substr($movie['release_date'], 0, 4) : null;
     $rating = $movie['vote_average'] ?? null;
     $tag = $href ? 'a' : 'div';
@@ -23,7 +20,7 @@
         @if ($rating !== null)
             <span class="absolute top-2 right-2 inline-flex items-center gap-1 rounded-md bg-jet/80 px-1.5 py-0.5 text-xs font-semibold text-white backdrop-blur"
                   aria-label="TMDB rating {{ number_format($rating, 1) }} out of 10">
-                <svg class="h-3 w-3 text-neon-rose" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.9l-5.2 2.7 1-5.8L1.5 7.7l5.9-.9L10 1.5z"/></svg>
+                <x-icons.star class="h-3 w-3 text-neon-rose" />
                 <span aria-hidden="true">{{ number_format($rating, 1) }}</span>
             </span>
         @endif
