@@ -10,6 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Gate;
 use Mockery;
+use MoviePlatform\Common\Auth\Role;
 use MoviePlatform\Common\Http\Resources\PaginatedCollection;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -90,10 +91,9 @@ class JsonErrorsTest extends TestCase
 
     public function test_refused_policy_returns_403_json(): void
     {
-        $user = new User(['name' => 'Maria Makary']);
-        $user->setKeyType('string')->setIncrementing(false);
-        $user->forceFill(['id' => '0193a7c0-1111-7aaa-8bbb-000000000001', 'role' => 'user']);
-        $token = app(TokenService::class)->issue($user);
+        $user = (new User(['name' => 'Maria Makary']))
+            ->forceFill(['id' => '0193a7c0-1111-7aaa-8bbb-000000000001', 'role' => Role::User]);
+        $token = app(TokenService::class)->issue($user)->token;
 
         $this->put('/api/test-authorize', [], ['Authorization' => "Bearer $token"])
             ->seeStatusCode(403)
