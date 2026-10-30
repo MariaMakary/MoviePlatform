@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use Firebase\JWT\JWT;
+use MoviePlatform\Common\Auth\Role;
 use RuntimeException;
 
 class TokenService
@@ -20,7 +21,7 @@ class TokenService
 
         return JWT::encode([
             'sub' => (string) $user->id,
-            'role' => $user->role ?? 'user',
+            'role' => ($user->role ?? Role::User)->value,
             'name' => $user->name,
             'iat' => $now,
             'exp' => $now + config('jwt.ttl'),

@@ -7,6 +7,7 @@ use App\Services\TokenService;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Firebase\JWT\SignatureInvalidException;
+use MoviePlatform\Common\Auth\Role;
 use RuntimeException;
 
 class TokenServiceTest extends TestCase
@@ -23,11 +24,8 @@ class TokenServiceTest extends TestCase
 
     private function user(array $attributes = []): User
     {
-        $user = new User(['name' => 'Maria Makary', 'email' => 'maria@example.com']);
-        $user->setKeyType('string')->setIncrementing(false);
-        $user->forceFill(['id' => '0193a7c0-1111-7aaa-8bbb-000000000001', 'role' => 'user', ...$attributes]);
-
-        return $user;
+        return (new User(['name' => 'Maria Makary', 'email' => 'maria@example.com']))
+            ->forceFill(['id' => '0193a7c0-1111-7aaa-8bbb-000000000001', 'role' => Role::User, ...$attributes]);
     }
 
     private function publicKey(string $name = 'test'): Key
@@ -37,7 +35,7 @@ class TokenServiceTest extends TestCase
 
     public function test_token_has_the_agreed_claims(): void
     {
-        $token = app(TokenService::class)->issue($this->user(['role' => 'admin']));
+        $token = app(TokenService::class)->issue($this->user(['role' => Role::Admin]));
 
         $claims = JWT::decode($token, $this->publicKey());
 

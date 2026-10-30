@@ -14,6 +14,7 @@ app/
 │   ├── Resources/            JSON output = the "View" of an API
 │   └── Middleware/           service-specific only (jwt, admin, service come from packages/common)
 ├── Models/                   Eloquent: relationships, casts, scopes
+├── Enums/                    backed enums for fixed sets of values (cast in the models)
 ├── Services/                 business logic lives here
 ├── Policies/                 ownership / role checks
 ├── Integration/
@@ -183,7 +184,8 @@ return PaginatedCollection::fromQuery(Review::where('movie_id', $movieId), Revie
 ## 6. Authentication and policies
 
 - Protected routes use the `jwt` middleware (from `packages/common`). Then `$request->user()` is the logged-in user
-  from the token: `->id`, `->role`, `->name`, `->isAdmin()`. There is no `User` lookup in other services.
+  from the token: `->id`, `->role` (`Role::User` or `Role::Admin`, from `MoviePlatform\Common\Auth\Role`), `->name`,
+  `->isAdmin()`. There is no `User` lookup in other services.
 - Policies: register `App\Providers\AuthServiceProvider` in `bootstrap/app.php`. **First delete the skeleton's
   `viaRequest('api', …)` example** in its `boot()` and register the policies instead:
 

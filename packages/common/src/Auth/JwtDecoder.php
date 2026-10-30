@@ -8,8 +8,6 @@ use UnexpectedValueException;
 
 class JwtDecoder
 {
-    private const ROLES = ['user', 'admin'];
-
     public function __construct(
         private readonly string $publicKey,
         private readonly int $leeway = 30,
@@ -27,10 +25,12 @@ class JwtDecoder
             }
         }
 
-        if (! is_string($claims->sub) || $claims->sub === '' || ! in_array($claims->role, self::ROLES, true)) {
+        $role = is_string($claims->role) ? Role::tryFrom($claims->role) : null;
+
+        if (! is_string($claims->sub) || $claims->sub === '' || $role === null) {
             throw new UnexpectedValueException('Invalid sub or role claim');
         }
 
-        return new JwtUser($claims->sub, $claims->role, (string) $claims->name);
+        return new JwtUser($claims->sub, $role, (string) $claims->name);
     }
 }
