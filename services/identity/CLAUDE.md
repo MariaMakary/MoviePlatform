@@ -13,9 +13,13 @@ Payloads and rules: `docs/events.md`.
 
 ## Notes
 
-- `App\Services\AuthService` does login, refresh and "current user": always reuse it. On an unknown email it still
+- Outgoing events are classes in `app/Integration/Events` with the routing key and the payload of `docs/events.md`,
+  published after the transaction commits:
+  `$this->events->publish(UserRegistered::ROUTING_KEY, UserRegistered::data($user))`. Social login (1149) reuses
+  `UserRegistered`.
+- `App\Services\AuthService` does register, login, refresh and "current user": always reuse it. On an unknown email it still
   runs `Hash::check` against a fixed dummy hash, so a login takes the same time whether the email exists or not.
-  Emails are lowercased by the `User` model when saved, and by `AuthService` when looked up.
+  Emails go through `User::normalizeEmail()` (trim + lowercase) when saved, looked up and checked for uniqueness.
 - `App\Services\TokenService::issue()` returns an `IssuedToken` (`user`, `token`, `expiresAt`), output with
   `TokenResource` (`{token, expires_at, user}`). It signs RS256 tokens with `secret('jwt_private_key')`. Every service verifies them with the committed `keys/jwt_public.pem`. Never generate a new key pair without telling the team.
 - It is the only service that stores users. Other services only keep `user_id` (a UUID) and read the user from the token.
