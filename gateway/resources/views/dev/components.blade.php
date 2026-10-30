@@ -81,6 +81,15 @@
         </section>
 
         <section class="space-y-4">
+            <h2 class="text-lg font-semibold text-white"><code>&lt;x-input label="…" name="…" type="text|email|password" wire:model="…" /&gt;</code></h2>
+            <div class="grid max-w-xl gap-4 sm:grid-cols-2">
+                <x-input label="Email" name="demo_email" type="email" placeholder="maria@example.com" />
+                <x-input label="Password" name="demo_password" type="password" />
+            </div>
+            <p class="text-sm text-gray-400">A field with an error gets a pink border and its message below it (<code>@@error('name')</code>, filled from the service's 422).</p>
+        </section>
+
+        <section class="space-y-4">
             <h2 class="text-lg font-semibold text-white"><code>&lt;x-modal name="…" title="…"&gt;</code></h2>
             <p class="text-sm text-gray-400">Open with <code>$dispatch('open-modal', 'name')</code> in Alpine or <code>$this->dispatch('open-modal', name: 'name')</code> in Livewire.</p>
             <x-button variant="secondary" x-data x-on:click="$dispatch('open-modal', 'demo')">Open modal</x-button>

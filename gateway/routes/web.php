@@ -1,10 +1,15 @@
 <?php
 
+use App\Livewire\Auth\Login;
+use App\Livewire\Auth\Register;
 use App\Livewire\Dev\ServiceStatus;
 use App\Livewire\Home;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', Home::class)->name('home');
+
+Route::get('/login', Login::class)->name('login');
+Route::get('/register', Register::class)->name('register');
 
 Route::get('/dev/components', function () {
     abort_unless(app()->isLocal(), 404);
