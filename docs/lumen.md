@@ -214,7 +214,7 @@ $this->json('POST', '/api/reviews', ['movie_id' => $movieId, 'body' => 'Great'],
     ->seeJson(['body' => 'Great']);
 ```
 
-Use the `DatabaseTransactions` trait in tests that write to the database, so nothing stays behind. For tokens, see how
+Tests use the service's real PostgreSQL database, never SQLite. Use the `DatabaseTransactions` trait in tests that write to the database, so nothing stays behind. For tokens, see how
 `services/identity/tests/JwtMiddlewareTest.php` signs one with the test keys in `tests/Fixtures/jwt`.
 
 ## 8. Shared code

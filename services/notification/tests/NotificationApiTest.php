@@ -6,10 +6,12 @@ use App\Models\Notification;
 use Firebase\JWT\JWT;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
+use Laravel\Lumen\Testing\DatabaseTransactions;
 
 class NotificationApiTest extends TestCase
 {
+    use DatabaseTransactions;
+
     private const ME = '0193a7c0-1111-7aaa-8bbb-000000000001';
 
     private const OTHER = '0193a7c0-2222-7aaa-8bbb-000000000002';
@@ -18,14 +20,7 @@ class NotificationApiTest extends TestCase
     {
         parent::setUp();
 
-        config([
-            'database.default' => 'testing',
-            'database.connections.testing' => ['driver' => 'sqlite', 'database' => ':memory:', 'prefix' => ''],
-            'jwt.public_key_path' => base_path('tests/Fixtures/jwt/test-public.pem'),
-        ]);
-        DB::purge('testing');
-
-        $this->artisan('migrate');
+        config(['jwt.public_key_path' => base_path('tests/Fixtures/jwt/test-public.pem')]);
     }
 
     private function auth(string $userId = self::ME): array
@@ -52,14 +47,30 @@ class NotificationApiTest extends TestCase
 
     public function test_the_table_matches_the_erd(): void
     {
-        $this->assertSame(
-            ['id', 'user_id', 'type', 'title', 'body', 'data', 'read_at', 'created_at', 'updated_at'],
-            Schema::getColumnListing('notifications'),
-        );
+        $columns = collect(DB::select(
+            "select column_name, data_type, character_maximum_length, is_nullable from information_schema.columns
+             where table_schema = current_schema() and table_name = 'notifications' order by ordinal_position"
+        ))->mapWithKeys(fn ($c) => [$c->column_name => implode(' ', array_filter([
+            $c->data_type,
+            $c->character_maximum_length ? "({$c->character_maximum_length})" : null,
+            $c->is_nullable === 'YES' ? 'NULL' : null,
+        ]))])->all();
 
-        $indexes = collect(Schema::getIndexes('notifications'))->pluck('columns')->all();
-        $this->assertContains(['user_id', 'read_at'], $indexes);
-        $this->assertContains(['user_id', 'created_at'], $indexes);
+        $this->assertSame([
+            'id' => 'uuid',
+            'user_id' => 'uuid',
+            'type' => 'character varying (50)',
+            'title' => 'character varying (255)',
+            'body' => 'text',
+            'data' => 'jsonb NULL',
+            'read_at' => 'timestamp without time zone NULL',
+            'created_at' => 'timestamp without time zone NULL',
+            'updated_at' => 'timestamp without time zone NULL',
+        ], $columns);
+
+        $indexes = collect(DB::select("select indexname from pg_indexes where tablename = 'notifications'"))->pluck('indexname');
+        $this->assertContains('notifications_user_id_read_at_index', $indexes);
+        $this->assertContains('notifications_user_id_created_at_index', $indexes);
     }
 
     public function test_every_route_needs_a_token(): void

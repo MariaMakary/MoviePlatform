@@ -78,4 +78,5 @@ project's `composer run dev` script, never as Docker containers. Details: `READM
 - Before writing something, check whether it already exists in the service or in `packages/common` (rule 9).
 - Follow the folder structure and naming, and match the existing code style of the service.
 - Prefer small changes that fit one task and one pull request. Update the docs in the same change.
+- Tests always run on the service's real **PostgreSQL** database with `DatabaseTransactions` (`docs/lumen.md`, section 7), never SQLite: SQLite hides Postgres behaviour (`uuid`, `jsonb`, CHECK constraints, indexes). Run `docker compose up -d` and `php artisan migrate` first.
 - Keep explanations short and suggest the commit message with `AB#<id>`.
