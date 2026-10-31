@@ -2,9 +2,11 @@
 
 namespace App\Livewire;
 
+use App\Exceptions\ServiceRequestException;
 use App\Livewire\Concerns\WithServiceFallback;
 use App\Services\Clients\CatalogClient;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -58,7 +60,15 @@ class Home extends Component
     private function loadNextPage(string $section): void
     {
         $next = $this->page[$section] + 1;
-        $result = $this->fromService($section, fn () => app(CatalogClient::class)->$section($next));
+
+        try {
+            $result = $this->fromService($section, fn () => app(CatalogClient::class)->$section($next));
+        } catch (ServiceRequestException $e) {
+            Log::warning("Home section {$section} failed", ['status' => $e->getStatusCode(), 'message' => $e->getMessage()]);
+            $this->unavailable[$section] = $e->service;
+
+            return;
+        }
 
         if ($result === null) {
             return;
