@@ -2,16 +2,13 @@
 
 namespace App\Models;
 
+use App\Enums\CreditRole;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class Credit extends Pivot
 {
     use HasUuids;
-
-    public const ROLE_CAST = 'cast';
-
-    public const ROLE_DIRECTOR = 'director';
 
     protected $table = 'movie_person';
 
@@ -20,6 +17,7 @@ class Credit extends Pivot
     public $timestamps = false;
 
     protected $casts = [
+        'role' => CreditRole::class,
         'cast_order' => 'integer',
     ];
 }

@@ -38,7 +38,7 @@ Token" (starts with `eyJ`, sent as `Authorization: Bearer`).
 |---|---|
 | `popular($page)`, `upcoming($page)`, `search($query, $page)`, `discover($genreTmdbId, $year, $page)` | `['results' => [['movie' => […], 'genre_tmdb_ids' => […]]], 'page', 'total_pages']` |
 | `movie($tmdbId)` | `['movie' => […incl. runtime, trailer_key], 'genres' => [['tmdb_id', 'name']], 'cast' => [['person' => […], 'character', 'cast_order']] (top 20), 'directors' => [['person' => […]]]]`, or `null` if TMDB has no such movie |
-| `person($tmdbId)` | `['person' => […incl. biography, birthday], 'movies' => [['movie' => […], 'genre_tmdb_ids', 'role', 'character']]]` (movies only, cast and director), or `null` |
+| `person($tmdbId)` | `['person' => […incl. biography, birthday], 'movies' => [['movie' => […], 'genre_tmdb_ids', 'role' (CreditRole), 'character']]]` (movies only, cast and director), or `null` |
 | `genres()` | `[['tmdb_id', 'name']]` |
 
 Any other TMDB error or timeout throws `TmdbUnavailable`, which the API returns as `503 {"message": "TMDB is
@@ -65,3 +65,9 @@ print "TMDB is unavailable." and exit with code 1; movies saved before the error
 through the `Credit` pivot (its own UUID `id`): use `$movie->cast()` (ordered by `cast_order`, with `character`) and
 `$movie->directors()`. They set `role` on attach, so `$movie->cast()->attach($personId, ['character' => …,
 'cast_order' => 0])` is all you need.
+
+A credit's role is the enum `App\Enums\CreditRole` (`Cast = 'cast'`, `Director = 'director'`), cast on the `Credit`
+pivot: `$movie->cast()->first()->pivot->role` and the pivot of `$person->movies()` are `CreditRole` cases, so compare
+with `=== CreditRole::Director`. Never write `'cast'` or `'director'` in code: use the case, and `->value` only where
+the model is bypassed (`DB::table('movie_person')`, string keys). The `movie_person` column stays `varchar` with its
+CHECK (`docs/database.md`).

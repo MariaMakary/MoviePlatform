@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use App\Models\Credit;
+use App\Enums\CreditRole;
 use App\Models\Genre;
 use App\Models\Movie;
 use App\Models\Person;
@@ -134,9 +134,11 @@ class CatalogSchemaTest extends TestCase
         $this->assertSame('Cobb', $cast[0]->pivot->character);
         $this->assertSame(0, $cast[0]->pivot->cast_order);
         $this->assertTrue(Str::isUuid($cast[0]->pivot->id));
+        $this->assertSame(CreditRole::Cast, $movie->cast()->first()->pivot->role);
 
         $this->assertSame([$director->id], $movie->directors()->pluck('people.id')->all());
-        $this->assertSame(Credit::ROLE_DIRECTOR, DB::table('movie_person')->where('person_id', $director->id)->value('role'));
+        $this->assertSame(CreditRole::Director, $movie->directors()->first()->pivot->role);
+        $this->assertSame(CreditRole::Director->value, DB::table('movie_person')->where('person_id', $director->id)->value('role'));
     }
 
     public function test_person_movies_include_the_role(): void
@@ -149,7 +151,8 @@ class CatalogSchemaTest extends TestCase
 
         $roles = $nolan->movies()->get()->mapWithKeys(fn ($movie) => [$movie->id => $movie->pivot->role])->all();
 
-        $this->assertEquals([$inception->id => 'director', $tenet->id => 'cast'], $roles);
+        $this->assertEquals([$inception->id => CreditRole::Director, $tenet->id => CreditRole::Cast], $roles);
+        $this->assertContainsOnlyInstancesOf(CreditRole::class, $roles);
     }
 
     public function test_the_same_person_can_act_in_and_direct_a_movie(): void

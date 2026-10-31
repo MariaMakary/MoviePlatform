@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
+use App\Enums\CreditRole;
 use App\Integration\Clients\TmdbClient;
-use App\Models\Credit;
 use App\Models\Genre;
 use App\Models\Movie;
 use App\Models\Person;
@@ -104,9 +104,9 @@ class MovieSyncService
     {
         $credits = collect($data['cast'])
             ->take(self::CAST_LIMIT)
-            ->map(fn (array $credit) => $this->creditRow($movie, $credit['person'], Credit::ROLE_CAST, $credit['character'], $credit['cast_order']))
+            ->map(fn (array $credit) => $this->creditRow($movie, $credit['person'], CreditRole::Cast, $credit['character'], $credit['cast_order']))
             ->concat(collect($data['directors'])
-                ->map(fn (array $credit) => $this->creditRow($movie, $credit['person'], Credit::ROLE_DIRECTOR)))
+                ->map(fn (array $credit) => $this->creditRow($movie, $credit['person'], CreditRole::Director)))
             ->unique(fn (array $row) => $row['person_id'].'|'.$row['role'])
             ->values();
 
@@ -127,13 +127,13 @@ class MovieSyncService
         }
     }
 
-    private function creditRow(Movie $movie, array $person, string $role, ?string $character = null, ?int $castOrder = null): array
+    private function creditRow(Movie $movie, array $person, CreditRole $role, ?string $character = null, ?int $castOrder = null): array
     {
         return [
             'id' => (string) Str::orderedUuid(),
             'movie_id' => $movie->id,
             'person_id' => $this->savePerson($person)->id,
-            'role' => $role,
+            'role' => $role->value,
             'character' => $character,
             'cast_order' => $castOrder,
         ];

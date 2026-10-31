@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use App\Models\Credit;
+use App\Enums\CreditRole;
 use App\Models\Genre;
 use App\Models\Movie;
 use App\Models\Person;
@@ -199,7 +199,7 @@ class MovieSyncTest extends TestCase
 
         $movie = $this->sync();
 
-        $this->assertSame(1, $this->credits($movie)->where('role', Credit::ROLE_CAST)->where('person_id', Person::where('tmdb_id', 900200000)->value('id'))->count());
+        $this->assertSame(1, $this->credits($movie)->where('role', CreditRole::Cast->value)->where('person_id', Person::where('tmdb_id', 900200000)->value('id'))->count());
     }
 
     public function test_a_local_genre_with_the_same_name_is_linked_to_tmdb(): void

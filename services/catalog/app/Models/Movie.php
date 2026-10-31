@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\CreditRole;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -38,19 +39,19 @@ class Movie extends Model
 
     public function cast(): BelongsToMany
     {
-        return $this->credits(Credit::ROLE_CAST)->orderByPivot('cast_order');
+        return $this->credits(CreditRole::Cast)->orderByPivot('cast_order');
     }
 
     public function directors(): BelongsToMany
     {
-        return $this->credits(Credit::ROLE_DIRECTOR);
+        return $this->credits(CreditRole::Director);
     }
 
-    private function credits(string $role): BelongsToMany
+    private function credits(CreditRole $role): BelongsToMany
     {
         return $this->belongsToMany(Person::class, 'movie_person')
             ->using(Credit::class)
-            ->withPivot('id', 'character', 'cast_order')
-            ->withPivotValue('role', $role);
+            ->withPivot('id', 'role', 'character', 'cast_order')
+            ->withPivotValue('role', $role->value);
     }
 }
