@@ -1,4 +1,5 @@
-<div wire:ignore data-cinema-map data-fallback-lat="{{ $fallback['lat'] }}" data-fallback-lng="{{ $fallback['lng'] }}" class="space-y-4">
+<div wire:ignore data-cinema-map data-fallback-lat="{{ $fallback['lat'] }}" data-fallback-lng="{{ $fallback['lng'] }}"
+     data-radius="{{ $radius }}" class="space-y-4">
     <header class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
             <h1 class="text-2xl font-bold text-white">Cinemas near me</h1>
@@ -14,7 +15,20 @@
         </x-button>
     </header>
 
-    {{-- isolate: keeps Leaflet's high z-indexes under the sticky navbar --}}
-    <div data-map class="isolate h-[70vh] min-h-80 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]"
-         role="region" aria-label="Map of cinemas near you"></div>
+    <div class="grid gap-4 lg:grid-cols-3">
+        {{-- isolate: keeps Leaflet's high z-indexes under the sticky navbar --}}
+        <div data-map class="isolate h-[70vh] min-h-80 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] lg:col-span-2"
+             role="region" aria-label="Map of cinemas near you"></div>
+
+        <aside class="flex max-h-[70vh] min-h-48 flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]"
+               aria-labelledby="cinemas-heading">
+            <div class="border-b border-white/10 px-4 py-3">
+                <h2 id="cinemas-heading" class="text-sm font-semibold text-white">Cinemas within {{ $radius / 1000 }} km</h2>
+                <p data-cinemas-status role="status" aria-live="polite" class="mt-0.5 text-sm text-gray-400">Waiting for your location…</p>
+                <x-button variant="ghost" size="sm" class="mt-3" data-cinemas-retry hidden>Try again</x-button>
+            </div>
+
+            <ol data-cinemas-list class="flex-1 divide-y divide-white/10 overflow-y-auto"></ol>
+        </aside>
+    </div>
 </div>
