@@ -13,6 +13,7 @@ class MovieCardResource extends JsonResource
             'title' => $this->title,
             'poster_url' => $this->posterUrl(),
             'year' => $this->release_date?->year,
+            'release_date' => $this->release_date?->toDateString(),
             'vote_average' => $this->vote_average === null ? null : (float) $this->vote_average,
             'genres' => $this->genres->pluck('name')->sort()->values()->all(),
         ];

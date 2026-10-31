@@ -15,6 +15,7 @@ popular and upcoming). Built by `MovieCardResource`.
 | `title` | string | |
 | `poster_url` | string \| null | full TMDB image URL (w342), `null` when the movie has no poster |
 | `year` | integer \| null | year of `release_date` |
+| `release_date` | date (`YYYY-MM-DD`) \| null | e.g. to show when an upcoming movie comes out |
 | `vote_average` | number \| null | TMDB average, 0–10, one decimal |
 | `genres` | string[] | genre names, alphabetical; can be empty |
 
@@ -41,11 +42,56 @@ be shorter than the request. A repeated id is returned once. Not paginated.
 ```json
 {
   "data": [
-    {"id": "0193a7c1-3333-7aaa-8bbb-000000000101", "title": "Interstellar", "poster_url": "https://image.tmdb.org/t/p/w342/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg", "year": 2014, "vote_average": 8.5, "genres": ["Adventure", "Drama", "Science Fiction"]},
-    {"id": "0193a7c1-3333-7aaa-8bbb-000000000100", "title": "Inception", "poster_url": "https://image.tmdb.org/t/p/w342/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg", "year": 2010, "vote_average": 8.4, "genres": ["Action", "Science Fiction"]}
+    {"id": "0193a7c1-3333-7aaa-8bbb-000000000101", "title": "Interstellar", "poster_url": "https://image.tmdb.org/t/p/w342/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg", "year": 2014, "release_date": "2014-11-05", "vote_average": 8.5, "genres": ["Adventure", "Drama", "Science Fiction"]},
+    {"id": "0193a7c1-3333-7aaa-8bbb-000000000100", "title": "Inception", "poster_url": "https://image.tmdb.org/t/p/w342/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg", "year": 2010, "release_date": "2010-07-15", "vote_average": 8.4, "genres": ["Action", "Science Fiction"]}
   ]
 }
 ```
 
 **Errors:** `422` `ids` missing or empty, more than 100 ids, or an id that is not a UUID (`errors.ids` or
 `errors.ids.<position>`)
+
+### GET /api/movies/popular
+
+TMDB's popular movies, 20 per page, as movie cards with their **Catalog** ids. Every movie on the page is made sure to
+exist in Catalog: a movie seen for the first time is created from the list data (title, overview, poster, release date,
+`vote_average`, genres) without an extra TMDB call, and gets its full details (cast, runtime, trailer) when it is first
+opened (`GET /api/movies/{id}`). A movie already in Catalog is used as it is (an admin's edits are kept).
+
+The pages are TMDB's: `last_page` is at most 500 and `total` at most 10 000 (TMDB serves no more).
+
+**Who:** guest
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `page` | integer | query, optional, default 1, 1–500 |
+
+**Response** `200`
+
+```json
+{
+  "data": [
+    {"id": "0193a7c1-3333-7aaa-8bbb-000000000100", "title": "Inception", "poster_url": "https://image.tmdb.org/t/p/w342/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg", "year": 2010, "release_date": "2010-07-15", "vote_average": 8.4, "genres": ["Action", "Science Fiction"]}
+  ],
+  "meta": {"current_page": 1, "last_page": 500, "total": 10000}
+}
+```
+
+**Errors:** `422` `page` not an integer from 1 to 500 · `503` `"TMDB is unavailable."` (TMDB down and the page not
+cached)
+
+### GET /api/movies/upcoming
+
+Like `GET /api/movies/popular`, for movies coming out soon in the configured region (`TMDB_REGION`, default `US`).
+Only movies with a release date **after today (UTC)** are kept, so a page can hold fewer than 20 movies; `meta` stays
+TMDB's.
+
+**Who:** guest
+
+**Request:** same as popular (`page`, 1–500)
+
+**Response** `200`: same shape as popular
+
+**Errors:** `422` invalid `page` · `503` `"TMDB is unavailable."`

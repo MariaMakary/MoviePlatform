@@ -36,7 +36,7 @@ Token" (starts with `eyJ`, sent as `Authorization: Bearer`).
 
 | Method | Returns (our column names, ready to save) |
 |---|---|
-| `popular($page)`, `upcoming($page)`, `search($query, $page)`, `discover($genreTmdbId, $year, $page)` | `['results' => [['movie' => […], 'genre_tmdb_ids' => […]]], 'page', 'total_pages']` |
+| `popular($page)`, `upcoming($page)`, `search($query, $page)`, `discover($genreTmdbId, $year, $page)` | `['results' => [['movie' => […], 'genre_tmdb_ids' => […]]], 'page', 'total_pages', 'total_results']`. `upcoming` asks for `TMDB_REGION` (default `US`): without a region TMDB's `release_date` is the first release anywhere, usually already past. |
 | `movie($tmdbId)` | `['movie' => […incl. runtime, trailer_key], 'genres' => [['tmdb_id', 'name']], 'cast' => [['person' => […], 'character', 'cast_order']] (top 20), 'directors' => [['person' => […]]]]`, or `null` if TMDB has no such movie |
 | `person($tmdbId)` | `['person' => […incl. biography, birthday], 'movies' => [['movie' => […], 'genre_tmdb_ids', 'role' (CreditRole), 'character']]]` (movies only, cast and director), or `null` |
 | `genres()` | `[['tmdb_id', 'name']]` |
