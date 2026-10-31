@@ -28,6 +28,22 @@ Read `docs/lumen.md` (how to write Lumen code here), `docs/api/catalog.md` (this
 The tests use the real `catalog-db` (CHECK constraints, full-text index, cascades), so run `docker compose up -d` and
 `composer run dev` once first (it applies the migrations). They use `DatabaseTransactions`, so they leave no rows behind.
 
+## TMDB
+
+`App\Integration\Clients\TmdbClient` is the only code that calls TMDB (`en-US`, 5-second timeout). The key comes from
+`secret('tmdb_api_key')` in `config/services.php`: either the v3 "API Key" (sent as `api_key`) or the "API Read Access
+Token" (starts with `eyJ`, sent as `Authorization: Bearer`).
+
+| Method | Returns (our column names, ready to save) |
+|---|---|
+| `popular($page)`, `upcoming($page)`, `search($query, $page)`, `discover($genreTmdbId, $year, $page)` | `['results' => [['movie' => […], 'genre_tmdb_ids' => […]]], 'page', 'total_pages']` |
+| `movie($tmdbId)` | `['movie' => […incl. runtime, trailer_key], 'genres' => [['tmdb_id', 'name']], 'cast' => [['person' => […], 'character', 'cast_order']] (top 20), 'directors' => [['person' => […]]]]`, or `null` if TMDB has no such movie |
+| `person($tmdbId)` | `['person' => […incl. biography, birthday], 'movies' => [['movie' => […], 'genre_tmdb_ids', 'role', 'character']]]` (movies only, cast and director), or `null` |
+| `genres()` | `[['tmdb_id', 'name']]` |
+
+Any other TMDB error or timeout throws `TmdbUnavailable`, which the API returns as `503 {"message": "TMDB is
+unavailable."}`. The key never reaches a log or a response: errors are logged with the path and status only.
+
 ## Models
 
 `Movie`, `Genre`, `Person` (table `people`) with factories in `database/factories`. Credits live in `movie_person`
