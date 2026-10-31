@@ -24,6 +24,10 @@ Rules for every service's database, migrations and models.
   (`watched_at`, `processed_at`).
 - CHECK constraints, UNIQUE keys and the important indexes are written in the **"Constraints & indexes"** box of the
   service's ERD, and implemented in the migration.
+- A fixed set of values (role, status, kind) is a `varchar` column with a CHECK listing the values, added with
+  `DB::statement("ALTER TABLE … ADD CONSTRAINT <table>_<column>_check CHECK (<column> IN (…)))")`, and a PHP backed enum
+  cast in the model (`'role' => Role::class`). The migration writes the values as plain strings, never through the
+  enum, so it stays the same if the enum changes later.
 - Flexible data in `jsonb` (`$table->jsonb('settings')`). Case-insensitive search with `ILIKE`.
 
 ## Changing the schema

@@ -8,13 +8,13 @@ class JwtUser implements Authenticatable
 {
     public function __construct(
         public readonly string $id,
-        public readonly string $role,
+        public readonly Role $role,
         public readonly string $name,
     ) {}
 
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return $this->role === Role::Admin;
     }
 
     public function getAuthIdentifierName(): string

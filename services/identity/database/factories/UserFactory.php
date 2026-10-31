@@ -4,26 +4,28 @@ namespace Database\Factories;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use MoviePlatform\Common\Auth\Role;
 
 class UserFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
     protected $model = User::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
-    public function definition()
+    public function definition(): array
     {
         return [
-            'name' => $this->faker->name,
-            'email' => $this->faker->unique()->safeEmail,
+            'name' => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail(),
+            'password' => 'password',
         ];
+    }
+
+    public function admin(): static
+    {
+        return $this->state(['role' => Role::Admin]);
+    }
+
+    public function blocked(): static
+    {
+        return $this->state(['is_blocked' => true]);
     }
 }

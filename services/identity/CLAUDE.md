@@ -25,3 +25,12 @@ Read `docs/lumen.md` (how to write Lumen code here), `docs/api/identity.md` (thi
 ## Running
 
 `composer run dev` starts `php -S 127.0.0.1:8001 -t public` (it only publishes events). Tests: `vendor/bin/phpunit`.
+The tests use the real `identity-db` (CHECK constraint, unique email), so run `docker compose up -d` and
+`php artisan migrate` first. They use `DatabaseTransactions`, so they leave no rows behind.
+
+## Models
+
+`User` (UUID, `HasUuids`) with `UserFactory` (`->admin()`, `->blocked()`). `password` is hashed by its cast, so assign
+the plain value; it is `null` for social-login accounts and hidden from `toArray()`. `role` is cast to the
+`MoviePlatform\Common\Auth\Role` enum (`Role::User`, `Role::Admin`). `role` and `is_blocked` are not fillable: a
+request can never set them, so admin actions set them explicitly (`$user->role = Role::Admin`).
