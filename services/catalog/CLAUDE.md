@@ -44,6 +44,21 @@ Token" (starts with `eyJ`, sent as `Authorization: Bearer`).
 Any other TMDB error or timeout throws `TmdbUnavailable`, which the API returns as `503 {"message": "TMDB is
 unavailable."}`. The key never reaches a log or a response: errors are logged with the path and status only.
 
+## Filling the database from TMDB
+
+Each laptop has its own `catalog-db`, so run this once (needs your key in `secrets/tmdb_api_key`):
+
+```powershell
+php artisan catalog:sync-genres          # all TMDB genres (19)
+php artisan catalog:sync-popular 5       # 5 pages × 20 = 100 popular movies, with cast, directors and trailer
+```
+
+Both are safe to run again: they update instead of duplicating. `App\Services\MovieSyncService::sync($tmdbId)`
+upserts one movie by `tmdb_id`: its fields, genres, top 15 cast, director(s), trailer key and `synced_at`. A movie with
+`is_edited = true` keeps its fields and genres (only `synced_at` and the credits change). Credits are upserted on
+UNIQUE (`movie_id`, `person_id`, `role`); a credit that left TMDB's top 15 is removed. If TMDB is down, the commands
+print "TMDB is unavailable." and exit with code 1; movies saved before the error are kept.
+
 ## Models
 
 `Movie`, `Genre`, `Person` (table `people`) with factories in `database/factories`. Credits live in `movie_person`
