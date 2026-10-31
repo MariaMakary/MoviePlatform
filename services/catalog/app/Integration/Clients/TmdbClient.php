@@ -2,7 +2,7 @@
 
 namespace App\Integration\Clients;
 
-use App\Models\Credit;
+use App\Enums\CreditRole;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
@@ -84,7 +84,7 @@ class TmdbClient
             ->map(fn (array $movie) => [
                 'movie' => $this->movieAttributes($movie),
                 'genre_tmdb_ids' => $movie['genre_ids'] ?? [],
-                'role' => Credit::ROLE_CAST,
+                'role' => CreditRole::Cast,
                 'character' => $this->nullIfEmpty($movie['character'] ?? null),
             ])
             ->concat(collect($credits['crew'] ?? [])
@@ -93,10 +93,10 @@ class TmdbClient
                 ->map(fn (array $movie) => [
                     'movie' => $this->movieAttributes($movie),
                     'genre_tmdb_ids' => $movie['genre_ids'] ?? [],
-                    'role' => Credit::ROLE_DIRECTOR,
+                    'role' => CreditRole::Director,
                     'character' => null,
                 ]))
-            ->unique(fn (array $credit) => $credit['movie']['tmdb_id'].'-'.$credit['role'])
+            ->unique(fn (array $credit) => $credit['movie']['tmdb_id'].'-'.$credit['role']->value)
             ->values()
             ->all();
 

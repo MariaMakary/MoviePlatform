@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use App\Enums\CreditRole;
 use App\Integration\Clients\TmdbClient;
 use App\Integration\Clients\TmdbUnavailable;
 use Illuminate\Http\Client\ConnectionException;
@@ -194,8 +195,8 @@ class TmdbClientTest extends TestCase
         ], $result['person']);
 
         $this->assertCount(2, $result['movies']);
-        $this->assertSame([1, 'cast', 'Himself'], [$result['movies'][0]['movie']['tmdb_id'], $result['movies'][0]['role'], $result['movies'][0]['character']]);
-        $this->assertSame([27205, 'director', null], [$result['movies'][1]['movie']['tmdb_id'], $result['movies'][1]['role'], $result['movies'][1]['character']]);
+        $this->assertSame([1, CreditRole::Cast, 'Himself'], [$result['movies'][0]['movie']['tmdb_id'], $result['movies'][0]['role'], $result['movies'][0]['character']]);
+        $this->assertSame([27205, CreditRole::Director, null], [$result['movies'][1]['movie']['tmdb_id'], $result['movies'][1]['role'], $result['movies'][1]['character']]);
         $this->assertSame([28, 878], $result['movies'][1]['genre_tmdb_ids']);
     }
 
