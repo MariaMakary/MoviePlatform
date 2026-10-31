@@ -1,8 +1,9 @@
-@props(['movie', 'href' => null, 'posterSize' => 'w342'])
+@props(['movie', 'href' => null, 'posterSize' => 'w342', 'showReleaseDate' => false])
 
 @php
-    $poster = \App\Services\TmdbImage::url($movie['poster_path'] ?? null, $posterSize);
-    $year = isset($movie['release_date']) ? substr($movie['release_date'], 0, 4) : null;
+    $poster = $movie['poster_url'] ?? \App\Services\TmdbImage::url($movie['poster_path'] ?? null, $posterSize);
+    $year = $movie['year'] ?? (isset($movie['release_date']) ? substr($movie['release_date'], 0, 4) : null);
+    $releaseDate = $showReleaseDate ? ($movie['release_date'] ?? null) : null;
     $rating = $movie['vote_average'] ?? null;
     $tag = $href ? 'a' : 'div';
 @endphp
@@ -28,7 +29,9 @@
 
     <div class="mt-2 px-0.5">
         <h3 class="line-clamp-2 text-sm font-semibold text-gray-100 group-hover:text-white">{{ $movie['title'] }}</h3>
-        @if ($year)
+        @if ($releaseDate)
+            <p class="text-xs font-medium text-sky-300"><x-date :value="$releaseDate" format="j M Y" /></p>
+        @elseif ($year)
             <p class="text-xs text-gray-400">{{ $year }}</p>
         @endif
     </div>
