@@ -15,4 +15,9 @@ class IdentityClient extends BaseClient
     {
         return $this->post('/api/login', ['email' => $email, 'password' => $password])['data'];
     }
+
+    public function refresh(): array
+    {
+        return $this->post('/api/token/refresh')['data'];
+    }
 }

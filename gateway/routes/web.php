@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\LogoutController;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
 use App\Livewire\Dev\ServiceStatus;
@@ -13,6 +14,7 @@ Route::get('/cinemas', CinemaMap::class)->name('cinemas');
 
 Route::get('/login', Login::class)->name('login');
 Route::get('/register', Register::class)->name('register');
+Route::post('/logout', LogoutController::class)->name('logout');
 
 Route::get('/dev/components', function () {
     abort_unless(app()->isLocal(), 404);
