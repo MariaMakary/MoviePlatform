@@ -37,11 +37,20 @@
         </section>
 
         <section class="space-y-4">
-            <h2 class="text-lg font-semibold text-white"><code>&lt;x-movie-card :movie="$movie" href="…" /&gt;</code></h2>
+            <h2 class="text-lg font-semibold text-white"><code>&lt;x-movie-card :movie="$movie" href="…" :show-release-date="true" /&gt;</code></h2>
+            <p class="text-sm text-gray-400">Takes a Catalog movie card (<code>poster_url</code>, <code>year</code>, <code>release_date</code>) or raw TMDB fields (<code>poster_path</code>). The last card shows the release date instead of the year.</p>
             <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
                 @foreach ($movies as $movie)
                     <x-movie-card :movie="$movie" href="#" />
                 @endforeach
+                <x-movie-card href="#" :show-release-date="true" :movie="[
+                    'id' => '0193a7c1-3333-7aaa-8bbb-000000000104',
+                    'title' => 'A Catalog card',
+                    'poster_url' => 'https://image.tmdb.org/t/p/w342/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg',
+                    'year' => 2026,
+                    'release_date' => '2026-12-18',
+                    'vote_average' => null,
+                ]" />
             </div>
         </section>
 
