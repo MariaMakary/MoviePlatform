@@ -4,6 +4,7 @@ namespace Tests;
 
 use App\Models\User;
 use App\Services\TokenService;
+use MoviePlatform\Common\Auth\Role;
 
 class AdminAndServiceMiddlewareTest extends TestCase
 {
@@ -27,25 +28,24 @@ class AdminAndServiceMiddlewareTest extends TestCase
         });
     }
 
-    private function token(string $role): string
+    private function token(Role $role): string
     {
-        $user = new User(['name' => 'Maria Makary']);
-        $user->setKeyType('string')->setIncrementing(false);
-        $user->forceFill(['id' => '0193a7c0-1111-7aaa-8bbb-000000000001', 'role' => $role]);
+        $user = (new User(['name' => 'Maria Makary']))
+            ->forceFill(['id' => '0193a7c0-1111-7aaa-8bbb-000000000001', 'role' => $role]);
 
-        return app(TokenService::class)->issue($user);
+        return app(TokenService::class)->issue($user)->token;
     }
 
     public function test_admin_token_passes_the_admin_middleware(): void
     {
-        $this->get('/api/test-admin', ['Authorization' => 'Bearer '.$this->token('admin')])
+        $this->get('/api/test-admin', ['Authorization' => 'Bearer '.$this->token(Role::Admin)])
             ->seeStatusCode(200)
             ->seeJsonEquals(['ok' => true]);
     }
 
     public function test_user_token_gets_403_json(): void
     {
-        $this->get('/api/test-admin', ['Authorization' => 'Bearer '.$this->token('user')])
+        $this->get('/api/test-admin', ['Authorization' => 'Bearer '.$this->token(Role::User)])
             ->seeStatusCode(403)
             ->seeJsonEquals(['message' => 'This action is unauthorized.']);
     }

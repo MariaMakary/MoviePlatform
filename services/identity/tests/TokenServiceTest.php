@@ -35,20 +35,21 @@ class TokenServiceTest extends TestCase
 
     public function test_token_has_the_agreed_claims(): void
     {
-        $token = app(TokenService::class)->issue($this->user(['role' => Role::Admin]));
+        $issued = app(TokenService::class)->issue($this->user(['role' => Role::Admin]));
 
-        $claims = JWT::decode($token, $this->publicKey());
+        $claims = JWT::decode($issued->token, $this->publicKey());
 
         $this->assertSame('0193a7c0-1111-7aaa-8bbb-000000000001', $claims->sub);
         $this->assertSame('admin', $claims->role);
         $this->assertSame('Maria Makary', $claims->name);
         $this->assertSame(1800, $claims->exp - $claims->iat);
         $this->assertEqualsWithDelta(time(), $claims->iat, 5);
+        $this->assertSame($claims->exp, $issued->expiresAt->getTimestamp());
     }
 
     public function test_token_is_signed_with_rs256(): void
     {
-        $token = app(TokenService::class)->issue($this->user());
+        $token = app(TokenService::class)->issue($this->user())->token;
 
         $header = json_decode(base64_decode(strtr(explode('.', $token)[0], '-_', '+/')), true);
 
@@ -57,7 +58,7 @@ class TokenServiceTest extends TestCase
 
     public function test_token_is_rejected_by_another_public_key(): void
     {
-        $token = app(TokenService::class)->issue($this->user());
+        $token = app(TokenService::class)->issue($this->user())->token;
 
         $this->expectException(SignatureInvalidException::class);
 
@@ -66,7 +67,7 @@ class TokenServiceTest extends TestCase
 
     public function test_role_defaults_to_user(): void
     {
-        $token = app(TokenService::class)->issue($this->user(['role' => null]));
+        $token = app(TokenService::class)->issue($this->user(['role' => null]))->token;
 
         $this->assertSame('user', JWT::decode($token, $this->publicKey())->role);
     }

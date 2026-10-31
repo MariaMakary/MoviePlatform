@@ -5,6 +5,7 @@ namespace Tests;
 use App\Models\User;
 use App\Services\TokenService;
 use Illuminate\Http\Request;
+use MoviePlatform\Common\Auth\Role;
 
 class JwtMiddlewareTest extends TestCase
 {
@@ -28,11 +29,10 @@ class JwtMiddlewareTest extends TestCase
 
     private function token(): string
     {
-        $user = new User(['name' => 'Maria Makary']);
-        $user->setKeyType('string')->setIncrementing(false);
-        $user->forceFill(['id' => '0193a7c0-1111-7aaa-8bbb-000000000001', 'role' => 'admin']);
+        $user = (new User(['name' => 'Maria Makary']))
+            ->forceFill(['id' => '0193a7c0-1111-7aaa-8bbb-000000000001', 'role' => Role::Admin]);
 
-        return app(TokenService::class)->issue($user);
+        return app(TokenService::class)->issue($user)->token;
     }
 
     public function test_token_issued_by_identity_passes_the_jwt_middleware(): void

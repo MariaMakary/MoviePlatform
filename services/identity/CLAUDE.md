@@ -13,7 +13,11 @@ Payloads and rules: `docs/events.md`.
 
 ## Notes
 
-- `App\Services\TokenService` signs RS256 tokens with `secret('jwt_private_key')`. Every service verifies them with the committed `keys/jwt_public.pem`. Never generate a new key pair without telling the team.
+- `App\Services\AuthService` does login, refresh and "current user": always reuse it. On an unknown email it still
+  runs `Hash::check` against a fixed dummy hash, so a login takes the same time whether the email exists or not.
+  Emails are lowercased by the `User` model when saved, and by `AuthService` when looked up.
+- `App\Services\TokenService::issue()` returns an `IssuedToken` (`user`, `token`, `expiresAt`), output with
+  `TokenResource` (`{token, expires_at, user}`). It signs RS256 tokens with `secret('jwt_private_key')`. Every service verifies them with the committed `keys/jwt_public.pem`. Never generate a new key pair without telling the team.
 - It is the only service that stores users. Other services only keep `user_id` (a UUID) and read the user from the token.
 - Social login uses Laravel Socialite in **stateless** mode (Lumen has no sessions).
 
