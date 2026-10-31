@@ -10,7 +10,7 @@ services. Sessions and cache are in Redis (`predis`).
 app/Livewire/<Module>/         Auth, Catalog, Engagement, Social, Intelligence, Notifications, Admin
 app/Services/Clients/          BaseClient + one client per service (IdentityClient, CatalogClient, …)
 app/Services/Aggregators/      combine several services for one page (e.g. MoviePageAggregator)
-resources/views/components/    shared: x-logo, x-nav-link, x-date, x-flash, x-movie-card, x-rating-stars, x-avatar, x-button, x-modal, x-empty-state, x-service-unavailable, x-icons.star
+resources/views/components/    shared: x-logo, x-nav-link, x-date, x-flash, x-movie-card, x-rating-stars, x-avatar, x-button, x-input, x-modal, x-empty-state, x-service-unavailable, x-icons.star
 resources/views/layouts/       app.blade.php (navbar, flash area, footer) + partials/ (navigation, search, user-menu, notification-bell, footer)
 resources/views/livewire/<module>/
 resources/js/                  Echo (Reverb), Leaflet
@@ -34,6 +34,11 @@ resources/js/                  Echo (Reverb), Leaflet
 
   Exception: `health()` returns the body of a `503` too (`status: degraded` and the part that failed), so the admin
   dashboard can show what is wrong; only a connection error throws.
+- **Logged-in user:** `App\Services\AuthSession` owns the session keys. Login and register (`App\Livewire\Auth`, through
+  the `SignsIn` trait) call `start()`: a new session id, then the token (`jwt`), its `jwt_expires_at` and the user
+  (`id`, `name`, `role`, `avatar`). Read the user with `app(AuthSession::class)->user()` (null for guests), never with
+  `session('user')` directly. Form errors from a service's 422 appear under `<x-input>` fields automatically; other
+  form-level messages use the `form` error key (`@error('form')`).
 - **Graceful fallback:** a section whose service is down shows `<x-service-unavailable/>`; the page never crashes.
   In a Livewire component, `use WithServiceFallback` and load data **in `render()`** (so "Try again" reloads it):
 
