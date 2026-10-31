@@ -32,6 +32,6 @@ trait SignsIn
         app(AuthSession::class)->start($auth);
         session()->flash('success', "{$greeting}, {$auth['user']['name']}!");
 
-        $this->redirectRoute('home');
+        $this->redirectIntended(route('home'));
     }
 }

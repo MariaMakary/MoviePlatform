@@ -36,9 +36,16 @@ resources/js/                  Echo (Reverb), Leaflet
   dashboard can show what is wrong; only a connection error throws.
 - **Logged-in user:** `App\Services\AuthSession` owns the session keys. Login and register (`App\Livewire\Auth`, through
   the `SignsIn` trait) call `start()`: a new session id, then the token (`jwt`), its `jwt_expires_at` and the user
-  (`id`, `name`, `role`, `avatar`). Read the user with `app(AuthSession::class)->user()` (null for guests), never with
-  `session('user')` directly. Form errors from a service's 422 appear under `<x-input>` fields automatically; other
-  form-level messages use the `form` error key (`@error('form')`).
+  (`id`, `name`, `role`, `avatar`). Read the user with `app(AuthSession::class)->user()` (null for guests and once the
+  token has expired), never with `session('user')` directly. Form errors from a service's 422 appear under `<x-input>`
+  fields automatically; other form-level messages use the `form` error key (`@error('form')`).
+- **Protected pages:** add `->middleware('auth.jwt')` to the route. A guest is sent to `/login` and comes back to that
+  page after logging in. It also protects the page's Livewire actions (persistent middleware).
+- **Token renewal:** `RefreshJwt` runs on every web request. When a logged-in user's token expires in less than 10
+  minutes, it calls Identity's `POST /api/token/refresh` and stores the new token, so an active user stays logged in.
+  Identity refusing (401/403: expired, deleted or blocked) logs the user out to `/login` with a message; Identity down
+  keeps the current token until it expires. After changing the user's name, call `app(AuthSession::class)->refresh()`.
+- **Logout:** `POST /logout` (route `logout`) clears the session. The token is not revoked: it expires on its own.
 - **Graceful fallback:** a section whose service is down shows `<x-service-unavailable/>`; the page never crashes.
   In a Livewire component, `use WithServiceFallback` and load data **in `render()`** (so "Try again" reloads it):
 
