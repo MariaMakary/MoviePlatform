@@ -1,10 +1,18 @@
 <div wire:ignore data-cinema-map data-fallback-lat="{{ $fallback['lat'] }}" data-fallback-lng="{{ $fallback['lng'] }}"
      data-radius="{{ $radius }}" class="space-y-4">
-    <header class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-            <h1 class="text-2xl font-bold text-white">Cinemas near me</h1>
-            <p data-map-status role="status" aria-live="polite" class="mt-1 text-sm text-gray-400">Finding your location…</p>
-        </div>
+    <header>
+        <h1 class="text-2xl font-bold text-white">Cinemas near me</h1>
+        <p data-map-status role="status" aria-live="polite" class="mt-1 text-sm text-gray-400">Finding your location…</p>
+    </header>
+
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+        <form data-place-search role="search" class="flex flex-1 items-end gap-2">
+            <div class="flex-1">
+                <x-input label="Choose a location" name="place" type="search" placeholder="City, area or address"
+                         autocomplete="off" enterkeyhint="search" />
+            </div>
+            <x-button type="submit" variant="ghost">Search</x-button>
+        </form>
 
         <x-button variant="secondary" data-map-locate>
             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
@@ -13,7 +21,7 @@
             </svg>
             Use my location
         </x-button>
-    </header>
+    </div>
 
     <div class="grid gap-4 lg:grid-cols-3">
         {{-- isolate: keeps Leaflet's high z-indexes under the sticky navbar --}}
