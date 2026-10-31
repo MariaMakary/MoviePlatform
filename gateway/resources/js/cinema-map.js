@@ -120,7 +120,7 @@ export function mountCinemaMap(root) {
         if (label) {
             const marker = L.circleMarker(position, {
                 radius: 8, color: 'white', weight: 2, fillColor: markerColor, fillOpacity: 1, bubblingMouseEvents: false,
-            }).bindTooltip(label);
+            }).bindTooltip(element('span', '', label)); // never a string: Leaflet would insert it as HTML
             here = L.layerGroup(accuracy
                 ? [L.circle(position, { radius: accuracy, color: markerColor, weight: 1, fillOpacity: 0.1, interactive: false }), marker]
                 : [marker]).addTo(map);
