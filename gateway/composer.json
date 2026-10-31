@@ -45,6 +45,8 @@
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
+            "@composer install --no-interaction",
+            "npm install --no-save",
             "npx concurrently -c \"#93c5fd,#fdba74\" \"php artisan serve --port=8000\" \"npm run dev\" --names=server,vite --kill-others"
         ],
         "test": [

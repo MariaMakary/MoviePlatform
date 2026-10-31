@@ -29,6 +29,7 @@ $app->singleton(
 $app->configure('app');
 
 $app->register(MoviePlatform\Common\CommonServiceProvider::class);
+$app->register(App\Providers\AuthServiceProvider::class);
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
