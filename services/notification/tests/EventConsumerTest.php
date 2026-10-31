@@ -7,6 +7,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Laravel\Lumen\Testing\DatabaseTransactions;
 use MoviePlatform\Common\Integration\EventConsumer;
 use MoviePlatform\Common\Integration\RabbitMqConnection;
 use PhpAmqpLib\Channel\AMQPChannel;
@@ -17,6 +18,8 @@ use Tests\Fixtures\RecordingHandler;
 
 class EventConsumerTest extends TestCase
 {
+    use DatabaseTransactions;
+
     private const USER_ID = '0193a7c0-1111-7aaa-8bbb-000000000001';
 
     private AMQPChannel $channel;
@@ -29,13 +32,6 @@ class EventConsumerTest extends TestCase
     {
         parent::setUp();
 
-        config([
-            'database.default' => 'testing',
-            'database.connections.testing' => ['driver' => 'sqlite', 'database' => ':memory:', 'prefix' => ''],
-        ]);
-        DB::purge('testing');
-
-        $this->artisan('migrate');
         Schema::create('test_effects', function (Blueprint $table) {
             $table->uuid('event_id');
             $table->uuid('user_id');
@@ -137,33 +133,38 @@ class EventConsumerTest extends TestCase
 
     public function test_the_same_event_twice_has_no_double_effect(): void
     {
-        $body = $this->event('UserRegistered');
+        $id = (string) Str::uuid();
+        $body = $this->event('UserRegistered', $id);
 
         $this->consumer()->process($this->message($body, 1));
         $this->consumer()->process($this->message($body, 2));
 
         $this->assertSame([1, 2], $this->acked);
         $this->assertSame(1, DB::table('test_effects')->count());
-        $this->assertSame(1, DB::table('processed_events')->count());
+        $this->assertSame(1, DB::table('processed_events')->where('event_id', $id)->count());
     }
 
     public function test_a_failing_handler_is_retried_3_times_then_goes_to_the_dlq(): void
     {
-        $this->consumer()->process($this->message($this->event('UserDeleted')));
+        $id = (string) Str::uuid();
+
+        $this->consumer()->process($this->message($this->event('UserDeleted', $id)));
 
         $this->assertSame(4, FailingHandler::$calls);
         $this->assertSame([], $this->acked);
         $this->assertSame([[1, false]], $this->rejected);
         $this->assertSame(0, DB::table('test_effects')->count());
-        $this->assertSame(0, DB::table('processed_events')->count());
+        $this->assertSame(0, DB::table('processed_events')->where('event_id', $id)->count());
     }
 
     public function test_an_event_without_a_handler_is_acked_and_skipped(): void
     {
-        $this->consumer()->process($this->message($this->event('MovieNightFinalized')));
+        $id = (string) Str::uuid();
+
+        $this->consumer()->process($this->message($this->event('MovieNightFinalized', $id)));
 
         $this->assertSame([1], $this->acked);
-        $this->assertSame(0, DB::table('processed_events')->count());
+        $this->assertSame(0, DB::table('processed_events')->where('event_id', $id)->count());
     }
 
     public function test_a_broken_message_goes_straight_to_the_dlq(): void
