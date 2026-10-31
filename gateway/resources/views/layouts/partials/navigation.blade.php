@@ -2,6 +2,7 @@
     ['label' => 'Home', 'href' => route('home'), 'active' => request()->routeIs('home')],
     ['label' => 'Movies', 'href' => '#', 'active' => false],
     ['label' => 'Movie nights', 'href' => '#', 'active' => false],
+    ['label' => 'Cinemas', 'href' => route('cinemas'), 'active' => request()->routeIs('cinemas')],
 ])
 
 <header x-data="{ open: false }" class="sticky top-0 z-40 border-b border-white/10 bg-jet/90 backdrop-blur">
