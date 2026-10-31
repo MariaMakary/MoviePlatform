@@ -18,6 +18,32 @@ A user, as returned by every endpoint below:
 | `avatar` | string \| null | |
 | `role` | string | `user` or `admin` |
 
+### POST /api/register
+
+Creates an account with email and password and logs it in. The email is saved in lowercase, and the role is always
+`user` (`role` and `is_blocked` in the request are ignored).
+
+**Who:** guest
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `name` | string | required, max 100 |
+| `email` | string | required, valid email, max 255, not already used (in any letter case) |
+| `password` | string | required, min 8 |
+| `password_confirmation` | string | required, equal to `password` |
+
+**Response** `201`, same body as login
+
+```json
+{"data": {"token": "eyJhbGciOiJSUzI1NiIs…", "expires_at": "2026-11-03T18:50:00Z", "user": {"id": "0193a7c0-1111-7aaa-8bbb-000000000001", "name": "Maria Makary", "email": "maria@example.com", "avatar": null, "role": "user"}}}
+```
+
+**Errors:** `422` invalid fields, or `email` already taken (`"The email has already been taken."`)
+
+**Events:** publishes `UserRegistered` after the user is saved
+
 ### POST /api/login
 
 Logs in with email and password. The email is compared in lowercase.

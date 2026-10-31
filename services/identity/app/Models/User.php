@@ -33,8 +33,13 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'is_blocked' => false,
     ];
 
+    public static function normalizeEmail(string $email): string
+    {
+        return Str::lower(trim($email));
+    }
+
     protected function email(): Attribute
     {
-        return Attribute::make(set: fn (string $value) => Str::lower(trim($value)));
+        return Attribute::make(set: fn (string $value) => self::normalizeEmail($value));
     }
 }
