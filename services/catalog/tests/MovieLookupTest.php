@@ -110,6 +110,7 @@ class MovieLookupTest extends TestCase
             'title' => 'Inception',
             'poster_url' => 'https://image.tmdb.org/t/p/w342/abc.jpg',
             'year' => 2010,
+            'release_date' => '2010-07-15',
             'vote_average' => 8.4,
             'genres' => ['Aa Test Action', 'Zz Test Sci-Fi'],
         ]]]);
@@ -124,6 +125,7 @@ class MovieLookupTest extends TestCase
         $card = json_decode($this->response->getContent(), true)['data'][0];
         $this->assertNull($card['poster_url']);
         $this->assertNull($card['year']);
+        $this->assertNull($card['release_date']);
         $this->assertNull($card['vote_average']);
         $this->assertSame([], $card['genres']);
     }

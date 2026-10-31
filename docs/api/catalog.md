@@ -15,6 +15,7 @@ popular and upcoming). Built by `MovieCardResource`.
 | `title` | string | |
 | `poster_url` | string \| null | full TMDB image URL (w342), `null` when the movie has no poster |
 | `year` | integer \| null | year of `release_date` |
+| `release_date` | date (`YYYY-MM-DD`) \| null | e.g. to show when an upcoming movie comes out |
 | `vote_average` | number \| null | TMDB average, 0–10, one decimal |
 | `genres` | string[] | genre names, alphabetical; can be empty |
 
@@ -41,8 +42,8 @@ be shorter than the request. A repeated id is returned once. Not paginated.
 ```json
 {
   "data": [
-    {"id": "0193a7c1-3333-7aaa-8bbb-000000000101", "title": "Interstellar", "poster_url": "https://image.tmdb.org/t/p/w342/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg", "year": 2014, "vote_average": 8.5, "genres": ["Adventure", "Drama", "Science Fiction"]},
-    {"id": "0193a7c1-3333-7aaa-8bbb-000000000100", "title": "Inception", "poster_url": "https://image.tmdb.org/t/p/w342/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg", "year": 2010, "vote_average": 8.4, "genres": ["Action", "Science Fiction"]}
+    {"id": "0193a7c1-3333-7aaa-8bbb-000000000101", "title": "Interstellar", "poster_url": "https://image.tmdb.org/t/p/w342/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg", "year": 2014, "release_date": "2014-11-05", "vote_average": 8.5, "genres": ["Adventure", "Drama", "Science Fiction"]},
+    {"id": "0193a7c1-3333-7aaa-8bbb-000000000100", "title": "Inception", "poster_url": "https://image.tmdb.org/t/p/w342/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg", "year": 2010, "release_date": "2010-07-15", "vote_average": 8.4, "genres": ["Action", "Science Fiction"]}
   ]
 }
 ```
@@ -72,7 +73,7 @@ The pages are TMDB's: `last_page` is at most 500 and `total` at most 10 000 (TMD
 ```json
 {
   "data": [
-    {"id": "0193a7c1-3333-7aaa-8bbb-000000000100", "title": "Inception", "poster_url": "https://image.tmdb.org/t/p/w342/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg", "year": 2010, "vote_average": 8.4, "genres": ["Action", "Science Fiction"]}
+    {"id": "0193a7c1-3333-7aaa-8bbb-000000000100", "title": "Inception", "poster_url": "https://image.tmdb.org/t/p/w342/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg", "year": 2010, "release_date": "2010-07-15", "vote_average": 8.4, "genres": ["Action", "Science Fiction"]}
   ],
   "meta": {"current_page": 1, "last_page": 500, "total": 10000}
 }

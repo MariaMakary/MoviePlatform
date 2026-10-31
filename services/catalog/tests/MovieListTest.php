@@ -88,6 +88,7 @@ class MovieListTest extends TestCase
         $this->assertSame('List movie 900500101', $first['title']);
         $this->assertSame('https://image.tmdb.org/t/p/w342/poster900500101.jpg', $first['poster_url']);
         $this->assertSame(2024, $first['year']);
+        $this->assertSame('2024-05-01', $first['release_date']);
         $this->assertSame(['Test List Genre'], $first['genres']);
     }
 
