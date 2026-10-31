@@ -12,7 +12,7 @@ class PersonFactory extends Factory
     public function definition(): array
     {
         return [
-            'tmdb_id' => $this->faker->unique()->numberBetween(1, 9999999),
+            'tmdb_id' => $this->faker->unique()->numberBetween(1000000000, 1999999999),
             'name' => $this->faker->name(),
             'known_for' => 'Acting',
         ];
