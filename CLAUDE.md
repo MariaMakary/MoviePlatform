@@ -50,9 +50,12 @@ Auth: **JWT RS256**, signed by Identity, verified in every service. PHP 8.2+ on 
 
 ## Running
 
-Docker runs only the infrastructure (`docker compose up -d`). Services run with `php -S 127.0.0.1:800X -t public`, the
-Gateway with `php artisan serve --port=8000`. Background processes (`events:consume`, `reverb:start`) start from each
-project's `composer run dev` script, never as Docker containers. Details: `README.md`.
+Docker runs only the infrastructure (`docker compose up -d`). Every app starts with `composer run dev` in its folder: it
+runs `composer install` (plus `npm install --no-save` in the Gateway) and, in services, `php artisan migrate --force`, then starts
+`php -S 127.0.0.1:800X -t public` (Gateway: `php artisan serve --port=8000`). Nobody runs `composer install`, `npm install`
+or `migrate` by hand after a pull; adding or upgrading a package (`composer require`, `npm install <package>`) stays
+manual and the lock file is committed with it. Background processes (`events:consume`, `reverb:start`) start from the
+same `composer run dev` script, never as Docker containers. Details: `README.md`.
 
 ## Git workflow
 

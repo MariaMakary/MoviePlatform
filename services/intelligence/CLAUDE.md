@@ -23,4 +23,4 @@ Read `docs/lumen.md` (how to write Lumen code here), `docs/api/intelligence.md` 
 
 ## Running
 
-`composer run dev` starts `php -S 127.0.0.1:8005 -t public` + `php artisan events:consume`. Tests: `vendor/bin/phpunit`.
+`composer run dev` runs `composer install` and `php artisan migrate --force`, then starts `php -S 127.0.0.1:8005 -t public` + `php artisan events:consume`. Tests: `vendor/bin/phpunit`.

@@ -29,6 +29,8 @@
     "scripts": {
         "dev": [
             "Composer\\Config::disableProcessTimeout",
+            "@composer install --no-interaction",
+            "@php artisan migrate --force",
             "npx concurrently@9 --restart-tries -1 --restart-after 5000 -c \"#93c5fd,#fdba74\" -n server,events \"php -S 127.0.0.1:8003 -t public\" \"php artisan events:consume\""
         ],
         "post-root-package-install": [

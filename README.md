@@ -60,6 +60,8 @@ composer install          # installs packages/common, the Gateway and every serv
 cd gateway; npm install; cd ..
 ```
 
+Only needed once. After that, `composer run dev` installs whatever a pull changed (see "Every day").
+
 **3. `.env` for each app.**
 
 ```powershell
@@ -72,29 +74,39 @@ Lumen has no `key:generate`, so the second line writes a random 32-character `AP
 No passwords go in `.env`: the apps read them from `secrets/` (`SECRETS_DIR` in `.env` points there), the same
 files the database and RabbitMQ containers use.
 
-**4. Start the infrastructure and run the migrations.**
+**4. Start the infrastructure.**
 
 ```powershell
 docker compose up -d
 docker compose ps            # wait until everything shows "healthy"
-cd services/identity; php artisan migrate; cd ../..
-# …same for the other services
 ```
+
+The migrations run the first time you start each service (next section).
 
 ## Every day
 
 ```powershell
 docker compose up -d                       # infrastructure
-cd services/identity; php -S 127.0.0.1:8001 -t public
+cd services/identity; composer run dev     # in its own terminal, for each app you need (Gateway: in gateway/)
 ```
 
-Start each service you need in its own terminal with its port from the table above (Lumen has no `artisan serve`).
-Engagement, social, intelligence and notification also consume events: start them with `composer run dev` instead,
-which runs the server and the `events:consume` worker together (it uses `npx concurrently`, so Node.js is needed).
-If RabbitMQ is down, the worker restarts every 5 seconds until it is back; the server keeps running.
-For the Gateway run `php artisan serve --port=8000` in `gateway/`, plus `npm run dev` for CSS/JS with hot reload.
-Check a service with `http://localhost:8001/api/health`: `200` when its database and RabbitMQ are reachable, `503`
-with the failing part set to `"fail"` otherwise.
+`composer run dev` does everything a pull may need, then starts the app (like `dotnet run`):
+
+1. `composer install`: installs exactly the versions in `composer.lock` (about 2 seconds and "Nothing to install" when
+   nothing changed). In the Gateway, `npm install --no-save` follows (installs `package-lock.json` without rewriting it).
+2. `php artisan migrate --force` (services only): applies any new migration. If the service's database is not running,
+   this step fails and the server does not start: run `docker compose up -d` and try again.
+3. Starts the app with `npx concurrently` (Node.js is needed): the service's `php -S` on its port from the table above.
+   Engagement, social, intelligence and notification also start their `events:consume` worker; if RabbitMQ is down,
+   the worker restarts every 5 seconds until it is back, and the server keeps running. The Gateway starts
+   `php artisan serve --port=8000` and `npm run dev` (CSS/JS with hot reload).
+
+Stop with `Ctrl+C`. Check a service with `http://localhost:8001/api/health`: `200` when its database and RabbitMQ are
+reachable, `503` with the failing part set to `"fail"` otherwise.
+
+**Adding or upgrading a package stays manual:** `composer require …` (or `npm install <package>` in the Gateway) in
+that app's folder, and commit the changed `composer.lock` / `package-lock.json` with your change. Everyone else gets it
+with their next `composer run dev`.
 
 You don't need every database: `docker compose up -d identity-db redis rabbitmq` starts only what Identity needs.
 
@@ -108,4 +120,5 @@ docker compose down                        # remove the containers (data is kept
 docker compose down -v                     # remove the containers AND all data (fresh start)
 ```
 
-Inside a service folder: `php artisan migrate`, `vendor/bin/phpunit` (tests). The Gateway has no automated tests: its pages are checked by hand.
+Inside a service folder: `vendor/bin/phpunit` (tests; run `composer run dev` once after a pull so new migrations are
+applied). The Gateway has no automated tests: its pages are checked by hand.

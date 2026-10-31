@@ -34,7 +34,7 @@ EventPublisher (after commit) → Resource`
 
 | Missing | Use instead |
 |---|---|
-| `php artisan serve` | `php -S 127.0.0.1:800X -t public` (from the service folder) |
+| `php artisan serve` | `composer run dev` (from the service folder): `composer install`, `php artisan migrate --force`, then `php -S 127.0.0.1:800X -t public` (+ `events:consume`). Never run `composer install` or `migrate` by hand after a pull. |
 | `php artisan key:generate` | A random 32-character `APP_KEY` in `.env` (see the root README) |
 | `make:controller`, `make:model`, `make:request`, `make:resource`, `make:factory`, `make:test` | Create the file by hand (templates below). Only `make:migration` and `make:seeder` exist. |
 | FormRequest classes | A request class with static `rules()` + `$this->validate()` (section 4) |
@@ -52,7 +52,8 @@ This file replaces Laravel's automatic setup. Every service has the same one; do
 
 - `$app->withFacades()` and `$app->withEloquent()` are on.
 - `$app->register(MoviePlatform\Common\CommonServiceProvider::class)` loads `packages/common` (the `jwt` guard and
-  middleware).
+  the `jwt`, `admin` and `service` middleware).
+- `$app->register(App\Providers\AuthServiceProvider::class)` registers this service's policies (section 6).
 - `routes/api.php` is loaded under the **`/api` prefix**, with controllers in `App\Http\Controllers`.
 
 When you add:
@@ -61,7 +62,6 @@ When you add:
 |---|---|
 | A config file `config/reviews.php` | `$app->configure('reviews');` |
 | A service provider | `$app->register(App\Providers\XyzServiceProvider::class);` |
-| Policies | `$app->register(App\Providers\AuthServiceProvider::class);` (section 6) |
 | Service-specific middleware | `$app->routeMiddleware(['name' => App\Http\Middleware\Xyz::class]);` |
 
 `env()` is only read in `config/*.php` (secrets with `secret()`), never in app code.
@@ -186,8 +186,8 @@ return PaginatedCollection::fromQuery(Review::where('movie_id', $movieId), Revie
 - Protected routes use the `jwt` middleware (from `packages/common`). Then `$request->user()` is the logged-in user
   from the token: `->id`, `->role` (`Role::User` or `Role::Admin`, from `MoviePlatform\Common\Auth\Role`), `->name`,
   `->isAdmin()`. There is no `User` lookup in other services.
-- Policies: register `App\Providers\AuthServiceProvider` in `bootstrap/app.php`. **First delete the skeleton's
-  `viaRequest('api', …)` example** in its `boot()` and register the policies instead:
+- Policies: `App\Providers\AuthServiceProvider` is already registered in every service's `bootstrap/app.php` (the
+  skeleton's `viaRequest('api', …)` example is removed). Add one line per policy in its `boot()`:
 
 ```php
 public function boot(): void

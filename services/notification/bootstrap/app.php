@@ -30,6 +30,7 @@ $app->configure('app');
 $app->configure('events');
 
 $app->register(MoviePlatform\Common\CommonServiceProvider::class);
+$app->register(App\Providers\AuthServiceProvider::class);
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',

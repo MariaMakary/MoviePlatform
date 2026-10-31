@@ -72,7 +72,8 @@ resources/js/                  Echo (Reverb), Leaflet
 
 ## Running
 
-`composer run dev` starts `php artisan serve --port=8000` and `npm run dev`; `php artisan reverb:start` is added
+`composer run dev` runs `composer install` and `npm install --no-save` (exactly the versions in the lock files; nobody runs them by
+hand after a pull), then starts `php artisan serve --port=8000` and `npm run dev`; `php artisan reverb:start` is added
 when Reverb is installed. Never add `php artisan pail`: it needs `pcntl`, which does not exist on Windows.
 
 No automated tests in the Gateway: each task's "Done when" in Azure Boards is checked by hand in the browser.

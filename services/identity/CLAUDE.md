@@ -32,9 +32,9 @@ Read `docs/lumen.md` (how to write Lumen code here), `docs/api/identity.md` (thi
 
 ## Running
 
-`composer run dev` starts `php -S 127.0.0.1:8001 -t public` (it only publishes events). Tests: `vendor/bin/phpunit`.
+`composer run dev` runs `composer install` and `php artisan migrate --force`, then starts `php -S 127.0.0.1:8001 -t public` (it only publishes events). Tests: `vendor/bin/phpunit`.
 The tests use the real `identity-db` (CHECK constraint, unique email), so run `docker compose up -d` and
-`php artisan migrate` first. They use `DatabaseTransactions`, so they leave no rows behind.
+`composer run dev` once first (it applies the migrations). They use `DatabaseTransactions`, so they leave no rows behind.
 
 ## Models
 
