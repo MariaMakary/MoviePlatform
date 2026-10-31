@@ -204,8 +204,8 @@ class CatalogSchemaTest extends TestCase
         $this->assertNull($first->fresh()->tmdb_id);
         $this->assertNull($second->fresh()->tmdb_id);
 
-        Movie::factory()->create(['tmdb_id' => 27205]);
-        $this->assertRefused(fn () => Movie::factory()->create(['tmdb_id' => 27205]), '23505');
+        Movie::factory()->create(['tmdb_id' => 900000777]);
+        $this->assertRefused(fn () => Movie::factory()->create(['tmdb_id' => 900000777]), '23505');
     }
 
     public function test_database_defaults_for_a_movie_created_without_them(): void

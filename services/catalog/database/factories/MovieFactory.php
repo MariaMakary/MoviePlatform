@@ -12,7 +12,7 @@ class MovieFactory extends Factory
     public function definition(): array
     {
         return [
-            'tmdb_id' => $this->faker->unique()->numberBetween(1, 9999999),
+            'tmdb_id' => $this->faker->unique()->numberBetween(1000000000, 1999999999),
             'title' => $this->faker->sentence(3),
             'overview' => $this->faker->paragraph(),
             'poster_path' => '/'.$this->faker->lexify('??????????').'.jpg',
