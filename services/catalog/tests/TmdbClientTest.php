@@ -46,6 +46,7 @@ class TmdbClientTest extends TestCase
         Http::fake(['api.themoviedb.org/*' => Http::response([
             'page' => 2,
             'total_pages' => 500,
+            'total_results' => 10000,
             'results' => [$this->tmdbMovie(), $this->tmdbMovie(['id' => 1, 'title' => 'No date', 'release_date' => '', 'overview' => '', 'poster_path' => null])],
         ])]);
 
@@ -53,6 +54,7 @@ class TmdbClientTest extends TestCase
 
         $this->assertSame(2, $result['page']);
         $this->assertSame(500, $result['total_pages']);
+        $this->assertSame(10000, $result['total_results']);
         $this->assertSame([
             'movie' => [
                 'tmdb_id' => 27205,
@@ -100,6 +102,7 @@ class TmdbClientTest extends TestCase
 
         $sent = collect(Http::recorded())->map(fn ($pair) => $pair[0]);
         $this->assertStringContainsString('/movie/upcoming?', $sent[0]->url());
+        $this->assertStringContainsString('region=US', $sent[0]->url());
         $this->assertSame('inception', $sent[1]['query']);
         $this->assertStringContainsString('/search/movie?', $sent[1]->url());
         $this->assertSame('878', (string) $sent[2]['with_genres']);

@@ -20,7 +20,7 @@ class TmdbClient
 
     public function upcoming(int $page = 1): array
     {
-        return $this->movieList('/movie/upcoming', ['page' => $page]);
+        return $this->movieList('/movie/upcoming', ['page' => $page, 'region' => config('services.tmdb.region')]);
     }
 
     public function search(string $query, int $page = 1): array
@@ -127,6 +127,7 @@ class TmdbClient
             ], $data['results'] ?? []),
             'page' => $data['page'] ?? 1,
             'total_pages' => $data['total_pages'] ?? 1,
+            'total_results' => $data['total_results'] ?? 0,
         ];
     }
 
