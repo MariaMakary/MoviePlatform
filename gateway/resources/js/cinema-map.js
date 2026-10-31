@@ -3,6 +3,7 @@ import L from 'leaflet';
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
+import { findPlace } from './nominatim';
 import { findCinemas } from './overpass';
 
 // Leaflet guesses its marker images' path from its CSS, which breaks once Vite renames them: give the bundled URLs.
@@ -21,6 +22,11 @@ const MESSAGES = {
     denied: 'Location is off, so the map shows Beirut. Allow location for this site in your browser, then press "Use my location".',
     unavailable: "Your location couldn't be found, so the map shows Beirut. Try again in a moment.",
     unsupported: "Your browser can't share its location, so the map shows Beirut.",
+    lookingUp: (query) => `Looking up "${query}"…`,
+    place: (name) => `Showing the area around ${name}.`,
+    point: 'Showing the area around the point you chose. Click elsewhere on the map to move it.',
+    notFound: (query) => `No place called "${query}" was found. Try another name, or click on the map.`,
+    placeFailed: "The place search isn't responding right now. Try again in a moment, or click on the map.",
     searching: 'Searching for cinemas…',
     none: (km) => `No cinemas found within ${km} km.`,
     found: (count, km) => `${count} ${count === 1 ? 'cinema' : 'cinemas'} within ${km} km, nearest first.`,
@@ -30,7 +36,7 @@ const MESSAGES = {
 /**
  * Map of the "Cinemas near me" page: OpenStreetMap tiles centered on the browser's location, or on the fallback
  * (Beirut) given by the page when location is refused or unavailable, with the cinemas around that point as markers
- * and as a list sorted by distance.
+ * and as a list sorted by distance. The user can move that point with a place search or a click on the map.
  */
 export function mountCinemaMap(root) {
     const status = root.querySelector('[data-map-status]');
@@ -38,18 +44,25 @@ export function mountCinemaMap(root) {
     const cinemaStatus = root.querySelector('[data-cinemas-status]');
     const list = root.querySelector('[data-cinemas-list]');
     const retry = root.querySelector('[data-cinemas-retry]');
+    const placeForm = root.querySelector('[data-place-search]');
+    const placeInput = placeForm.querySelector('input');
+    const placeButton = placeForm.querySelector('button[type="submit"]');
     const fallback = [Number(root.dataset.fallbackLat), Number(root.dataset.fallbackLng)];
     const radius = Number(root.dataset.radius);
     const km = radius / 1000;
-    const color = getComputedStyle(document.documentElement).getPropertyValue('--color-cerulean').trim();
+    const theme = getComputedStyle(document.documentElement);
+    const color = theme.getPropertyValue('--color-cerulean').trim();
+    const accent = theme.getPropertyValue('--color-neon-rose').trim();
 
     const map = L.map(root.querySelector('[data-map]')).setView(fallback, FALLBACK_ZOOM);
     L.tileLayer(TILES, { maxZoom: 19, attribution: ATTRIBUTION }).addTo(map);
 
     const cinemaLayer = L.layerGroup().addTo(map);
-    let here = null;
+    let here = null; // marker of the point cinemas are searched around
     let center = null;
-    let search = null;
+    let search = null; // running Overpass search
+    let placeLookup = null; // running Nominatim search
+    let choice = 0;
 
     const showCinemas = (cinemas) => {
         cinemaStatus.textContent = cinemas.length ? MESSAGES.found(cinemas.length, km) : MESSAGES.none(km);
@@ -97,31 +110,42 @@ export function mountCinemaMap(root) {
         }
     };
 
-    const showFallback = (message) => {
+    // Moves the point cinemas are searched around. `label` adds a marker there (none for the Beirut fallback).
+    const setCenter = (position, { message, label = null, markerColor = color, accuracy = null, zoom = USER_ZOOM }) => {
+        center = position;
+
         here?.remove();
         here = null;
-        center = fallback;
-        map.setView(fallback, FALLBACK_ZOOM);
+
+        if (label) {
+            const marker = L.circleMarker(position, {
+                radius: 8, color: 'white', weight: 2, fillColor: markerColor, fillOpacity: 1, bubblingMouseEvents: false,
+            }).bindTooltip(label);
+            here = L.layerGroup(accuracy
+                ? [L.circle(position, { radius: accuracy, color: markerColor, weight: 1, fillOpacity: 0.1, interactive: false }), marker]
+                : [marker]).addTo(map);
+        }
+
+        map.setView(position, zoom);
         status.textContent = message;
         searchCinemas();
     };
 
-    const showPosition = ({ coords }) => {
-        center = [coords.latitude, coords.longitude];
+    // Each choice (browser location, place search, map click) cancels the ones still running,
+    // so a late answer can never move the map away from a newer choice.
+    const newChoice = () => {
+        placeLookup?.abort();
+        button.disabled = false;
+        placeButton.disabled = false;
 
-        here?.remove();
-        here = L.layerGroup([
-            L.circle(center, { radius: coords.accuracy, color, weight: 1, fillOpacity: 0.1, interactive: false }),
-            L.circleMarker(center, { radius: 8, color: 'white', weight: 2, fillColor: color, fillOpacity: 1 })
-                .bindTooltip('You are here'),
-        ]).addTo(map);
-
-        map.setView(center, USER_ZOOM);
-        status.textContent = MESSAGES.located;
-        searchCinemas();
+        return ++choice;
     };
 
+    const showFallback = (message) => setCenter(fallback, { message, zoom: FALLBACK_ZOOM });
+
     const locate = () => {
+        const current = newChoice();
+
         if (!('geolocation' in navigator)) {
             showFallback(MESSAGES.unsupported);
             return;
@@ -131,11 +155,19 @@ export function mountCinemaMap(root) {
         button.disabled = true;
 
         navigator.geolocation.getCurrentPosition(
-            (position) => {
+            ({ coords }) => {
+                if (current !== choice) {
+                    return;
+                }
+
                 button.disabled = false;
-                showPosition(position);
+                setCenter([coords.latitude, coords.longitude], { message: MESSAGES.located, label: 'You are here', accuracy: coords.accuracy });
             },
             (error) => {
+                if (current !== choice) {
+                    return;
+                }
+
                 button.disabled = false;
                 showFallback(error.code === error.PERMISSION_DENIED ? MESSAGES.denied : MESSAGES.unavailable);
             },
@@ -143,8 +175,54 @@ export function mountCinemaMap(root) {
         );
     };
 
+    const searchPlace = async (event) => {
+        event.preventDefault();
+        const query = placeInput.value.trim();
+
+        if (!query) {
+            placeInput.focus();
+            return;
+        }
+
+        const current = newChoice();
+        placeLookup = new AbortController();
+        const { signal } = placeLookup;
+
+        placeButton.disabled = true;
+        status.textContent = MESSAGES.lookingUp(query);
+
+        try {
+            const place = await findPlace(query, signal);
+
+            if (!place) {
+                status.textContent = MESSAGES.notFound(query);
+                return;
+            }
+
+            setCenter(place.position, { message: MESSAGES.place(place.name), label: place.name, markerColor: accent });
+        } catch (error) {
+            if (signal.aborted) {
+                return; // a newer choice replaced this one
+            }
+
+            console.warn('Nominatim search failed', error);
+            status.textContent = MESSAGES.placeFailed;
+        } finally {
+            if (current === choice) {
+                placeButton.disabled = false;
+            }
+        }
+    };
+
+    const choosePoint = ({ latlng }) => {
+        newChoice();
+        setCenter([latlng.lat, latlng.lng], { message: MESSAGES.point, label: 'Chosen location', markerColor: accent, zoom: map.getZoom() });
+    };
+
     button.addEventListener('click', locate);
     retry.addEventListener('click', searchCinemas);
+    placeForm.addEventListener('submit', searchPlace);
+    map.on('click', choosePoint);
     locate();
 
     return map;
