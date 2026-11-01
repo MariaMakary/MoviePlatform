@@ -2,8 +2,10 @@
 
 namespace Tests;
 
+use App\Enums\NotificationType;
 use App\Models\Notification;
 use Firebase\JWT\JWT;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Laravel\Lumen\Testing\DatabaseTransactions;
@@ -38,7 +40,7 @@ class NotificationApiTest extends TestCase
     {
         return Notification::forceCreate(array_merge([
             'user_id' => $userId,
-            'type' => 'new_follower',
+            'type' => NotificationType::NewFollower,
             'title' => 'New follower',
             'body' => 'Maria started following you.',
             'data' => ['follower_id' => self::OTHER],
@@ -71,6 +73,25 @@ class NotificationApiTest extends TestCase
         $indexes = collect(DB::select("select indexname from pg_indexes where tablename = 'notifications'"))->pluck('indexname');
         $this->assertContains('notifications_user_id_read_at_index', $indexes);
         $this->assertContains('notifications_user_id_created_at_index', $indexes);
+    }
+
+    public function test_the_type_is_a_notification_type_case(): void
+    {
+        $this->assertSame(NotificationType::NewFollower, $this->notification()->fresh()->type);
+    }
+
+    public function test_the_database_refuses_an_unknown_type(): void
+    {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('notifications_type_check');
+
+        DB::table('notifications')->insert([
+            'id' => '0193a7d0-5555-7aaa-8bbb-000000000999',
+            'user_id' => self::ME,
+            'type' => 'birthday',
+            'title' => 'Happy birthday',
+            'body' => 'Not a type this service creates.',
+        ]);
     }
 
     public function test_every_route_needs_a_token(): void

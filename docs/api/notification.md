@@ -12,7 +12,7 @@ A notification:
 | Field | Type | Content |
 |---|---|---|
 | `id` | uuid | |
-| `type` | string | kind of notification: `welcome`, `new_follower`, `movie_night_invite`, … |
+| `type` | string | kind of notification: `welcome`, `new_follower`, `movie_night_invite`, `movie_night_invite_answered` or `movie_night_finalized` |
 | `title` | string | short text for the bell |
 | `body` | string | full text |
 | `data` | object \| null | ids the Gateway needs to build links (e.g. `follower_id`, `movie_night_id`) |
