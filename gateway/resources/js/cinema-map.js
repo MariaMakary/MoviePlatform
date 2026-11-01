@@ -3,8 +3,8 @@ import L from 'leaflet';
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
-import { findPlace } from './nominatim';
-import { findCinemas } from './overpass';
+import * as nominatim from './nominatim';
+import * as overpass from './overpass';
 
 // Leaflet guesses its marker images' path from its CSS, which breaks once Vite renames them: give the bundled URLs.
 delete L.Icon.Default.prototype._getIconUrl;
@@ -96,6 +96,7 @@ export function mountCinemaMap(root) {
             const from = L.latLng(center);
             const cinemas = (await findCinemas(center, radius, signal))
                 .map((cinema) => ({ ...cinema, distance: from.distanceTo(cinema.position) }))
+                .filter((cinema) => cinema.distance <= radius) // Nominatim searches a square around the point
                 .sort((a, b) => a.distance - b.distance);
 
             showCinemas(cinemas);
@@ -104,7 +105,7 @@ export function mountCinemaMap(root) {
                 return; // a newer search replaced this one
             }
 
-            console.warn('Overpass search failed', error);
+            console.warn('Cinema search failed', error);
             cinemaStatus.textContent = MESSAGES.failed;
             retry.hidden = false;
         }
@@ -192,7 +193,7 @@ export function mountCinemaMap(root) {
         status.textContent = MESSAGES.lookingUp(query);
 
         try {
-            const place = await findPlace(query, signal);
+            const place = await nominatim.findPlace(query, signal);
 
             if (!place) {
                 status.textContent = MESSAGES.notFound(query);
@@ -226,6 +227,18 @@ export function mountCinemaMap(root) {
     locate();
 
     return map;
+}
+
+// Nominatim answers in about a second; the public Overpass server is often overloaded, so it is only the fallback.
+async function findCinemas(center, radius, signal) {
+    try {
+        return await nominatim.findCinemas(center, radius, signal);
+    } catch (error) {
+        signal.throwIfAborted();
+        console.warn('Nominatim cinema search failed, trying Overpass', error);
+
+        return overpass.findCinemas(center, radius, signal);
+    }
 }
 
 function formatDistance(meters) {
