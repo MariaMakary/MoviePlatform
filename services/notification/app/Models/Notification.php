@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\NotificationType;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -13,6 +14,7 @@ class Notification extends Model
     protected $fillable = ['user_id', 'type', 'title', 'body', 'data', 'read_at'];
 
     protected $casts = [
+        'type' => NotificationType::class,
         'data' => 'array',
         'read_at' => 'datetime',
     ];

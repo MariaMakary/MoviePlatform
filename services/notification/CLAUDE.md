@@ -15,6 +15,9 @@ Payloads and rules: `docs/events.md`.
 
 - Turns consumed events into notifications for users. Event payloads carry the names it needs (e.g. `follower_name`), so it never calls other services to build the text.
 - Real time: broadcasts `NotificationCreated` on `user.{id}` through Reverb, using the `pusher` broadcast driver.
+- A notification's type is the enum `App\Enums\NotificationType`, cast on the `Notification` model: handlers create
+  notifications with its cases (`NotificationType::Welcome`), never with strings. A new kind of notification needs a
+  new case **and** a new migration that replaces the `notifications_type_check` CHECK (`docs/database.md`).
 
 ## Before coding
 

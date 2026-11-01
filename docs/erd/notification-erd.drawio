@@ -269,7 +269,7 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
       
-        <mxCell id="z20" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;fontFamily=Arial;fontSize=12;" value="&lt;b&gt;Constraints &amp;amp; indexes&lt;/b&gt;&lt;br&gt;• notifications.type: one value per kind of notification (welcome, new_follower, movie_night_invite, ...)&lt;br&gt;• Indexes: notifications(user_id, read_at) for the unread count, notifications(user_id, created_at) for the list"><mxGeometry x="40" y="400" width="1320" height="80" as="geometry" /></mxCell></root>
+        <mxCell id="z20" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;fontFamily=Arial;fontSize=12;" value="&lt;b&gt;Constraints &amp;amp; indexes&lt;/b&gt;&lt;br&gt;• notifications.type CHECK IN (welcome, new_follower, movie_night_invite, movie_night_invite_answered, movie_night_finalized): enum NotificationType&lt;br&gt;• Indexes: notifications(user_id, read_at) for the unread count, notifications(user_id, created_at) for the list"><mxGeometry x="40" y="400" width="1320" height="80" as="geometry" /></mxCell></root>
     </mxGraphModel>
   </diagram>
 </mxfile>
