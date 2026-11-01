@@ -18,6 +18,8 @@ Payloads and rules: `docs/events.md`.
 - A notification's type is the enum `App\Enums\NotificationType`, cast on the `Notification` model: handlers create
   notifications with its cases (`NotificationType::Welcome`), never with strings. A new kind of notification needs a
   new case **and** a new migration that replaces the `notifications_type_check` CHECK (`docs/database.md`).
+- Handlers live in `app/Integration/Handlers` (one per event, listed in `config/events.php`) and create notifications
+  only through `NotificationService::notify()`. Example: `UserRegisteredHandler` (welcome).
 
 ## Before coding
 
