@@ -9,5 +9,7 @@ return [
         'timeout' => 5,
         'image_url' => env('TMDB_IMAGE_URL', 'https://image.tmdb.org/t/p'),
         'poster_size' => 'w342',
+        'backdrop_size' => 'w1280',
+        'profile_size' => 'w185',
     ],
 ];

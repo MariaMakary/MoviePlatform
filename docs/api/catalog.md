@@ -51,6 +51,59 @@ be shorter than the request. A repeated id is returned once. Not paginated.
 **Errors:** `422` `ids` missing or empty, more than 100 ids, or an id that is not a UUID (`errors.ids` or
 `errors.ids.<position>`)
 
+### GET /api/movies/{id}
+
+Everything the movie page shows, built by `MovieDetailResource`. `{id}` is the Catalog movie id (UUID).
+
+A TMDB movie that was never synced (created from a list by popular or upcoming) or was last synced more than
+**7 days** ago is first synced from TMDB (details, genres, cast, director, trailer). If TMDB is down or no longer has
+the movie, the local copy is served as it is (the cast can then be empty) and the sync is tried again on the next
+open. A movie added by an admin (no `tmdb_id`) is never synced, and an admin's edits are kept.
+
+**Who:** guest
+
+**Response** `200`
+
+| Field | Type | Content |
+|---|---|---|
+| `id` | uuid | |
+| `title` | string | |
+| `overview` | string \| null | |
+| `poster_url` | string \| null | full TMDB image URL (w342) |
+| `backdrop_url` | string \| null | full TMDB image URL (w1280) |
+| `year` | integer \| null | year of `release_date` |
+| `release_date` | date (`YYYY-MM-DD`) \| null | |
+| `runtime` | integer \| null | minutes |
+| `vote_average` | number \| null | TMDB average, 0–10, one decimal |
+| `genres` | `{id, name}[]` | Catalog genre ids, alphabetical |
+| `directors` | `{id, name, photo_url}[]` | Catalog person ids, alphabetical; usually one |
+| `cast` | `{id, name, character, photo_url}[]` | Catalog person ids, in billing order, at most 15 |
+| `trailer_key` | string \| null | YouTube video key (`https://www.youtube.com/watch?v=<key>`) |
+
+`photo_url` is a full TMDB image URL (w185) or `null`; `character` can be `null`.
+
+```json
+{
+  "data": {
+    "id": "0193a7c1-3333-7aaa-8bbb-000000000100",
+    "title": "Inception",
+    "overview": "Cobb, a skilled thief who commits corporate espionage by infiltrating the subconscious of his targets…",
+    "poster_url": "https://image.tmdb.org/t/p/w342/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg",
+    "backdrop_url": "https://image.tmdb.org/t/p/w1280/8ZTVqvKDQ8emSGUEMjsS4yHAwrp.jpg",
+    "year": 2010,
+    "release_date": "2010-07-15",
+    "runtime": 148,
+    "vote_average": 8.4,
+    "genres": [{"id": "0193a7c1-4444-7aaa-8bbb-000000000001", "name": "Action"}],
+    "directors": [{"id": "0193a7c1-5555-7aaa-8bbb-000000000001", "name": "Christopher Nolan", "photo_url": "https://image.tmdb.org/t/p/w185/xuAIuYSmsUzKlUMBFGVZaWsY3DZ.jpg"}],
+    "cast": [{"id": "0193a7c1-5555-7aaa-8bbb-000000000002", "name": "Leonardo DiCaprio", "character": "Cobb", "photo_url": "https://image.tmdb.org/t/p/w185/wo2hJpn04vbtmh0B9utCFdsQhxM.jpg"}],
+    "trailer_key": "YoHD9XEInc0"
+  }
+}
+```
+
+**Errors:** `404` `"Movie not found."` (unknown id, or not a UUID)
+
 ### GET /api/movies/popular
 
 TMDB's popular movies, 20 per page, as movie cards with their **Catalog** ids. Every movie on the page is made sure to
