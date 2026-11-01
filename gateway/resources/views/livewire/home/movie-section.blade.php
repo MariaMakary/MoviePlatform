@@ -11,7 +11,7 @@
     @else
         <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
             @foreach ($movies[$section] as $movie)
-                <x-movie-card wire:key="{{ $section }}-{{ $movie['id'] }}" :movie="$movie" :href="url('/movies/'.$movie['id'])" :show-release-date="$showReleaseDate" />
+                <x-movie-card wire:key="{{ $section }}-{{ $movie['id'] }}" :movie="$movie" :href="route('movies.show', $movie['id'])" :show-release-date="$showReleaseDate" />
             @endforeach
         </div>
 
