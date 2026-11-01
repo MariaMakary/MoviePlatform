@@ -127,6 +127,13 @@
         </section>
 
         <section class="space-y-4">
+            <h2 class="text-lg font-semibold text-white"><code>&lt;x-reserved id="…" title="…" subtitle="…" compact /&gt;</code></h2>
+            <p class="text-sm text-gray-400">Space kept for a feature another task adds: replace the tag with that feature's component. <code>compact</code> is the small version for a button.</p>
+            <x-reserved id="demo-reserved" title="Similar movies" subtitle="If you liked this one." />
+            <x-reserved compact id="demo-reserved-compact" title="Watchlist" />
+        </section>
+
+        <section class="space-y-4">
             <h2 class="text-lg font-semibold text-white"><code>&lt;x-date :value="$utc" /&gt;</code> and <code>&lt;x-flash /&gt;</code></h2>
             <p class="text-sm text-gray-300">2026-11-03T18:20:00Z is shown as <x-date value="2026-11-03T18:20:00Z" class="font-semibold text-white" />.</p>
         </section>

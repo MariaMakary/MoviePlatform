@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LogoutController;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
+use App\Livewire\Catalog\MoviePage;
 use App\Livewire\Dev\ServiceStatus;
 use App\Livewire\Home;
 use App\Livewire\Intelligence\CinemaMap;
@@ -10,7 +11,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', Home::class)->name('home');
 
-Route::get('/cinemas', CinemaMap::class)->name('cinemas');
+Route::get('/movies/{id}', MoviePage::class)->whereUuid('id')->name('movies.show');
+
+Route::get('/cinemas',CinemaMap::class)->name('cinemas');
 
 Route::get('/login', Login::class)->name('login');
 Route::get('/register', Register::class)->name('register');

@@ -11,11 +11,7 @@
         </p>
     </section>
 
-    @include('livewire.home.reserved-row', [
-        'id' => 'recommendations-row',
-        'title' => 'Recommended for you',
-        'subtitle' => 'Picks based on what you rate and watch.',
-    ])
+    <x-reserved id="recommendations-row" title="Recommended for you" subtitle="Picks based on what you rate and watch." />
 
     @include('livewire.home.movie-section', [
         'section' => 'popular',
@@ -24,11 +20,7 @@
         'showReleaseDate' => false,
     ])
 
-    @include('livewire.home.reserved-row', [
-        'id' => 'weather-row',
-        'title' => 'For today\'s weather',
-        'subtitle' => 'Movies that fit the weather outside.',
-    ])
+    <x-reserved id="weather-row" title="For today's weather" subtitle="Movies that fit the weather outside." />
 
     @include('livewire.home.movie-section', [
         'section' => 'upcoming',
