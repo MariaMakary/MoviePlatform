@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\MovieIdsRequest;
 use App\Http\Requests\MoviePageRequest;
 use App\Http\Resources\MovieCardResource;
+use App\Http\Resources\MovieDetailResource;
 use App\Services\MovieService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,6 +22,11 @@ class MovieController extends Controller
         $data = $this->validate($request, MovieIdsRequest::rules());
 
         return MovieCardResource::collection($this->movies->findMany($data['ids']))->response();
+    }
+
+    public function show(string $id): JsonResponse
+    {
+        return (new MovieDetailResource($this->movies->find($id)))->response();
     }
 
     public function popular(Request $request): JsonResponse
