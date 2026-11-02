@@ -154,6 +154,7 @@ A list:
 | `description` | string \| null | |
 | `is_public` | boolean | |
 | `contains_movie` | boolean | only on `GET /api/lists?movie_id=` |
+| `movie_ids` | uuid[] | only on `GET /api/lists/{id}`: Catalog `movies.id`, in the order they were added |
 | `created_at` | date | |
 | `updated_at` | date | |
 
@@ -206,11 +207,18 @@ Social ignores the private ones.
 
 ### GET /api/lists/{id}
 
-One list. The movies in it are added by task 1199.
+One list with the ids of its movies. Get the movie cards with Catalog `GET /api/movies?ids=`, which takes at most 100
+ids per call.
 
 **Who:** guest (the owner's token also shows their private list)
 
-**Response** `200`: `{"data": <a list>}`
+**Response** `200`
+
+```json
+{
+  "data": {"id": "0193a7d2-7777-7aaa-8bbb-000000000500", "user_id": "0193a7c0-1111-7aaa-8bbb-000000000001", "title": "Best of Nolan", "description": "Mind benders", "is_public": true, "movie_ids": ["0193a7c1-3333-7aaa-8bbb-000000000100"], "created_at": "2026-11-03T18:20:00Z", "updated_at": "2026-11-03T18:20:00Z"}
+}
+```
 
 **Errors:** `404` `"List not found."` (unknown id, not a UUID, or a list the caller may not see)
 
@@ -241,6 +249,40 @@ Deletes a list and its items.
 **Response** `204`
 
 **Errors:** `401` no or invalid token · `403` not the owner · `404` `"List not found."`
+
+### POST /api/lists/{id}/movies
+
+Adds a movie to a list and updates the list's `updated_at`. Catalog is not called, so the id is not checked against it.
+
+**Who:** owner
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `movie_id` | uuid | required, Catalog `movies.id`, not already in this list |
+
+**Response** `201`
+
+```json
+{
+  "data": {"list_id": "0193a7d2-7777-7aaa-8bbb-000000000500", "movie_id": "0193a7c1-3333-7aaa-8bbb-000000000100", "created_at": "2026-11-03T18:20:00Z"}
+}
+```
+
+**Errors:** `401` no or invalid token · `403` not the owner · `404` `"List not found."` · `422` `movie_id` is missing or
+not a UUID, or `"Already in this list"` (`errors.movie_id`)
+
+### DELETE /api/lists/{id}/movies/{movie_id}
+
+Removes a movie from a list and updates the list's `updated_at`. A movie that is not in the list gives `204` too and
+changes nothing.
+
+**Who:** owner
+
+**Response** `204`
+
+**Errors:** `401` no or invalid token · `403` not the owner · `404` `"List not found."` · `422` `movie_id` is not a UUID
 
 ### GET /api/users/{id}/lists
 

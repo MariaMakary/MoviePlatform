@@ -3,8 +3,11 @@
 namespace App\Services;
 
 use App\Integration\Events\ListCreated;
+use App\Models\ListItem;
 use App\Models\MovieList;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use MoviePlatform\Common\Integration\EventPublisher;
 
 class ListService
@@ -36,7 +39,9 @@ class ListService
     {
         $list = $this->find($id);
 
-        return $list->isVisibleTo($userId) ? $list : abort(404, 'List not found.');
+        return $list->isVisibleTo($userId)
+            ? $list->load(['items' => fn ($items) => $items->orderBy('created_at')->orderBy('movie_id')])
+            : abort(404, 'List not found.');
     }
 
     public function create(string $userId, array $data): MovieList
@@ -58,5 +63,30 @@ class ListService
     public function delete(MovieList $list): void
     {
         $list->delete();
+    }
+
+    // createOrFirst relies on the primary key, so two clicks at the same time still give one row.
+    public function addMovie(MovieList $list, string $movieId): ListItem
+    {
+        return DB::transaction(function () use ($list, $movieId) {
+            $item = ListItem::createOrFirst(['list_id' => $list->id, 'movie_id' => $movieId]);
+
+            if (! $item->wasRecentlyCreated) {
+                throw ValidationException::withMessages(['movie_id' => 'Already in this list']);
+            }
+
+            $list->touch();
+
+            return $item;
+        });
+    }
+
+    public function removeMovie(MovieList $list, string $movieId): void
+    {
+        DB::transaction(function () use ($list, $movieId) {
+            if ($list->items()->where('movie_id', $movieId)->delete() > 0) {
+                $list->touch();
+            }
+        });
     }
 }
