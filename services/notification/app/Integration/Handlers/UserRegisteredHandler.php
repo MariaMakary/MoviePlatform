@@ -15,7 +15,7 @@ class UserRegisteredHandler implements EventHandler
         $this->notifications->notify(
             $data['user_id'],
             NotificationType::Welcome,
-            'Welcome to MoviePlatform!',
+            'Welcome to KAIA!',
             "Hi {$data['name']}, rate movies, build your watchlist and plan movie nights with friends.",
         );
     }
