@@ -137,6 +137,124 @@ Which of these movies are in the current user's watchlist, to show the button st
 
 **Errors:** `401` no or invalid token · `422` missing or invalid `ids`, or more than 100
 
+## Lists
+
+Custom lists like "Favorite Comedies". Private by default. Everybody sees a list that is public and whose author is not
+blocked (`author_blocked`, never returned); the owner always sees their own. Everyone else gets a `404`, the same as an
+unknown id, so nobody can tell that a private list exists. Only the owner can change or delete a list, an admin
+included.
+
+A list:
+
+| Field | Type | Content |
+|---|---|---|
+| `id` | uuid | |
+| `user_id` | uuid | the owner, Identity `users.id` |
+| `title` | string | |
+| `description` | string \| null | |
+| `is_public` | boolean | |
+| `contains_movie` | boolean | only on `GET /api/lists?movie_id=` |
+| `created_at` | date | |
+| `updated_at` | date | |
+
+### GET /api/lists
+
+The current user's lists, public and private, newest first. With `movie_id`, each list also has `contains_movie`, for
+the "Add to list" dropdown.
+
+**Who:** user
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `movie_id` | uuid | query, optional, Catalog `movies.id` |
+| `page` | integer | query, default 1 |
+| `per_page` | integer | query, default 20, max 100 |
+
+**Response** `200`
+
+```json
+{
+  "data": [
+    {"id": "0193a7d2-7777-7aaa-8bbb-000000000500", "user_id": "0193a7c0-1111-7aaa-8bbb-000000000001", "title": "Best of Nolan", "description": "Mind benders", "is_public": true, "contains_movie": true, "created_at": "2026-11-03T18:20:00Z", "updated_at": "2026-11-03T18:20:00Z"}
+  ],
+  "meta": {"current_page": 1, "last_page": 1, "total": 1}
+}
+```
+
+**Errors:** `401` no or invalid token · `422` `movie_id` is not a UUID
+
+### POST /api/lists
+
+Creates a list for the current user and publishes `ListCreated` (`docs/events.md`), for public and private lists alike:
+Social ignores the private ones.
+
+**Who:** user
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `title` | string | required, max 150 |
+| `description` | string \| null | optional, max 500 |
+| `is_public` | boolean | optional, default `false` |
+
+**Response** `201`: `{"data": <a list>}`
+
+**Errors:** `401` no or invalid token · `422` invalid fields
+
+### GET /api/lists/{id}
+
+One list. The movies in it are added by task 1199.
+
+**Who:** guest (the owner's token also shows their private list)
+
+**Response** `200`: `{"data": <a list>}`
+
+**Errors:** `404` `"List not found."` (unknown id, not a UUID, or a list the caller may not see)
+
+### PUT /api/lists/{id}
+
+Changes a list. A field left out keeps its value.
+
+**Who:** owner
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `title` | string | optional, not empty, max 150 |
+| `description` | string \| null | optional, max 500, `null` clears it |
+| `is_public` | boolean | optional |
+
+**Response** `200`: `{"data": <a list>}`
+
+**Errors:** `401` no or invalid token · `403` not the owner · `404` `"List not found."` · `422` invalid fields
+
+### DELETE /api/lists/{id}
+
+Deletes a list and its items.
+
+**Who:** owner
+
+**Response** `204`
+
+**Errors:** `401` no or invalid token · `403` not the owner · `404` `"List not found."`
+
+### GET /api/users/{id}/lists
+
+A user's public lists (not those hidden because the author is blocked), newest first, for the public profile. The same
+for everyone, including that user. An unknown user gives an empty page: users live in Identity.
+
+**Who:** guest
+
+**Request:** `page`, `per_page` as above
+
+**Response** `200`: a page of lists, same shape as `GET /api/lists` without `contains_movie`
+
+**Errors:** `404` the id is not a UUID
+
 ## History
 
 Every route works on the token's user only: nobody can see or change another user's history. A movie can be watched
