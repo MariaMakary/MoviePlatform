@@ -94,4 +94,11 @@ class WatchlistButton extends Component
             $this->error = null;
         }
     }
+
+    // Marking a movie as watched removes it from the watchlist (Engagement does it in the same request).
+    #[On('movie-watched')]
+    public function movieWatched(string $movieId): void
+    {
+        $this->syncState($movieId, false);
+    }
 }
