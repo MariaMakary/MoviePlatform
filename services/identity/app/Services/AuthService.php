@@ -11,7 +11,7 @@ use MoviePlatform\Common\Integration\EventPublisher;
 
 class AuthService
 {
-    private const DUMMY_HASH = '$2y$10$cf5AjmmM59rn2YPlJxMtOuWeqL7t108JbnNVIHe7XkWJnTG9dPZO2';
+    public const DUMMY_HASH = '$2y$10$cf5AjmmM59rn2YPlJxMtOuWeqL7t108JbnNVIHe7XkWJnTG9dPZO2';
 
     public function __construct(private TokenService $tokens, private EventPublisher $events) {}
 

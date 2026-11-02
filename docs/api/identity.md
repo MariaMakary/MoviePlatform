@@ -103,3 +103,51 @@ The current user, read from the database with the token's `sub`.
 ```
 
 **Errors:** `401` no, invalid or expired token, or the user was deleted · `403` `"Account blocked."`
+
+## Password reset
+
+Every email field of this API (register, login, forgot, reset) refuses control characters such as line breaks, with
+`422` on `email`.
+
+### POST /api/password/forgot
+
+Emails a reset link to the account, if it exists. The answer is always the same, so nobody can tell which emails
+exist. The link goes to the Gateway page `<GATEWAY_URL>/reset-password?token=…&email=…` and works once, for
+**60 minutes**. Asking again replaces the older link. Accounts created through social login get a link too.
+
+**Who:** guest
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `email` | string | required, valid email, max 255 |
+
+**Response** `200`, also for an unknown email
+
+```json
+{"data": {"message": "If this email exists, we sent you a link."}}
+```
+
+**Errors:** `422` invalid `email`
+
+### POST /api/password/reset
+
+Sets a new password with the token from the link, then deletes the token. Works for social-login accounts too: it sets
+their first password. Tokens already issued stay valid until they expire.
+
+**Who:** guest
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `email` | string | required, valid email, max 255 |
+| `token` | string | required, from the link |
+| `password` | string | required, min 8 |
+| `password_confirmation` | string | required, equal to `password` |
+
+**Response** `204`, no body
+
+**Errors:** `422` on `token`: `"This password reset link is invalid or has expired."` (wrong, used or expired token, or
+an unknown email) · `422` other invalid fields

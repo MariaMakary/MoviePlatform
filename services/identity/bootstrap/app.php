@@ -27,9 +27,11 @@ $app->singleton(
 );
 
 $app->configure('app');
+$app->configure('mail');
 
 $app->register(MoviePlatform\Common\CommonServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
+$app->register(Illuminate\Mail\MailServiceProvider::class);
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
