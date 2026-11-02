@@ -92,3 +92,86 @@ Which of these movies are in the current user's watchlist, to show the button st
 ```
 
 **Errors:** `401` no or invalid token · `422` missing or invalid `ids`, or more than 100
+
+## History
+
+Every route works on the token's user only: nobody can see or change another user's history. A movie can be watched
+again, so it can have several entries.
+
+A history entry:
+
+| Field | Type | Content |
+|---|---|---|
+| `id` | uuid | |
+| `movie_id` | uuid | Catalog `movies.id`; get the movie card with Catalog `GET /api/movies?ids=` |
+| `watched_at` | date | when the user watched it |
+
+### GET /api/history
+
+Lists the current user's history, newest `watched_at` first.
+
+**Who:** user
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `page` | integer | query, default 1 |
+| `per_page` | integer | query, default 20, max 100 |
+
+**Response** `200`
+
+```json
+{
+  "data": [
+    {"id": "0193a7d0-5555-7aaa-8bbb-000000000400", "movie_id": "0193a7c1-3333-7aaa-8bbb-000000000100", "watched_at": "2026-11-02T21:00:00Z"}
+  ],
+  "meta": {"current_page": 1, "last_page": 1, "total": 1}
+}
+```
+
+**Errors:** `401` no or invalid token
+
+### POST /api/history
+
+Marks a movie as watched: adds a history entry and removes the movie from the watchlist, in one transaction.
+
+**Who:** user
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `movie_id` | uuid | required, Catalog `movies.id` |
+| `watched_at` | date | optional, default now, cannot be in the future |
+
+**Response** `201`
+
+```json
+{"data": {"id": "0193a7d0-5555-7aaa-8bbb-000000000400", "movie_id": "0193a7c1-3333-7aaa-8bbb-000000000100", "watched_at": "2026-11-02T21:00:00Z"}}
+```
+
+**Errors:** `401` no or invalid token · `422` invalid `movie_id` or `watched_at`
+
+**Events:** publishes `MovieWatched`
+
+### GET /api/history/contains
+
+The latest `watched_at` of each of these movies the current user has watched, to show 'Watched on <date>' with one
+call. Movies that were not watched are left out.
+
+**Who:** user
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `ids` | string | query, required, comma-separated UUIDs, max 100 |
+
+**Response** `200`
+
+```json
+{"data": [{"movie_id": "0193a7c1-3333-7aaa-8bbb-000000000100", "watched_at": "2026-11-02T21:00:00Z"}]}
+```
+
+**Errors:** `401` no or invalid token · `422` missing or invalid `ids`, or more than 100
