@@ -15,6 +15,9 @@
 
         <x-input label="Email" name="email" type="email" wire:model="email" autocomplete="email" required autofocus />
         <x-input label="Password" name="password" type="password" wire:model="password" autocomplete="current-password" required />
+        <p class="-mt-2 text-right text-sm">
+            <a href="{{ route('password.request') }}" class="text-gray-400 hover:text-white hover:underline">Forgot password?</a>
+        </p>
 
         <x-button type="submit" class="w-full" wire:loading.attr="disabled">Log in</x-button>
     </form>
