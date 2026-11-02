@@ -59,7 +59,7 @@
                     {{-- Actions from other tasks: replace each x-reserved with its Livewire component --}}
                     <div class="flex flex-wrap items-center gap-2">
                         <x-reserved compact id="rating-slot" title="Your rating" />              {{-- 1178 rating stars --}}
-                        <x-reserved compact id="watchlist-slot" title="Watchlist" />             {{-- 1193 watchlist button --}}
+                        <livewire:engagement.watchlist-button :movie-id="$movie['id']" :key="'watchlist-'.$movie['id']" />
                         <x-reserved compact id="watched-slot" title="Mark as watched" />         {{-- 1196 mark as watched --}}
                         @if ($upcoming)
                             <x-reserved compact id="calendar-slot" title="Add to calendar" />    {{-- 1250 add to calendar --}}

@@ -5,6 +5,7 @@ use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
 use App\Livewire\Catalog\MoviePage;
 use App\Livewire\Dev\ServiceStatus;
+use App\Livewire\Engagement\Watchlist;
 use App\Livewire\Home;
 use App\Livewire\Intelligence\CinemaMap;
 use App\Livewire\Notifications\Index as Notifications;
@@ -17,6 +18,8 @@ Route::get('/movies/{id}', MoviePage::class)->whereUuid('id')->name('movies.show
 Route::get('/cinemas',CinemaMap::class)->name('cinemas');
 
 Route::get('/notifications', Notifications::class)->middleware('auth.jwt')->name('notifications');
+
+Route::get('/watchlist', Watchlist::class)->middleware('auth.jwt')->name('watchlist');
 
 Route::get('/login', Login::class)->name('login');
 Route::get('/register', Register::class)->name('register');

@@ -13,6 +13,11 @@
 
     <x-reserved id="recommendations-row" title="Recommended for you" subtitle="Picks based on what you rate and watch." />
 
+    {{-- One notice instead of one per card: the watchlist buttons wait until Engagement answers --}}
+    @if ($loggedIn && $this->isUnavailable('watchlist'))
+        <x-service-unavailable :service="$unavailable['watchlist']" :retry="true" compact />
+    @endif
+
     @include('livewire.home.movie-section', [
         'section' => 'popular',
         'title' => 'Popular',

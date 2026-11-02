@@ -4,7 +4,9 @@ namespace App\Livewire;
 
 use App\Exceptions\ServiceRequestException;
 use App\Livewire\Concerns\WithServiceFallback;
+use App\Services\AuthSession;
 use App\Services\Clients\CatalogClient;
+use App\Services\Clients\EngagementClient;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Title;
@@ -22,6 +24,9 @@ class Home extends Component
     public array $page = ['popular' => 0, 'upcoming' => 0];
 
     public array $lastPage = ['popular' => 1, 'upcoming' => 1];
+
+    /** Movie id => in the user's watchlist, for the cards shown so far (logged-in users only). */
+    public array $inWatchlist = [];
 
     public function render(): View
     {
@@ -42,7 +47,13 @@ class Home extends Component
             $down = $this->unavailable[$section] ?? null;
         }
 
-        return view('livewire.home');
+        $loggedIn = app(AuthSession::class)->check();
+
+        if ($loggedIn) {
+            $this->loadWatchlistStates();
+        }
+
+        return view('livewire.home', ['loggedIn' => $loggedIn]);
     }
 
     public function loadMore(string $section): void
@@ -85,5 +96,26 @@ class Home extends Component
 
         $this->page[$section] = $result['meta']['current_page'];
         $this->lastPage[$section] = $result['meta']['last_page'];
+    }
+
+    // One Engagement call for every card whose state is not known yet (first load, "Load more" or "Try again").
+    private function loadWatchlistStates(): void
+    {
+        $shown = array_column(array_merge(...array_values($this->movies)), 'id');
+        $unknown = array_values(array_diff($shown, array_keys($this->inWatchlist)));
+
+        if ($unknown === []) {
+            return;
+        }
+
+        $found = $this->fromService('watchlist', fn () => app(EngagementClient::class)->watchlistContains($unknown));
+
+        if ($found === null) {
+            return;
+        }
+
+        foreach ($unknown as $id) {
+            $this->inWatchlist[$id] = in_array($id, $found, true);
+        }
     }
 }

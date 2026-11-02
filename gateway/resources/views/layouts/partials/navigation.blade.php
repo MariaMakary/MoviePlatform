@@ -1,9 +1,12 @@
-@php($links = [
+@php($links = array_values(array_filter([
     ['label' => 'Home', 'href' => route('home'), 'active' => request()->routeIs('home')],
     ['label' => 'Movies', 'href' => '#', 'active' => false],
+    app(\App\Services\AuthSession::class)->check()
+        ? ['label' => 'Watchlist', 'href' => route('watchlist'), 'active' => request()->routeIs('watchlist')]
+        : null,
     ['label' => 'Movie nights', 'href' => '#', 'active' => false],
     ['label' => 'Cinemas', 'href' => route('cinemas'), 'active' => request()->routeIs('cinemas')],
-])
+])))
 
 <header x-data="{ open: false }" class="sticky top-0 z-40 border-b border-white/10 bg-jet/90 backdrop-blur">
     <nav class="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8" aria-label="Main">

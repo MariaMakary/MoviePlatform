@@ -11,7 +11,17 @@
     @else
         <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
             @foreach ($movies[$section] as $movie)
-                <x-movie-card wire:key="{{ $section }}-{{ $movie['id'] }}" :movie="$movie" :href="route('movies.show', $movie['id'])" :show-release-date="$showReleaseDate" />
+                <div wire:key="{{ $section }}-{{ $movie['id'] }}" class="relative">
+                    <x-movie-card :movie="$movie" :href="route('movies.show', $movie['id'])" :show-release-date="$showReleaseDate" />
+
+                    {{-- Logged in: only once its state is known (Engagement may be down, see the notice above) --}}
+                    @if (! $loggedIn || array_key_exists($movie['id'], $inWatchlist))
+                        <div class="absolute top-2 left-2">
+                            <livewire:engagement.watchlist-button :movie-id="$movie['id']" :in-watchlist="$inWatchlist[$movie['id']] ?? null" :compact="true"
+                                                                  :key="'watchlist-'.$section.'-'.$movie['id']" />
+                        </div>
+                    @endif
+                </div>
             @endforeach
         </div>
 
