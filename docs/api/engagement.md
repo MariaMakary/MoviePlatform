@@ -3,6 +3,50 @@
 Port **8003**. Ratings, reviews, watchlist, watch history, custom lists and moderation. Follows
 `docs/api/conventions.md`.
 
+## Ratings
+
+One rating per user and movie, with a score from 1 to 5.
+
+### POST /api/ratings
+
+Creates or updates the current user's rating of a movie (one rating per user and movie). `created_at` stays the date
+of the first rating.
+
+**Who:** user
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `movie_id` | uuid | required, Catalog `movies.id` |
+| `score` | integer | required, 1–5 |
+
+**Response** `200`
+
+```json
+{"data": {"id": "0193a7d0-5555-7aaa-8bbb-000000000300", "movie_id": "0193a7c1-3333-7aaa-8bbb-000000000100", "score": 4, "created_at": "2026-11-03T18:20:00Z"}}
+```
+
+**Errors:** `401` no or invalid token · `422` invalid `movie_id` or `score`
+
+**Events:** publishes `RatingAdded`, also when the rating is changed
+
+### GET /api/movies/{id}/rating-summary
+
+The average score of a movie, its number of ratings and the current user's score. A movie without ratings answers
+`average: null` and `count: 0`.
+
+**Who:** guest. With a valid token, `my_score` holds the user's score; without one, or with an invalid or expired
+token, `my_score` is `null`.
+
+**Response** `200`, `average` rounded to 2 decimals
+
+```json
+{"data": {"average": 4.25, "count": 12, "my_score": 4}}
+```
+
+**Errors:** `422` `id` is not a UUID
+
 ## Watchlist
 
 Every route works on the token's user only: nobody can see or change another user's watchlist.
