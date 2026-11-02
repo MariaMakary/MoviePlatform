@@ -4,6 +4,7 @@ namespace App\Livewire\Engagement;
 
 use App\Exceptions\ServiceRequestException;
 use App\Exceptions\ServiceUnavailable;
+use App\Livewire\Concerns\RedirectsGuestsToLogin;
 use App\Livewire\Concerns\WithServiceFallback;
 use App\Services\AuthSession;
 use App\Services\Clients\EngagementClient;
@@ -18,6 +19,7 @@ use Livewire\Component;
  */
 class WatchlistButton extends Component
 {
+    use RedirectsGuestsToLogin;
     use WithServiceFallback;
 
     #[Locked]
@@ -80,11 +82,7 @@ class WatchlistButton extends Component
 
     public function logIn()
     {
-        // Livewire calls come from the page, so the browser's referer is the page to come back to.
-        session()->put('url.intended', url()->previous(route('home')));
-        session()->flash('info', 'Log in to add movies to your watchlist.');
-
-        return $this->redirectRoute('login');
+        return $this->redirectToLogin('Log in to add movies to your watchlist.');
     }
 
     // Keeps every button of the same movie on the page in sync (a card and the movie header, for example).
