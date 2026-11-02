@@ -249,6 +249,7 @@ class PasswordResetTest extends TestCase
     {
         Mail::fake();
         $this->user();
+        $users = User::count();
 
         $requests = [
             '/api/register' => ['name' => 'Eve', 'email' => self::LINE_BREAK_EMAIL, 'password' => 'password', 'password_confirmation' => 'password'],
@@ -264,7 +265,7 @@ class PasswordResetTest extends TestCase
         }
 
         Mail::assertNothingSent();
-        $this->assertSame(1, User::count());
+        $this->assertSame($users, User::count());
         $this->assertSame(0, PasswordResetToken::count());
     }
 
@@ -291,7 +292,7 @@ class PasswordResetTest extends TestCase
 
         $email = $messages->first()->getOriginalMessage();
         $this->assertSame('maria@example.com', $email->getTo()[0]->getAddress());
-        $this->assertSame('Reset your MoviePlatform password', $email->getSubject());
+        $this->assertSame('Reset your KAIA password', $email->getSubject());
         $this->assertStringContainsString('http://gateway.test/reset-password?token=', $email->getHtmlBody());
     }
 }

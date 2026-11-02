@@ -26,7 +26,7 @@ return [
 
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'no-reply@movieplatform.test'),
-        'name' => env('MAIL_FROM_NAME', 'MoviePlatform'),
+        'name' => env('MAIL_FROM_NAME', 'KAIA'),
     ],
 
     // The reset link in the email points to this Gateway page.

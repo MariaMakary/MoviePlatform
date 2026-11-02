@@ -13,7 +13,7 @@ class ResetPasswordMail extends Mailable
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'Reset your MoviePlatform password');
+        return new Envelope(subject: 'Reset your KAIA password');
     }
 
     public function content(): Content
