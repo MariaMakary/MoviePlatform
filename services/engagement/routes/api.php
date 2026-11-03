@@ -16,6 +16,8 @@ $router->group(['middleware' => 'jwt'], function ($router) use ($uuid) {
     $router->post('/lists', 'Api\ListController@store');
     $router->put("/lists/{id:$uuid}", 'Api\ListController@update');
     $router->delete("/lists/{id:$uuid}", 'Api\ListController@destroy');
+    $router->post("/lists/{id:$uuid}/movies", 'Api\ListMovieController@store');
+    $router->delete("/lists/{id:$uuid}/movies/{movieId}", 'Api\ListMovieController@destroy');
 
     $router->get('/watchlist', 'Api\WatchlistController@index');
     $router->get('/watchlist/contains', 'Api\WatchlistController@contains');
