@@ -5,12 +5,18 @@ $router->get('/health', '\MoviePlatform\Common\Http\Controllers\HealthController
 $uuid = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}';
 
 $router->get('/movies/{id}/rating-summary', 'Api\RatingController@summary');
+$router->get('/movies/{id}/reviews', 'Api\ReviewController@forMovie');
+$router->get('/users/{id}/reviews', 'Api\ReviewController@forUser');
 
 $router->get("/lists/{id:$uuid}", 'Api\ListController@show');
 $router->get("/users/{id:$uuid}/lists", 'Api\ListController@ofUser');
 
 $router->group(['middleware' => 'jwt'], function ($router) use ($uuid) {
     $router->post('/ratings', 'Api\RatingController@store');
+
+    $router->post('/reviews', 'Api\ReviewController@store');
+    $router->put('/reviews/{id}', 'Api\ReviewController@update');
+    $router->delete('/reviews/{id}', 'Api\ReviewController@destroy');
 
     $router->get('/lists', 'Api\ListController@index');
     $router->post('/lists', 'Api\ListController@store');
