@@ -13,5 +13,6 @@ return [
     ],
 
     'handlers' => [
+        'UserRegistered' => App\Integration\Handlers\UserRegisteredHandler::class,
     ],
 ];
