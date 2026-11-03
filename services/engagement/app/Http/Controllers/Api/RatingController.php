@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\RatingSummaryRequest;
 use App\Http\Requests\StoreRatingRequest;
+use App\Http\Requests\UuidParameterRequest;
 use App\Http\Resources\RatingResource;
 use App\Services\RatingService;
 use Illuminate\Http\JsonResponse;
@@ -28,7 +28,7 @@ class RatingController extends Controller
     public function summary(Request $request, string $id): JsonResponse
     {
         $request->merge(['movie_id' => $id]);
-        $data = $this->validate($request, RatingSummaryRequest::rules());
+        $data = $this->validate($request, UuidParameterRequest::rules('movie_id'));
 
         return (new JsonResource($this->ratings->summaryFor($data['movie_id'], Auth::guard('jwt')->user()?->id)))->response();
     }

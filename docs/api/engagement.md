@@ -47,6 +47,105 @@ token, `my_score` is `null`.
 
 **Errors:** `422` `id` is not a UUID
 
+## Reviews
+
+One review per user and movie. Public lists only show reviews with `is_hidden = false` (admin moderation) and
+`author_blocked = false` (set by `user.blocked`); the author can still edit or delete a hidden review.
+
+A review:
+
+| Field | Type | Content |
+|---|---|---|
+| `id` | uuid | |
+| `user_id` | uuid | the author (Identity `users.id`) |
+| `movie_id` | uuid | Catalog `movies.id` |
+| `body` | string | 10–2000 characters |
+| `author_score` | integer \| null | the author's rating of the same movie (1–5), `null` if they did not rate it |
+| `sentiment_label` | string \| null | `positive`, `neutral` or `negative`, set by Intelligence a few seconds after writing; `null` until then |
+| `sentiment_score` | number \| null | 0–1, confidence of `sentiment_label` |
+| `created_at`, `updated_at` | date | |
+
+### GET /api/movies/{id}/reviews
+
+A movie's reviews, newest first.
+
+**Who:** guest
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `page` | integer | query, default 1 |
+| `per_page` | integer | query, default 20, max 100 |
+
+**Response** `200`
+
+```json
+{
+  "data": [
+    {"id": "0193a7d1-6666-7aaa-8bbb-000000000400", "user_id": "0193a7c0-1111-7aaa-8bbb-000000000001", "movie_id": "0193a7c1-3333-7aaa-8bbb-000000000100", "body": "Loved the ending, the soundtrack is amazing.", "author_score": 5, "sentiment_label": "positive", "sentiment_score": 0.9731, "created_at": "2026-11-03T18:20:00Z", "updated_at": "2026-11-03T18:20:00Z"}
+  ],
+  "meta": {"current_page": 1, "last_page": 1, "total": 1}
+}
+```
+
+**Errors:** `422` `id` is not a UUID
+
+### GET /api/users/{id}/reviews
+
+A user's reviews, newest first. Same request and response as the movie list.
+
+**Who:** guest
+
+**Errors:** `422` `id` is not a UUID
+
+### POST /api/reviews
+
+Writes the current user's review of a movie.
+
+**Who:** user
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `movie_id` | uuid | required, Catalog `movies.id` |
+| `body` | string | required, 10–2000 characters, not only spaces |
+
+**Response** `201`, the review
+
+**Errors:** `401` no or invalid token · `422` invalid `movie_id` or `body`, or `movie_id`: `"You already reviewed this movie."`
+
+**Events:** publishes `ReviewCreated`
+
+### PUT /api/reviews/{id}
+
+Changes the text of the current user's review.
+
+**Who:** user, the author only
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `body` | string | required, 10–2000 characters, not only spaces |
+
+**Response** `200`, the review
+
+**Errors:** `401` no or invalid token · `403` not the author · `404` `"Review not found."` · `422` invalid `body`
+
+**Events:** publishes `ReviewUpdated`, only when the text changed
+
+### DELETE /api/reviews/{id}
+
+Deletes the current user's review.
+
+**Who:** user, the author only
+
+**Response** `204`
+
+**Errors:** `401` no or invalid token · `403` not the author · `404` `"Review not found."`
+
 ## Watchlist
 
 Every route works on the token's user only: nobody can see or change another user's watchlist.

@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Models\MovieList;
+use App\Models\Review;
 use App\Policies\ListPolicy;
+use App\Policies\ReviewPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -17,5 +19,6 @@ class AuthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(MovieList::class, ListPolicy::class);
+        Gate::policy(Review::class, ReviewPolicy::class);
     }
 }

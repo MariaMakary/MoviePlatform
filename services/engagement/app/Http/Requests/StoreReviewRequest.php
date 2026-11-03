@@ -2,12 +2,13 @@
 
 namespace App\Http\Requests;
 
-class RatingSummaryRequest
+class StoreReviewRequest
 {
     public static function rules(): array
     {
         return [
             'movie_id' => ['required', 'uuid'],
+            ...UpdateReviewRequest::rules(),
         ];
     }
 }
