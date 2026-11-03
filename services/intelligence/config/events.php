@@ -14,5 +14,6 @@ return [
     ],
 
     'handlers' => [
+        'RatingAdded' => App\Integration\Handlers\RatingAddedHandler::class,
     ],
 ];
