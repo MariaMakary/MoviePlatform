@@ -16,6 +16,16 @@ class IdentityClient extends BaseClient
         return $this->post('/api/login', ['email' => $email, 'password' => $password])['data'];
     }
 
+    /** Public profiles (id, name, avatar…) for up to 100 ids, from task 1145; unknown ids are skipped. */
+    public function users(array $ids): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+
+        return $this->get('/api/users', ['ids' => implode(',', array_values(array_unique($ids)))])['data'];
+    }
+
     public function refresh(): array
     {
         return $this->post('/api/token/refresh')['data'];
