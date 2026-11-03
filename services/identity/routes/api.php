@@ -14,6 +14,9 @@ $router->group(['middleware' => 'jwt'], function ($router) {
     $router->post('/logout', 'Api\AuthController@logout');
     $router->post('/token/refresh', 'Api\AuthController@refresh');
     $router->get('/me', 'Api\AuthController@me');
+    $router->put('/me', 'Api\ProfileController@update');
+    $router->post('/me/avatar', 'Api\ProfileController@updateAvatar');
+    $router->put('/me/password', 'Api\ProfileController@updatePassword');
     $router->put('/me/genres', 'Api\ProfileController@updateGenres');
 
     $router->get('/users/search', 'Api\UserController@search');

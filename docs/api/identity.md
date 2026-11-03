@@ -108,6 +108,74 @@ do not.
 
 ## Profile
 
+The logged-in user changes their own account. Every endpoint here answers `401` with no or an invalid token, or when
+the user was deleted, and `403` `"Account blocked."` for a blocked user. `email`, `role` and `is_blocked` cannot be
+changed here.
+
+### PUT /api/me
+
+Sets the name and the bio. Both are trimmed. A missing, empty or blank `bio` clears it. The token keeps the old name
+until it is refreshed, so the Gateway calls `POST /api/token/refresh` right after a rename.
+
+**Who:** user
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `name` | string | required, max 100 |
+| `bio` | string \| null | optional, max 500 |
+
+**Response** `200`, the user as in `GET /api/me`
+
+```json
+{"data": {"id": "0193a7c0-1111-7aaa-8bbb-000000000001", "name": "Maria Makary", "email": "maria@example.com", "avatar": null, "role": "user", "genre_ids": []}}
+```
+
+**Errors:** `422` invalid `name` or `bio`
+
+### POST /api/me/avatar
+
+Uploads a new avatar as `multipart/form-data` (POST, because PHP does not read files sent with PUT). The file is checked
+by its content, not its name, saved as `public/avatars/<uuid>.<jpg|png>` and served by Identity itself; `avatar` becomes
+its full URL. The previous avatar file is deleted (an avatar from Google or GitHub is only replaced, never deleted).
+
+**Who:** user
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `avatar` | file | required, jpg or png, max 2 MB |
+
+**Response** `200`, the user as in `GET /api/me`
+
+```json
+{"data": {"id": "0193a7c0-1111-7aaa-8bbb-000000000001", "name": "Maria Makary", "email": "maria@example.com", "avatar": "http://localhost:8001/avatars/0193a7c5-3333-7aaa-8bbb-000000000020.png", "role": "user", "genre_ids": []}}
+```
+
+**Errors:** `422` on `avatar`: missing, not a jpg or png (a gif, also one renamed to `.png`), or over 2 MB
+
+### PUT /api/me/password
+
+Changes the password. Tokens already issued stay valid until they expire.
+
+**Who:** user
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `current_password` | string | the password used today |
+| `password` | string | required, min 8 |
+| `password_confirmation` | string | required, equal to `password` |
+
+**Response** `204`, no body
+
+**Errors:** `422` on `current_password`: `"The current password is incorrect."` (wrong or missing), or
+`"This account has no password yet. Use 'Forgot password' to set one."` (an account created through social login) ·
+`422` invalid `password`
+
 ### PUT /api/me/genres
 
 Replaces the user's favorite genres with this list. An empty list clears them. The ids are Catalog `genres.id`; Identity
