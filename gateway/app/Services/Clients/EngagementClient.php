@@ -9,6 +9,17 @@ class EngagementClient extends BaseClient
 
     protected string $service = 'engagement';
 
+    /** {average, count, my_score}; my_score is null for guests. */
+    public function ratingSummary(string $movieId): array
+    {
+        return $this->get('/api/movies/'.rawurlencode($movieId).'/rating-summary')['data'];
+    }
+
+    public function rate(string $movieId, int $score): array
+    {
+        return $this->post('/api/ratings', ['movie_id' => $movieId, 'score' => $score])['data'];
+    }
+
     public function watchlist(int $page = 1, int $perPage = 20): array
     {
         return $this->get('/api/watchlist', ['page' => $page, 'per_page' => $perPage]);
