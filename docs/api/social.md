@@ -203,3 +203,26 @@ that is not a UUID or is repeated (`errors.user_ids.<position>`)
 
 **Events:** publishes one `MovieNightInviteSent` per new participant, after the invites are saved (`host_name` is the
 `name` claim of the host's token)
+
+### PATCH /api/movie-nights/{id}/rsvp
+
+An invited user accepts or declines. The answer can be changed (declined → accepted and back) while the night is
+`open`. Each change sets `responded_at`. Sending the answer the user already gave changes nothing and publishes no
+event, so the host is not told twice.
+
+**Who:** user, invited to the night (not the host)
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `status` | string | required, `accepted` or `declined` |
+
+**Response** `200`, the night as in `GET /api/movie-nights/{id}`, with the new `my_status`
+
+**Errors:** `401` no or invalid token · `404` `"Movie night not found."` (unknown id, or the caller is not invited) ·
+`422` `"The host is always going."` (the host) · `422` `"This movie night is no longer open."` (finalized or
+cancelled) · `422` `status` missing or not `accepted` / `declined` (`errors.status`)
+
+**Events:** publishes `MovieNightInviteAnswered` after the answer is saved, only when it changed (`user_name` is the
+`name` claim of the caller's token)

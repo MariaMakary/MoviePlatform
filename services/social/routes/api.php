@@ -16,4 +16,5 @@ $router->group(['middleware' => 'jwt'], function ($router) use ($uuid) {
     $router->get('/movie-nights', 'Api\MovieNightController@index');
     $router->get("/movie-nights/{id:$uuid}", 'Api\MovieNightController@show');
     $router->post("/movie-nights/{id:$uuid}/invites", 'Api\ParticipantController@invite');
+    $router->patch("/movie-nights/{id:$uuid}/rsvp", 'Api\ParticipantController@rsvp');
 });
