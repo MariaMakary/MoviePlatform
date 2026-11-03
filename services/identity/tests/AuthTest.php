@@ -88,11 +88,11 @@ class AuthTest extends TestCase
         $this->get('/api/me', $this->bearer($token))
             ->seeStatusCode(200)
             ->seeJsonEquals(['data' => [
-                'id' => $user->id, 'name' => 'Maria Makary', 'email' => 'maria@example.com', 'avatar' => null, 'role' => 'user',
+                'id' => $user->id, 'name' => 'Maria Makary', 'email' => 'maria@example.com', 'avatar' => null, 'role' => 'user', 'genre_ids' => [],
             ]]);
     }
 
-    public function test_login_ignores_the_case_of_the_email(): void
+public function test_login_ignores_the_case_of_the_email(): void
     {
         $this->user(['email' => 'Maria@Example.com']);
 

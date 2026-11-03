@@ -26,6 +26,9 @@ Payloads and rules: `docs/events.md`.
 - It is the only service that stores users. Other services only keep `user_id` (a UUID) and read the user from the token.
 - Anything about another user goes out through `PublicUserResource` (`id`, `name`, `avatar`, `bio`, `created_at`),
   from `App\Services\UserService`. `UserResource` (with `email` and `role`) is only for the user's own account.
+- `App\Services\ProfileService` changes the logged-in user's own profile (favorite genres for now). It locks the user
+  row while replacing the `user_genres` rows, so two saves at the same time cannot collide, and publishes
+  `UserGenresUpdated` with the full new list after the commit.
 - Social login uses Laravel Socialite in **stateless** mode (Lumen has no sessions).
 
 ## Before coding
@@ -45,3 +48,7 @@ The tests use the real `identity-db` (CHECK constraint, unique email), so run `d
 the plain value; it is `null` for social-login accounts and hidden from `toArray()`. `role` is cast to the
 `MoviePlatform\Common\Auth\Role` enum (`Role::User`, `Role::Admin`). `role` and `is_blocked` are not fillable: a
 request can never set them, so admin actions set them explicitly (`$user->role = Role::Admin`).
+
+`UserGenre` is a row of `user_genres` (primary key `user_id` + `genre_id`, only `created_at`), read through
+`$user->genres` (sorted by `genre_id`). `UserResource` adds `genre_ids` only when `genres` is loaded
+(`GET /api/me`, `PUT /api/me/genres`).
