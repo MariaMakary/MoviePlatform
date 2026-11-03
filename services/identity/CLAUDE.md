@@ -35,6 +35,9 @@ Payloads and rules: `docs/events.md`.
   the file the same way. Uploads are checked by content (`mimes:jpg,png`); in tests build a real
   `new UploadedFile($tempPath, $name, null, null, true)`, because `UploadedFile::fake()` reports its type from the file
   name.
+- `Database\Seeders\AdminSeeder` (`php artisan db:seed --class=AdminSeeder`) creates `admin@kaia.com` with role admin
+  from `config/admin.php`; the password is `secret('admin_password')`, at least 8 characters, or the seeder stops. If
+  the email already exists it changes nothing, so it never turns someone else's account into an admin.
 - Social login uses Laravel Socialite in **stateless** mode (Lumen has no sessions).
 
 ## Before coding

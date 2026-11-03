@@ -83,6 +83,16 @@ docker compose ps            # wait until everything shows "healthy"
 
 The migrations run the first time you start each service (next section).
 
+**5. Admin account** (after Identity has run once, so its tables exist):
+
+```powershell
+cd services/identity; php artisan db:seed --class=AdminSeeder; cd ../..
+```
+
+It creates `admin@kaia.com` with role `admin`, with the password in `secrets/admin_password` (filled by the secrets
+script in step 1, or set your own: at least 8 characters, one line). Running it again changes nothing. Log in with it
+on the Gateway to reach the admin pages.
+
 ## Every day
 
 ```powershell
