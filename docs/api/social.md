@@ -179,3 +179,27 @@ One movie night with its participants, candidates and votes.
 
 **Errors:** `401` no or invalid token · `404` `"Movie night not found."` (unknown id, or the caller is not a
 participant) · `404` `"Not found."` (`id` is not a UUID)
+
+### POST /api/movie-nights/{id}/invites
+
+The host invites users to an open movie night. Each new user becomes a `pending` participant. The host and users
+already invited (whatever their answer) are skipped without an error, so sending the same list twice changes nothing.
+Social does not check that the users exist: the Gateway picks them with Identity's user search.
+
+**Who:** user, host of the night
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `user_ids` | uuid[] | required, 1 to 20 Identity user ids, no id twice (in any letter case) |
+
+**Response** `200`, the night as in `GET /api/movie-nights/{id}`, with the new participants
+
+**Errors:** `401` no or invalid token · `403` `"Only the host can invite people."` (a participant who is not the host) ·
+`404` `"Movie night not found."` (unknown id, or the caller is not a participant) · `422` `"This movie night is no
+longer open."` (finalized or cancelled) · `422` `user_ids` missing, empty or more than 20 (`errors.user_ids`), or an id
+that is not a UUID or is repeated (`errors.user_ids.<position>`)
+
+**Events:** publishes one `MovieNightInviteSent` per new participant, after the invites are saved (`host_name` is the
+`name` claim of the host's token)
