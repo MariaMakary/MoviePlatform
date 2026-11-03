@@ -28,6 +28,7 @@ $app->singleton(
 
 $app->configure('app');
 $app->configure('mail');
+$app->configure('admin');
 
 $app->register(MoviePlatform\Common\CommonServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
