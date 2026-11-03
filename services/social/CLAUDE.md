@@ -16,6 +16,16 @@ Payloads and rules: `docs/events.md`.
 - Real time: broadcasts `MessageSent` on `room.{id}` and `VotesUpdated` on `movie-night.{id}` through Reverb (which runs from the Gateway), using the `pusher` broadcast driver.
 - The feed is built from consumed events; it never reads Engagement's database.
 
+## Movie nights
+
+- `App\Services\MovieNightService` creates nights (the host becomes an `accepted` participant in the same
+  transaction), lists the caller's nights and finds one. Visibility is `MovieNight::withParticipant($userId)`: a user
+  who is not a participant gets `404`, never `403`, so nobody can tell a night exists. Reuse it in invites, RSVP and
+  voting.
+- `my_status` (the caller's participant status) is added to each night with a subquery, so the list needs no extra
+  query per night.
+- The `{id}` route parameter is checked with the `$uuid` pattern in `routes/api.php`: a non-UUID is a `404`.
+
 ## Models
 
 - `MovieNight` (UUID, `HasUuids`, `MovieNightFactory`): `status` is the `App\Enums\MovieNightStatus` enum (`Open`,
