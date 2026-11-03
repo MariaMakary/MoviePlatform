@@ -25,6 +25,31 @@ class EngagementClient extends BaseClient
         return $this->get('/api/watchlist', ['page' => $page, 'per_page' => $perPage]);
     }
 
+    public function movieReviews(string $movieId, int $page = 1, int $perPage = 10): array
+    {
+        return $this->get('/api/movies/'.rawurlencode($movieId).'/reviews', ['page' => $page, 'per_page' => $perPage]);
+    }
+
+    public function userReviews(string $userId, int $page = 1, int $perPage = 20): array
+    {
+        return $this->get('/api/users/'.rawurlencode($userId).'/reviews', ['page' => $page, 'per_page' => $perPage]);
+    }
+
+    public function createReview(string $movieId, string $body): array
+    {
+        return $this->post('/api/reviews', ['movie_id' => $movieId, 'body' => $body])['data'];
+    }
+
+    public function updateReview(string $reviewId, string $body): array
+    {
+        return $this->put('/api/reviews/'.rawurlencode($reviewId), ['body' => $body])['data'];
+    }
+
+    public function deleteReview(string $reviewId): void
+    {
+        $this->delete('/api/reviews/'.rawurlencode($reviewId));
+    }
+
     public function addToWatchlist(string $movieId): array
     {
         return $this->post('/api/watchlist', ['movie_id' => $movieId])['data'];
