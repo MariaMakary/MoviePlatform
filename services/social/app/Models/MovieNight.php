@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\MovieNightStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -22,6 +23,11 @@ class MovieNight extends Model
     protected $attributes = [
         'status' => 'open',
     ];
+
+    public function scopeWithParticipant(Builder $query, string $userId): Builder
+    {
+        return $query->whereIn('id', Participant::select('movie_night_id')->where('user_id', $userId));
+    }
 
     public function participants(): HasMany
     {
