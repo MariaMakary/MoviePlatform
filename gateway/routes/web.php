@@ -6,6 +6,7 @@ use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
 use App\Livewire\Auth\ResetPassword;
 use App\Livewire\Catalog\MoviePage;
+use App\Livewire\Catalog\Search;
 use App\Livewire\Dev\ServiceStatus;
 use App\Livewire\Engagement\History;
 use App\Livewire\Engagement\Watchlist;
@@ -17,6 +18,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', Home::class)->name('home');
 
 Route::get('/movies/{id}', MoviePage::class)->whereUuid('id')->name('movies.show');
+
+Route::get('/search', Search::class)->name('search');
 
 Route::get('/cinemas',CinemaMap::class)->name('cinemas');
 
