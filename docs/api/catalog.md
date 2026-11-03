@@ -135,6 +135,44 @@ The pages are TMDB's: `last_page` is at most 500 and `total` at most 10 000 (TMD
 **Errors:** `422` `page` not an integer from 1 to 500 · `503` `"TMDB is unavailable."` (TMDB down and the page not
 cached)
 
+### GET /api/movies/search
+
+Searches Catalog's movies by title, genre and release year, as movie cards with their **Catalog** ids. All filters work
+together; without any filter it lists every movie.
+
+With `q`, titles are matched case-insensitively anywhere in the title (`ILIKE`). When fewer than **10** local movies
+match all the filters, TMDB's search is also asked once (its first page) and the movies missing from Catalog are
+created from the result data, as `GET /api/movies/popular` does (no extra TMDB call per movie). If TMDB is down, the
+local results are returned as they are.
+
+**Who:** guest
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `q` | string | query, optional, 2–100 characters; leave it out to not search by title |
+| `genre` | uuid | query, optional, a Catalog genre id |
+| `year` | integer | query, optional, release year |
+| `sort` | string | query, optional: `popularity` (default), `vote_average` or `release_date`, always descending; movies without a value come last |
+| `page` | integer | query, optional, default 1, 1–500; 20 movies per page |
+
+`GET /api/movies/search?q=incep&genre=0193a7c2-…&year=2010&sort=vote_average`
+
+**Response** `200`
+
+```json
+{
+  "data": [
+    {"id": "0193a7c1-3333-7aaa-8bbb-000000000100", "title": "Inception", "poster_url": "https://image.tmdb.org/t/p/w342/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg", "year": 2010, "release_date": "2010-07-15", "vote_average": 8.4, "genres": ["Action", "Science Fiction"]}
+  ],
+  "meta": {"current_page": 1, "last_page": 1, "total": 1}
+}
+```
+
+**Errors:** `422` `q` shorter than 2 or longer than 100 characters, `genre` not a UUID, `year` not an integer, an
+unknown `sort`, or `page` not an integer from 1 to 500
+
 ### GET /api/movies/upcoming
 
 Like `GET /api/movies/popular`, for movies coming out soon in the configured region (`TMDB_REGION`, default `US`).
