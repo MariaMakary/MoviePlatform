@@ -7,6 +7,7 @@ use App\Livewire\Concerns\WithServiceFallback;
 use App\Services\Clients\CatalogClient;
 use App\Services\Clients\EngagementClient;
 use Illuminate\Contracts\View\View;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -42,6 +43,10 @@ class Watchlist extends Component
         $this->dispatch('watchlist-changed', movieId: $movieId, inWatchlist: false);
     }
 
+    // A movie marked as watched has left the watchlist: render again without it.
+    #[On('movie-watched')]
+    public function movieWatched(): void {}
+
     public function render(EngagementClient $engagement, CatalogClient $catalog): View
     {
         $this->page = max(1, $this->page);
@@ -56,8 +61,12 @@ class Watchlist extends Component
         $movieIds = array_column($result['data'] ?? [], 'movie_id');
         $cards = $this->fromService('catalog', fn () => $catalog->movies($movieIds), []);
 
+        // One call for every "Mark as watched" button of the page (a movie can be in the watchlist to watch again).
+        $watched = $movieIds === [] ? [] : $this->fromService('history', fn () => $engagement->historyContains($movieIds));
+
         return view('livewire.engagement.watchlist', [
             'movies' => $cards,
+            'watched' => $watched,
             'lastPage' => $result['meta']['last_page'] ?? 1,
             'total' => $result['meta']['total'] ?? 0,
         ]);

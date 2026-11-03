@@ -60,7 +60,7 @@
                     <div class="flex flex-wrap items-center gap-2">
                         <livewire:engagement.rate-movie :movie-id="$movie['id']" :key="'rating-'.$movie['id']" />
                         <livewire:engagement.watchlist-button :movie-id="$movie['id']" :key="'watchlist-'.$movie['id']" />
-                        <x-reserved compact id="watched-slot" title="Mark as watched" />         {{-- 1196 mark as watched --}}
+                        <livewire:engagement.mark-watched-button :movie-id="$movie['id']" :key="'watched-'.$movie['id']" />
                         @if ($upcoming)
                             <x-reserved compact id="calendar-slot" title="Add to calendar" />    {{-- 1250 add to calendar --}}
                         @endif
