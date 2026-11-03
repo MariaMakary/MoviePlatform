@@ -7,6 +7,7 @@
     "require": {
         "php": "^8.1",
         "firebase/php-jwt": "^7.2",
+        "illuminate/mail": "^10.0",
         "laravel/lumen-framework": "^10.0",
         "movieplatform/common": "^1.0"
     },
@@ -41,7 +42,17 @@
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "sort-packages": true
+        "policy": {
+            "advisories": {
+                "ignore-id": {
+                    "PKSA-zwc5-qtrz-zm1n": "Lumen 10 has no patched illuminate/mail; emails with control characters are rejected by our own validation"
+                }
+            }
+        },
+        "sort-packages": true,
+        "platform": {
+            "php": "8.2.0"
+        }
     },
     "minimum-stability": "stable",
     "prefer-stable": true,

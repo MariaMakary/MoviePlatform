@@ -11,7 +11,7 @@ class RegisterRequest
     {
         return [
             'name' => ['required', 'string', 'max:100'],
-            'email' => ['bail', 'required', 'string', 'email', 'max:255', function (string $attribute, string $value, Closure $fail) {
+            'email' => ['bail', 'required', 'string', EmailRules::NO_CONTROL_CHARACTERS, 'email', 'max:255', function (string $attribute, string $value, Closure $fail) {
                 if (User::where('email', User::normalizeEmail($value))->exists()) {
                     $fail('The email has already been taken.');
                 }
