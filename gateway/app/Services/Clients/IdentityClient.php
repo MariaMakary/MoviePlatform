@@ -20,4 +20,15 @@ class IdentityClient extends BaseClient
     {
         return $this->post('/api/token/refresh')['data'];
     }
+
+    /** Identity answers the same for every email, so nobody can tell which accounts exist. */
+    public function forgotPassword(string $email): void
+    {
+        $this->post('/api/password/forgot', ['email' => $email]);
+    }
+
+    public function resetPassword(array $data): void
+    {
+        $this->post('/api/password/reset', $data);
+    }
 }

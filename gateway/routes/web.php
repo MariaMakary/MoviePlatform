@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\Auth\LogoutController;
+use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
+use App\Livewire\Auth\ResetPassword;
 use App\Livewire\Catalog\MoviePage;
 use App\Livewire\Dev\ServiceStatus;
 use App\Livewire\Engagement\History;
@@ -25,6 +27,9 @@ Route::get('/history', History::class)->middleware('auth.jwt')->name('history');
 
 Route::get('/login', Login::class)->name('login');
 Route::get('/register', Register::class)->name('register');
+Route::get('/forgot-password', ForgotPassword::class)->name('password.request');
+// The link in Identity's reset email points here (GATEWAY_URL/reset-password?token=…&email=…).
+Route::get('/reset-password', ResetPassword::class)->name('password.reset');
 Route::post('/logout', LogoutController::class)->name('logout');
 
 Route::get('/dev/components', function () {
