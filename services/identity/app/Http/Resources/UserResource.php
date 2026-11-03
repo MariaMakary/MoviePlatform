@@ -13,6 +13,7 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'avatar' => $this->avatar,
+            'bio' => $this->bio,
             'role' => $this->role->value,
             'genre_ids' => $this->whenLoaded('genres', fn () => $this->genres->pluck('genre_id')->all()),
         ];

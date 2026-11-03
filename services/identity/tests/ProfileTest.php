@@ -94,7 +94,7 @@ class ProfileTest extends TestCase
 
         $this->seeStatusCode(200)->seeJsonEquals(['data' => [
             'id' => $this->user->id, 'name' => 'Maria M.', 'email' => 'maria@example.com',
-            'avatar' => null, 'role' => 'user', 'genre_ids' => [],
+            'avatar' => null, 'bio' => 'Sci-fi first.', 'role' => 'user', 'genre_ids' => [],
         ]]);
         $this->assertSame('Maria M.', $this->user->fresh()->name);
         $this->assertSame('Sci-fi first.', $this->user->fresh()->bio);

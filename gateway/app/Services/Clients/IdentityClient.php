@@ -31,6 +31,26 @@ class IdentityClient extends BaseClient
         return $this->post('/api/token/refresh')['data'];
     }
 
+    public function me(): array
+    {
+        return $this->get('/api/me')['data'];
+    }
+
+    public function updateProfile(string $name, ?string $bio): array
+    {
+        return $this->put('/api/me', ['name' => $name, 'bio' => $bio])['data'];
+    }
+
+    public function uploadAvatar(string $contents, string $fileName): array
+    {
+        return $this->upload('/api/me/avatar', 'avatar', $contents, $fileName)['data'];
+    }
+
+    public function changePassword(array $data): void
+    {
+        $this->put('/api/me/password', $data);
+    }
+
     /** Identity answers the same for every email, so nobody can tell which accounts exist. */
     public function forgotPassword(string $email): void
     {

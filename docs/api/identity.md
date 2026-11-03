@@ -16,6 +16,7 @@ A user, as returned by every endpoint below:
 | `name` | string | |
 | `email` | string | always lowercase |
 | `avatar` | string \| null | |
+| `bio` | string \| null | |
 | `role` | string | `user` or `admin` |
 
 ### POST /api/register
@@ -37,7 +38,7 @@ Creates an account with email and password and logs it in. The email is saved in
 **Response** `201`, same body as login
 
 ```json
-{"data": {"token": "eyJhbGciOiJSUzI1NiIs…", "expires_at": "2026-11-03T18:50:00Z", "user": {"id": "0193a7c0-1111-7aaa-8bbb-000000000001", "name": "Maria Makary", "email": "maria@example.com", "avatar": null, "role": "user"}}}
+{"data": {"token": "eyJhbGciOiJSUzI1NiIs…", "expires_at": "2026-11-03T18:50:00Z", "user": {"id": "0193a7c0-1111-7aaa-8bbb-000000000001", "name": "Maria Makary", "email": "maria@example.com", "avatar": null, "bio": null, "role": "user"}}}
 ```
 
 **Errors:** `422` invalid fields, or `email` already taken (`"The email has already been taken."`)
@@ -60,7 +61,7 @@ Logs in with email and password. The email is compared in lowercase.
 **Response** `200`
 
 ```json
-{"data": {"token": "eyJhbGciOiJSUzI1NiIs…", "expires_at": "2026-11-03T18:50:00Z", "user": {"id": "0193a7c0-1111-7aaa-8bbb-000000000001", "name": "Maria Makary", "email": "maria@example.com", "avatar": null, "role": "user"}}}
+{"data": {"token": "eyJhbGciOiJSUzI1NiIs…", "expires_at": "2026-11-03T18:50:00Z", "user": {"id": "0193a7c0-1111-7aaa-8bbb-000000000001", "name": "Maria Makary", "email": "maria@example.com", "avatar": null, "bio": null, "role": "user"}}}
 ```
 
 **Errors:** `401` `"Invalid credentials."` (wrong password, unknown email, or an account created through social login
@@ -101,7 +102,7 @@ do not.
 **Response** `200`
 
 ```json
-{"data": {"id": "0193a7c0-1111-7aaa-8bbb-000000000001", "name": "Maria Makary", "email": "maria@example.com", "avatar": null, "role": "user", "genre_ids": ["0193a7b0-2222-7aaa-8bbb-000000000010"]}}
+{"data": {"id": "0193a7c0-1111-7aaa-8bbb-000000000001", "name": "Maria Makary", "email": "maria@example.com", "avatar": null, "bio": null, "role": "user", "genre_ids": ["0193a7b0-2222-7aaa-8bbb-000000000010"]}}
 ```
 
 **Errors:** `401` no, invalid or expired token, or the user was deleted · `403` `"Account blocked."`
@@ -129,7 +130,7 @@ until it is refreshed, so the Gateway calls `POST /api/token/refresh` right afte
 **Response** `200`, the user as in `GET /api/me`
 
 ```json
-{"data": {"id": "0193a7c0-1111-7aaa-8bbb-000000000001", "name": "Maria Makary", "email": "maria@example.com", "avatar": null, "role": "user", "genre_ids": []}}
+{"data": {"id": "0193a7c0-1111-7aaa-8bbb-000000000001", "name": "Maria Makary", "email": "maria@example.com", "avatar": null, "bio": null, "role": "user", "genre_ids": []}}
 ```
 
 **Errors:** `422` invalid `name` or `bio`
@@ -151,7 +152,7 @@ its full URL. The previous avatar file is deleted (an avatar from Google or GitH
 **Response** `200`, the user as in `GET /api/me`
 
 ```json
-{"data": {"id": "0193a7c0-1111-7aaa-8bbb-000000000001", "name": "Maria Makary", "email": "maria@example.com", "avatar": "http://localhost:8001/avatars/0193a7c5-3333-7aaa-8bbb-000000000020.png", "role": "user", "genre_ids": []}}
+{"data": {"id": "0193a7c0-1111-7aaa-8bbb-000000000001", "name": "Maria Makary", "email": "maria@example.com", "avatar": "http://localhost:8001/avatars/0193a7c5-3333-7aaa-8bbb-000000000020.png", "bio": null, "role": "user", "genre_ids": []}}
 ```
 
 **Errors:** `422` on `avatar`: missing, not a jpg or png (a gif, also one renamed to `.png`), or over 2 MB
@@ -192,7 +193,7 @@ does not check them with Catalog.
 **Response** `200`, the user as in `GET /api/me`, with the new `genre_ids`
 
 ```json
-{"data": {"id": "0193a7c0-1111-7aaa-8bbb-000000000001", "name": "Maria Makary", "email": "maria@example.com", "avatar": null, "role": "user", "genre_ids": ["0193a7b0-2222-7aaa-8bbb-000000000010", "0193a7b0-2222-7aaa-8bbb-000000000011"]}}
+{"data": {"id": "0193a7c0-1111-7aaa-8bbb-000000000001", "name": "Maria Makary", "email": "maria@example.com", "avatar": null, "bio": null, "role": "user", "genre_ids": ["0193a7b0-2222-7aaa-8bbb-000000000010", "0193a7b0-2222-7aaa-8bbb-000000000011"]}}
 ```
 
 **Errors:** `401` no or invalid token, or the user was deleted · `403` `"Account blocked."` · `422` `genre_ids` missing,

@@ -32,11 +32,12 @@
         </section>
 
         <section class="space-y-4">
-            <h2 class="text-lg font-semibold text-white"><code>&lt;x-icons.star class="h-4 w-4 text-neon-rose" /&gt;</code> and <code>&lt;x-icons.bookmark :filled="true" /&gt;</code></h2>
+            <h2 class="text-lg font-semibold text-white"><code>&lt;x-icons.star class="h-4 w-4 text-neon-rose" /&gt;</code>, <code>&lt;x-icons.bookmark :filled="true" /&gt;</code> and <code>&lt;x-icons.plus /&gt;</code></h2>
             <div class="flex items-center gap-3">
                 <x-icons.star class="h-6 w-6 text-neon-rose" />
                 <x-icons.bookmark class="h-6 w-6 text-gray-300" />
                 <x-icons.bookmark class="h-6 w-6 text-neon-rose" :filled="true" />
+                <x-icons.plus class="h-6 w-6 text-gray-300" />
             </div>
         </section>
 

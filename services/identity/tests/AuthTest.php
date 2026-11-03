@@ -70,7 +70,7 @@ class AuthTest extends TestCase
         $this->login();
 
         $this->seeStatusCode(200)->seeJson(['user' => [
-            'id' => $user->id, 'name' => 'Maria Makary', 'email' => 'maria@example.com', 'avatar' => null, 'role' => 'user',
+            'id' => $user->id, 'name' => 'Maria Makary', 'email' => 'maria@example.com', 'avatar' => null, 'bio' => null, 'role' => 'user',
         ]]);
         $data = $this->response->getData(true)['data'];
         $claims = $this->claims($data['token']);
@@ -88,7 +88,7 @@ class AuthTest extends TestCase
         $this->get('/api/me', $this->bearer($token))
             ->seeStatusCode(200)
             ->seeJsonEquals(['data' => [
-                'id' => $user->id, 'name' => 'Maria Makary', 'email' => 'maria@example.com', 'avatar' => null, 'role' => 'user', 'genre_ids' => [],
+                'id' => $user->id, 'name' => 'Maria Makary', 'email' => 'maria@example.com', 'avatar' => null, 'bio' => null, 'role' => 'user', 'genre_ids' => [],
             ]]);
     }
 
