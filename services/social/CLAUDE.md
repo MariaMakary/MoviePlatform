@@ -22,10 +22,11 @@ Payloads and rules: `docs/events.md`.
   transaction), lists the caller's nights and finds one. Visibility is `MovieNight::withParticipant($userId)`: a user
   who is not a participant gets `404`, never `403`, so nobody can tell a night exists. Reuse it in invites, RSVP and
   voting.
-- `App\Services\ParticipantService` changes who takes part (invites now, RSVP next). It locks the night row
-  (`lockForUpdate`) for the whole change, so two invites to the same night at the same time cannot add a user twice,
-  and publishes its events after the commit. Order of checks: not a participant → `404`, not the host → `403`, night
-  not `open` → `422` (`abort(422, '…')`, no field).
+- `App\Services\ParticipantService` changes who takes part: invites and RSVP. It locks the night row
+  (`lockForUpdate`) for the whole change, so two requests on the same night at the same time cannot collide, and
+  publishes its events after the commit. Order of checks: not a participant → `404`, then the role check (invite: not
+  the host → `403`; RSVP: the host → `422`), then night not `open` → `422` (`abort(422, '…')`, no field). An RSVP with
+  the same answer as before changes nothing and publishes nothing.
 - `my_status` (the caller's participant status) is added to each night with a subquery, so the list needs no extra
   query per night.
 - The `{id}` route parameter is checked with the `$uuid` pattern in `routes/api.php`: a non-UUID is a `404`.
