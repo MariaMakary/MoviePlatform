@@ -26,9 +26,15 @@ Payloads and rules: `docs/events.md`.
 - It is the only service that stores users. Other services only keep `user_id` (a UUID) and read the user from the token.
 - Anything about another user goes out through `PublicUserResource` (`id`, `name`, `avatar`, `bio`, `created_at`),
   from `App\Services\UserService`. `UserResource` (with `email` and `role`) is only for the user's own account.
-- `App\Services\ProfileService` changes the logged-in user's own profile (favorite genres for now). It locks the user
-  row while replacing the `user_genres` rows, so two saves at the same time cannot collide, and publishes
-  `UserGenresUpdated` with the full new list after the commit.
+- `App\Services\ProfileService` changes the logged-in user's own profile: name and bio, avatar, password and favorite
+  genres. For genres it locks the user row while replacing the `user_genres` rows, so two saves at the same time cannot
+  collide, and publishes `UserGenresUpdated` with the full new list after the commit.
+- Avatars are files in `public/avatars/<uuid>.<ext>` (gitignored, so they stay on the laptop that runs Identity),
+  served by `php -S`; `users.avatar` holds the full URL built from `APP_URL`. `ProfileService` deletes a previous avatar
+  only when its URL points to that folder, never an avatar from Google or GitHub. Deleting a user (1271) must delete
+  the file the same way. Uploads are checked by content (`mimes:jpg,png`); in tests build a real
+  `new UploadedFile($tempPath, $name, null, null, true)`, because `UploadedFile::fake()` reports its type from the file
+  name.
 - Social login uses Laravel Socialite in **stateless** mode (Lumen has no sessions).
 
 ## Before coding
