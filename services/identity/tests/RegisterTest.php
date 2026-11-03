@@ -54,7 +54,7 @@ class RegisterTest extends TestCase
 
         $this->seeStatusCode(201)->seeJson(['user' => [
             'id' => User::firstWhere('email', 'maria@example.com')->id,
-            'name' => 'Maria Makary', 'email' => 'maria@example.com', 'avatar' => null, 'role' => 'user',
+            'name' => 'Maria Makary', 'email' => 'maria@example.com', 'avatar' => null, 'bio' => null, 'role' => 'user',
         ]]);
         $data = $this->response->getData(true)['data'];
         $this->assertArrayHasKey('expires_at', $data);

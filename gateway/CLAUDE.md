@@ -10,7 +10,7 @@ services. Sessions and cache are in Redis (`predis`).
 app/Livewire/<Module>/         Auth, Catalog, Engagement, Social, Intelligence, Notifications, Admin
 app/Services/Clients/          BaseClient + one client per service (IdentityClient, CatalogClient, …)
 app/Services/Aggregators/      combine several services for one page (e.g. MoviePageAggregator)
-resources/views/components/    shared: x-logo, x-nav-link, x-date, x-flash, x-movie-card, x-rating-stars, x-avatar, x-button, x-input, x-modal, x-empty-state, x-service-unavailable, x-icons.star
+resources/views/components/    shared: x-logo, x-nav-link, x-date, x-flash, x-movie-card, x-rating-stars, x-avatar, x-button, x-input, x-modal, x-empty-state, x-service-unavailable, x-icons.star / bookmark / plus
 resources/views/layouts/       app.blade.php (navbar, flash area, footer) + partials/ (navigation, search, user-menu, notification-bell, footer)
 resources/views/livewire/<module>/
 resources/js/                  Echo (Reverb), Leaflet
@@ -21,7 +21,8 @@ resources/js/                  Echo (Reverb), Leaflet
 - A Livewire component **never calls `Http::` directly**: it uses a Client or an Aggregator.
 - Clients send the session's JWT (`Authorization: Bearer`), with a 3-second timeout and 2 retries for `GET` only, and throw `ServiceUnavailable` when a service is down (`docs/api/conventions.md`, section 10).
 - **Clients** (`app/Services/Clients`): add one public method per endpoint to that service's client, built on the
-  protected `get` / `post` / `put` / `patch` / `delete` of `BaseClient`. They return the decoded JSON (`null` for 204).
+  protected `get` / `post` / `put` / `patch` / `delete` of `BaseClient`, or `upload($path, $field, $contents, $fileName)`
+  for a multipart file (e.g. `IdentityClient::uploadAvatar`). They return the decoded JSON (`null` for 204).
   Service URLs come from `IDENTITY_URL` … `NOTIFICATION_URL` in `.env`. The JWT is read from `session('jwt')`
   (`BaseClient::SESSION_TOKEN`): login stores it there.
 
@@ -44,7 +45,9 @@ resources/js/                  Echo (Reverb), Leaflet
 - **Token renewal:** `RefreshJwt` runs on every web request. When a logged-in user's token expires in less than 10
   minutes, it calls Identity's `POST /api/token/refresh` and stores the new token, so an active user stays logged in.
   Identity refusing (401/403: expired, deleted or blocked) logs the user out to `/login` with a message; Identity down
-  keeps the current token until it expires. After changing the user's name, call `app(AuthSession::class)->refresh()`.
+  keeps the current token until it expires. After changing the user's name, call `app(AuthSession::class)->refresh()`;
+  after changing only the avatar, `updateUser($user)` with Identity's answer (the token has no avatar). The profile page
+  (`/profile`, `App\Livewire\Auth\Profile`) redirects to itself after each save, so the navbar shows the change at once.
 - **Logout:** `POST /logout` (route `logout`) clears the session. The token is not revoked: it expires on its own.
 - **Graceful fallback:** a section whose service is down shows `<x-service-unavailable/>`; the page never crashes.
   In a Livewire component, `use WithServiceFallback` and load data **in `render()`** (so "Try again" reloads it):
@@ -64,7 +67,9 @@ resources/js/                  Echo (Reverb), Leaflet
   `APP_ENV=local`). Check it before building UI; add a section there when you add a shared component.
 - Colors: use the theme tokens `jet`, `cerulean` and `neon-rose` (`bg-cerulean`, `text-neon-rose`…), never new hex values.
 - Full-page Livewire components use `layouts/app.blade.php` automatically (`config/livewire.php`); set the tab title
-  with `#[Title('…')]`. Flash messages: `session()->flash('success' | 'error' | 'info', '…')`.
+  with `#[Title('…')]`. Flash messages: `session()->flash('success' | 'error' | 'info', '…')`, shown by `x-flash` in the
+  layout as a toast at the top right that disappears by itself (3 seconds, errors 5; hovering keeps it open). They show
+  on the next page load, so flash before a redirect.
 - **Dates:** services send UTC. Show them with `<x-date :value="$movieNight['scheduled_at']" />` (optional `format`),
   which uses `APP_DISPLAY_TIMEZONE` (Asia/Beirut). Convert a date typed in a form back with
   `App\Services\DisplayTime::toService($input)` before sending it to a service. Never format service dates by hand.

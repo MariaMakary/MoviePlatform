@@ -72,6 +72,7 @@ class FavoriteGenresTest extends TestCase
             'name' => $this->user->name,
             'email' => $this->user->email,
             'avatar' => null,
+            'bio' => null,
             'role' => 'user',
             'genre_ids' => [self::DRAMA, self::SCI_FI],
         ]]);

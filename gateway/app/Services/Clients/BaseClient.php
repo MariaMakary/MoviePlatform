@@ -56,10 +56,17 @@ abstract class BaseClient
         return $this->send('DELETE', $path, ['json' => $data]);
     }
 
-    private function send(string $method, string $path, array $options, bool $retry = false, array $accept = []): ?array
+    protected function upload(string $path, string $field, string $contents, string $fileName): ?array
+    {
+        return $this->send('POST', $path, ['multipart' => [
+            ['name' => $field, 'contents' => $contents, 'filename' => $fileName],
+        ]], multipart: true);
+    }
+
+    private function send(string $method, string $path, array $options, bool $retry = false, array $accept = [], bool $multipart = false): ?array
     {
         try {
-            $response = $this->request($retry)->send($method, $path, $options);
+            $response = $this->request($retry, $multipart)->send($method, $path, $options);
         } catch (ConnectionException $e) {
             throw $this->unavailable($method, $path, $e);
         }
@@ -81,12 +88,16 @@ abstract class BaseClient
         throw new ServiceRequestException($this->name(), $response->status(), $response->json('message') ?? 'Request failed.');
     }
 
-    private function request(bool $retry): PendingRequest
+    private function request(bool $retry, bool $multipart = false): PendingRequest
     {
         $request = Http::baseUrl(config("services.{$this->service}.url"))
             ->acceptJson()
             ->timeout(self::TIMEOUT_SECONDS)
             ->connectTimeout(self::CONNECT_TIMEOUT_SECONDS);
+
+        if ($multipart) {
+            $request->asMultipart();
+        }
 
         if ($token = session(self::SESSION_TOKEN)) {
             $request->withToken($token);

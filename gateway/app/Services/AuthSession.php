@@ -29,8 +29,14 @@ class AuthSession
         session([
             BaseClient::SESSION_TOKEN => $auth['token'],
             self::EXPIRES_AT => $auth['expires_at'],
-            self::USER => Arr::only($auth['user'], ['id', 'name', 'role', 'avatar']),
         ]);
+
+        $this->updateUser($auth['user']);
+    }
+
+    public function updateUser(array $user): void
+    {
+        session([self::USER => Arr::only($user, ['id', 'name', 'role', 'avatar'])]);
     }
 
     public function check(): bool
