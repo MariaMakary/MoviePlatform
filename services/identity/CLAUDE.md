@@ -24,6 +24,8 @@ Payloads and rules: `docs/events.md`.
   `TokenResource` (`{token, expires_at, user}`). It signs RS256 tokens with `secret('jwt_private_key')`. Every service verifies them with the committed `keys/jwt_public.pem`. Never generate a new key pair without telling the team.
 - `composer.json` ignores advisory `PKSA-zwc5-qtrz-zm1n` (CVE-2026-48019: Laravel's `email` rule lets line breaks through, which can add mail headers such as Bcc) because Lumen 10 has no patched `illuminate/mail`. We are protected only by `EmailRules::NO_CONTROL_CHARACTERS` on every email field and by mailing `$user->email` from the database, never the request field: never remove either one.
 - It is the only service that stores users. Other services only keep `user_id` (a UUID) and read the user from the token.
+- Anything about another user goes out through `PublicUserResource` (`id`, `name`, `avatar`, `bio`, `created_at`),
+  from `App\Services\UserService`. `UserResource` (with `email` and `role`) is only for the user's own account.
 - Social login uses Laravel Socialite in **stateless** mode (Lumen has no sessions).
 
 ## Before coding
