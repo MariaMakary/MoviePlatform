@@ -92,17 +92,46 @@ name.
 
 ### GET /api/me
 
-The current user, read from the database with the token's `sub`.
+The current user, read from the database with the token's `sub`. Only this endpoint and `PUT /api/me/genres` add
+`genre_ids` (uuid[], the user's favorite Catalog `genres.id`, sorted by id, `[]` when none); login, register and refresh
+do not.
 
 **Who:** user
 
 **Response** `200`
 
 ```json
-{"data": {"id": "0193a7c0-1111-7aaa-8bbb-000000000001", "name": "Maria Makary", "email": "maria@example.com", "avatar": null, "role": "user"}}
+{"data": {"id": "0193a7c0-1111-7aaa-8bbb-000000000001", "name": "Maria Makary", "email": "maria@example.com", "avatar": null, "role": "user", "genre_ids": ["0193a7b0-2222-7aaa-8bbb-000000000010"]}}
 ```
 
 **Errors:** `401` no, invalid or expired token, or the user was deleted · `403` `"Account blocked."`
+
+## Profile
+
+### PUT /api/me/genres
+
+Replaces the user's favorite genres with this list. An empty list clears them. The ids are Catalog `genres.id`; Identity
+does not check them with Catalog.
+
+**Who:** user
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `genre_ids` | uuid[] | required (can be empty), at most 20, each a UUID, no id twice (in any letter case) |
+
+**Response** `200`, the user as in `GET /api/me`, with the new `genre_ids`
+
+```json
+{"data": {"id": "0193a7c0-1111-7aaa-8bbb-000000000001", "name": "Maria Makary", "email": "maria@example.com", "avatar": null, "role": "user", "genre_ids": ["0193a7b0-2222-7aaa-8bbb-000000000010", "0193a7b0-2222-7aaa-8bbb-000000000011"]}}
+```
+
+**Errors:** `401` no or invalid token, or the user was deleted · `403` `"Account blocked."` · `422` `genre_ids` missing,
+not a list or more than 20 ids (`errors.genre_ids`), or an id that is not a UUID or is repeated
+(`errors.genre_ids.<position>`)
+
+**Events:** publishes `UserGenresUpdated` with the full new list, after the change is saved
 
 ## Password reset
 

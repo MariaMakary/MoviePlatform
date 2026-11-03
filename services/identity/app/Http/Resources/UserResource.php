@@ -14,6 +14,7 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'avatar' => $this->avatar,
             'role' => $this->role->value,
+            'genre_ids' => $this->whenLoaded('genres', fn () => $this->genres->pluck('genre_id')->all()),
         ];
     }
 }

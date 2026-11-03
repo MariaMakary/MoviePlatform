@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 use Laravel\Lumen\Auth\Authorizable;
 use MoviePlatform\Common\Auth\Role;
@@ -36,6 +37,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public static function normalizeEmail(string $email): string
     {
         return Str::lower(trim($email));
+    }
+
+    public function genres(): HasMany
+    {
+        return $this->hasMany(UserGenre::class)->orderBy('genre_id');
     }
 
     protected function email(): Attribute
