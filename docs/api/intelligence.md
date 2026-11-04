@@ -71,3 +71,35 @@ Google has no separate field for it.
 ```
 
 **Errors:** `422` invalid fields
+
+## Sentiment
+
+Every review is analyzed in the background: Intelligence consumes `ReviewCreated` and `ReviewUpdated`, asks the
+Hugging Face model `cardiffnlp/twitter-roberta-base-sentiment-latest`, keeps one result per review in
+`sentiment_results` and publishes `ReviewAnalyzed` (`docs/events.md`) after saving it. If Hugging Face keeps failing,
+the event ends in `intelligence.events.dlq` (`php artisan events:replay-dlq` after the fix); the review itself is
+already saved in Engagement.
+
+### POST /api/sentiment/analyze
+
+Analyzes a text without storing anything, for manual testing. Admin only, so nobody else can spend the Hugging Face
+token.
+
+**Who:** admin
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `text` | string | required, max 5000 characters, not only spaces; texts over 1500 characters are cut before analysis |
+
+**Response** `200`
+
+```json
+{"data": {"label": "positive", "score": 0.9731}}
+```
+
+`label` is `positive`, `neutral` or `negative`; `score` (0–1) is the model's confidence in it.
+
+**Errors:** `401` no or invalid token · `403` not an admin · `422` invalid `text` · `503` `"Hugging Face is unavailable."`
+(timeout, rate limit, model loading, no credits or no token)
