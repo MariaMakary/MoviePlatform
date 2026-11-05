@@ -6,6 +6,7 @@ use App\Exceptions\ServiceRequestException;
 use App\Exceptions\ServiceUnavailable;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -63,7 +64,21 @@ abstract class BaseClient
         ]], multipart: true);
     }
 
+    /** POST that answers with a file instead of JSON (e.g. an .ics): returns the raw body. Errors as for `post`. */
+    protected function postForFile(string $path, array $data = []): string
+    {
+        return $this->respond('POST', $path, ['json' => $data])->body();
+    }
+
     private function send(string $method, string $path, array $options, bool $retry = false, array $accept = [], bool $multipart = false): ?array
+    {
+        $response = $this->respond($method, $path, $options, $retry, $accept, $multipart);
+
+        return $response->status() === 204 ? null : $response->json();
+    }
+
+    /** Sends the request and returns a successful (or accepted) response; throws for everything else. */
+    private function respond(string $method, string $path, array $options, bool $retry = false, array $accept = [], bool $multipart = false): Response
     {
         try {
             $response = $this->request($retry, $multipart)->send($method, $path, $options);
@@ -72,7 +87,7 @@ abstract class BaseClient
         }
 
         if ($response->successful() || (in_array($response->status(), $accept, true) && is_array($response->json()))) {
-            return $response->status() === 204 ? null : $response->json();
+            return $response;
         }
 
         if ($response->status() === 422) {
