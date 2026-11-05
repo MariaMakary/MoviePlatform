@@ -28,7 +28,7 @@ class Register extends Component
             'email' => $this->email,
             'password' => $this->password,
             'password_confirmation' => $this->password_confirmation,
-        ]), 'Welcome');
+        ]), 'Welcome', next: 'genres');
     }
 
     public function render(): View

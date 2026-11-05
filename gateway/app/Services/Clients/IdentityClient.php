@@ -41,6 +41,12 @@ class IdentityClient extends BaseClient
         return $this->put('/api/me', ['name' => $name, 'bio' => $bio])['data'];
     }
 
+    /** Replaces the favorite genres (Catalog genre ids, at most 20; [] clears them). Returns the user with `genre_ids`. */
+    public function updateGenres(array $genreIds): array
+    {
+        return $this->put('/api/me/genres', ['genre_ids' => array_values($genreIds)])['data'];
+    }
+
     public function uploadAvatar(string $contents, string $fileName): array
     {
         return $this->upload('/api/me/avatar', 'avatar', $contents, $fileName)['data'];

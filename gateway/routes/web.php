@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LogoutController;
+use App\Livewire\Auth\FavoriteGenres;
 use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Profile;
@@ -27,6 +28,7 @@ Route::get('/cinemas',CinemaMap::class)->name('cinemas');
 Route::get('/notifications', Notifications::class)->middleware('auth.jwt')->name('notifications');
 
 Route::get('/profile', Profile::class)->middleware('auth.jwt')->name('profile');
+Route::get('/genres', FavoriteGenres::class)->middleware('auth.jwt')->name('genres');
 
 Route::get('/watchlist', Watchlist::class)->middleware('auth.jwt')->name('watchlist');
 Route::get('/history', History::class)->middleware('auth.jwt')->name('history');
