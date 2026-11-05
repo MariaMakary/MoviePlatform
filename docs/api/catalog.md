@@ -186,3 +186,95 @@ TMDB's.
 **Response** `200`: same shape as popular
 
 **Errors:** `422` invalid `page` · `503` `"TMDB is unavailable."`
+
+## Genres
+
+### GET /api/genres
+
+All genres, alphabetical, with their Catalog ids (the ids that `GET /api/movies/search?genre=`, Identity's
+`genre_ids` and the endpoint below use). Not paginated: about 19 rows, filled by `catalog:sync-genres`.
+
+**Who:** guest
+
+**Response** `200`
+
+```json
+{"data": [{"id": "0193a7c1-4444-7aaa-8bbb-000000000001", "name": "Action"}, {"id": "0193a7c1-4444-7aaa-8bbb-000000000002", "name": "Adventure"}]}
+```
+
+### GET /api/genres/{id}/movies
+
+The **local** movies of one genre (no TMDB call), as movie cards, 20 per page, sorted descending. `{id}` is a Catalog
+genre id (UUID).
+
+**Who:** guest
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `sort` | string | query, optional, `popularity` (default) or `vote_average` |
+| `page` | integer | query, optional, default 1, 1–500 |
+
+**Response** `200`: movie cards, with `meta` as in `GET /api/movies/search`
+
+```json
+{
+  "data": [
+    {"id": "0193a7c1-3333-7aaa-8bbb-000000000100", "title": "Inception", "poster_url": "https://image.tmdb.org/t/p/w342/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg", "year": 2010, "release_date": "2010-07-15", "vote_average": 8.4, "genres": ["Action", "Science Fiction"]}
+  ],
+  "meta": {"current_page": 1, "last_page": 3, "total": 47}
+}
+```
+
+**Errors:** `404` `"Genre not found."` (unknown id, or not a UUID) · `422` unknown `sort`, or `page` not an integer
+from 1 to 500
+
+## People
+
+### GET /api/people/{id}
+
+A person's page: details and filmography. `{id}` is the Catalog person id (UUID), as in a movie's `cast` and
+`directors`.
+
+A TMDB person is synced on first open, then at most once every **7 days** (the cache remembers it, since `people` has no
+`synced_at`): their details and their movie credits as actor and director (TV credits and other crew jobs are left
+out). A movie of the filmography seen for the first time is created from the credit data, like popular and upcoming
+do, and gets its full details when it is first opened. If TMDB is down or no longer has the person, the local data is
+served (the filmography then holds only the movies already synced) and the sync is tried again on the next open.
+
+**Who:** guest
+
+**Response** `200`
+
+| Field | Type | Content |
+|---|---|---|
+| `id` | uuid | |
+| `name` | string | |
+| `photo_url` | string \| null | full TMDB image URL (w185) |
+| `biography` | string \| null | |
+| `birthday` | date (`YYYY-MM-DD`) \| null | |
+| `known_for` | string \| null | TMDB department, e.g. `Acting`, `Directing` |
+| `filmography.acting` | movie card[] | newest first, movies without a release date last |
+| `filmography.directing` | movie card[] | same order |
+
+```json
+{
+  "data": {
+    "id": "0193a7c1-5555-7aaa-8bbb-000000000001",
+    "name": "Christopher Nolan",
+    "photo_url": "https://image.tmdb.org/t/p/w185/xuAIuYSmsUzKlUMBFGVZaWsY3DZ.jpg",
+    "biography": "Christopher Edward Nolan is a British-American filmmaker…",
+    "birthday": "1970-07-30",
+    "known_for": "Directing",
+    "filmography": {
+      "acting": [],
+      "directing": [
+        {"id": "0193a7c1-3333-7aaa-8bbb-000000000100", "title": "Inception", "poster_url": "https://image.tmdb.org/t/p/w342/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg", "year": 2010, "release_date": "2010-07-15", "vote_average": 8.4, "genres": ["Action", "Science Fiction"]}
+      ]
+    }
+  }
+}
+```
+
+**Errors:** `404` `"Person not found."` (unknown id, or not a UUID)
