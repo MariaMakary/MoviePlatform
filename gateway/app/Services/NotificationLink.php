@@ -3,22 +3,20 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Route;
+use MoviePlatform\Common\Notifications\NotificationType;
 
 class NotificationLink
 {
-    /** Page each notification type opens: [route name, key in the notification's data passed as the route parameter]. */
-    private const ROUTES = [
-        'new_follower' => ['profiles.show', 'follower_id'],
-        'movie_night_invite' => ['movie-nights.show', 'movie_night_id'],
-        'movie_night_invite_answered' => ['movie-nights.show', 'movie_night_id'],
-        'movie_night_finalized' => ['movie-nights.show', 'movie_night_id'],
-    ];
-
-    /** The page a notification opens, or null when it has none (or that page isn't built yet). */
     public static function for(array $notification): ?string
     {
-        [$route, $key] = self::ROUTES[$notification['type']] ?? [null, null];
-        $id = $notification['data'][$key] ?? null;
+        [$route, $key] = match (NotificationType::tryFrom($notification['type'] ?? '')) {
+            NotificationType::NewFollower => ['profiles.show', 'follower_id'],
+            NotificationType::MovieNightInvite,
+            NotificationType::MovieNightInviteAnswered,
+            NotificationType::MovieNightFinalized => ['movie-nights.show', 'movie_night_id'],
+            default => [null, null],
+        };
+        $id = $key ? ($notification['data'][$key] ?? null) : null;
 
         return $route && $id && Route::has($route) ? route($route, $id) : null;
     }

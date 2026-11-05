@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use App\Enums\NotificationType;
+use MoviePlatform\Common\Notifications\NotificationType;
 use App\Models\Notification;
 use Firebase\JWT\JWT;
 use Illuminate\Database\QueryException;

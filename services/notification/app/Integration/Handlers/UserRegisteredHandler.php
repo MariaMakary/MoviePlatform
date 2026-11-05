@@ -2,7 +2,7 @@
 
 namespace App\Integration\Handlers;
 
-use App\Enums\NotificationType;
+use MoviePlatform\Common\Notifications\NotificationType;
 use App\Services\NotificationService;
 use MoviePlatform\Common\Integration\EventHandler;
 
