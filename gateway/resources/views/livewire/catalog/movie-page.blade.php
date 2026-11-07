@@ -62,7 +62,8 @@
                         <livewire:engagement.watchlist-button :movie-id="$movie['id']" :key="'watchlist-'.$movie['id']" />
                         <livewire:engagement.mark-watched-button :movie-id="$movie['id']" :key="'watched-'.$movie['id']" />
                         @if ($upcoming)
-                            <x-reserved compact id="calendar-slot" title="Add to calendar" />    {{-- 1250 add to calendar --}}
+                            <livewire:intelligence.add-to-calendar :movie-id="$movie['id']" :title="$movie['title']"
+                                :release-date="$movie['release_date']" :overview="$movie['overview']" :key="'calendar-'.$movie['id']" />
                         @endif
                         <x-reserved compact id="discussion-slot" title="Discussion" />           {{-- Sprint 4 discussion button --}}
                     </div>

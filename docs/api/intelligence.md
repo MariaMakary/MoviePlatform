@@ -71,3 +71,36 @@ Google has no separate field for it.
 ```
 
 **Errors:** `422` invalid fields
+
+## Sentiment
+
+Every review is analyzed in the background: Intelligence consumes `ReviewCreated` and `ReviewUpdated`, asks Azure AI
+Language (the team's free resource, 5,000 texts a month), keeps one result per review in `sentiment_results` and
+publishes `ReviewAnalyzed` (`docs/events.md`) after saving it. If Azure keeps failing, the event ends in
+`intelligence.events.dlq` (`php artisan events:replay-dlq` after the fix); the review itself is already saved in
+Engagement.
+
+### POST /api/sentiment/analyze
+
+Analyzes a text without storing anything, for manual testing. Admin only, so nobody else can spend the team's free
+Azure texts.
+
+**Who:** admin
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `text` | string | required, max 5000 characters, not only spaces; texts over 1000 characters are cut before analysis |
+
+**Response** `200`
+
+```json
+{"data": {"label": "positive", "score": 0.97}}
+```
+
+`label` is `positive`, `neutral` or `negative`; `score` (0–1) is Azure's confidence in it.
+
+**Errors:** `401` no or invalid token · `403` not an admin · `422` invalid `text` · `503`
+`"Azure AI Language is unavailable."` (timeout, bad key, free limit used up, refused text) or a message saying the key
+or endpoint is not set up

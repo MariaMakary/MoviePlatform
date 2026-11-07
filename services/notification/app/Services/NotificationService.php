@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Enums\NotificationType;
+use MoviePlatform\Common\Notifications\NotificationType;
 use App\Models\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;

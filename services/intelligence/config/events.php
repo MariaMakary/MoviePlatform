@@ -15,5 +15,7 @@ return [
 
     'handlers' => [
         'RatingAdded' => App\Integration\Handlers\RatingAddedHandler::class,
+        'ReviewCreated' => App\Integration\Handlers\AnalyzeReviewHandler::class,
+        'ReviewUpdated' => App\Integration\Handlers\AnalyzeReviewHandler::class,
     ],
 ];

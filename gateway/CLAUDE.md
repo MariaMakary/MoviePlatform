@@ -22,7 +22,8 @@ resources/js/                  Echo (Reverb), Leaflet
 - Clients send the session's JWT (`Authorization: Bearer`), with a 3-second timeout and 2 retries for `GET` only, and throw `ServiceUnavailable` when a service is down (`docs/api/conventions.md`, section 10).
 - **Clients** (`app/Services/Clients`): add one public method per endpoint to that service's client, built on the
   protected `get` / `post` / `put` / `patch` / `delete` of `BaseClient`, or `upload($path, $field, $contents, $fileName)`
-  for a multipart file (e.g. `IdentityClient::uploadAvatar`). They return the decoded JSON (`null` for 204).
+  for a multipart file (e.g. `IdentityClient::uploadAvatar`). They return the decoded JSON (`null` for 204);
+  `postForFile($path, $data)` returns the raw body of a non-JSON answer (e.g. `IntelligenceClient::calendarIcs`).
   Service URLs come from `IDENTITY_URL` … `NOTIFICATION_URL` in `.env`. The JWT is read from `session('jwt')`
   (`BaseClient::SESSION_TOKEN`): login stores it there.
 

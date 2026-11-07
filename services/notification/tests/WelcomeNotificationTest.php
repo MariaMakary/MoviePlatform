@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use App\Enums\NotificationType;
+use MoviePlatform\Common\Notifications\NotificationType;
 use App\Integration\Handlers\UserRegisteredHandler;
 use App\Models\Notification;
 use App\Services\NotificationService;
