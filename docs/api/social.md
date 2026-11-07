@@ -87,6 +87,66 @@ Counts for a profile, and whether the current user follows `id`.
 
 **Errors:** `422` `id` is not a UUID
 
+## Privacy
+
+What a user shows on their public profile. Every setting is `true` (shown) until the user saves their own choice: a
+user who never saved gets the defaults, and the row is only created on the first `PUT`. The services that own the
+data (reviews and ratings, lists, history) do not read these settings; the Gateway hides the sections on the profile.
+
+Settings, as returned by every endpoint here:
+
+| Field | Type | Content |
+|---|---|---|
+| `user_id` | uuid | Identity `users.id` |
+| `show_reviews` | boolean | default `true` |
+| `show_ratings` | boolean | default `true` |
+| `show_lists` | boolean | default `true` |
+| `show_history` | boolean | default `true` (watch history) |
+
+### GET /api/privacy
+
+The current user's settings.
+
+**Who:** user
+
+**Response** `200`
+
+```json
+{"data": {"user_id": "0193a7c0-1111-7aaa-8bbb-000000000001", "show_reviews": true, "show_ratings": true, "show_lists": true, "show_history": false}}
+```
+
+**Errors:** `401` no or invalid token
+
+### PUT /api/privacy
+
+Replaces the current user's settings.
+
+**Who:** user
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `show_reviews` | boolean | required |
+| `show_ratings` | boolean | required |
+| `show_lists` | boolean | required |
+| `show_history` | boolean | required |
+
+**Response** `200` (also on the first save), the new settings as in `GET /api/privacy`
+
+**Errors:** `401` no or invalid token · `422` a field missing or not a boolean
+
+### GET /api/users/{id}/privacy
+
+Another user's settings, for their public profile. An unknown user gets the defaults (Social does not check that a
+user exists).
+
+**Who:** guest
+
+**Response** `200`, as in `GET /api/privacy`
+
+**Errors:** `422` `id` is not a UUID (`errors.user_id`)
+
 ## Movie nights
 
 A user hosts a movie night and invites others (1220). Only participants (the host and invited users, whatever their
