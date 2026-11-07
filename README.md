@@ -151,3 +151,23 @@ docker compose down -v                     # remove the containers AND all data 
 
 Inside a service folder: `vendor/bin/phpunit` (tests; run `composer run dev` once after a pull so new migrations are
 applied). The Gateway has no automated tests: its pages are checked by hand.
+
+## Tests on GitHub
+
+`.github/workflows/tests.yml` runs on every pull request to `develop` and every push to `develop`. Each project is its
+own check, so one failing project does not hide the others:
+
+| Check | What it runs |
+|---|---|
+| `common` | `composer update` and `vendor/bin/phpunit` in `packages/common` |
+| `identity` … `notification` | `composer install`, `php artisan migrate --force` and `vendor/bin/phpunit`, against a fresh PostgreSQL 16 container (the same engine as Docker) |
+| `gateway (install only)` | `composer install`, to check it still installs (no automated tests) |
+
+No real secret is used. Each job writes throwaway values into a temporary secrets folder and points `SECRETS_DIR` at
+it: random values for every name in `secrets.example/`, a fresh RSA key pair (`jwt_private_key`, and the runner's copy
+of `keys/jwt_public.pem`), and a random database password that is set on the job's PostgreSQL user and masked in the
+logs. The tests sign their own tokens with the keys in `tests/Fixtures/jwt`. RabbitMQ and Redis are not needed: tests
+mock RabbitMQ and use the `array` cache.
+
+A PR can only be merged when every check is green (branch protection on `develop`). If a check fails, open it on the PR
+and read the `Test` step: it is the same output as `vendor/bin/phpunit` on your laptop.
