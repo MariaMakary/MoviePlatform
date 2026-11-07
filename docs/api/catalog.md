@@ -111,7 +111,8 @@ exist in Catalog: a movie seen for the first time is created from the list data 
 `vote_average`, genres) without an extra TMDB call, and gets its full details (cast, runtime, trailer) when it is first
 opened (`GET /api/movies/{id}`). A movie already in Catalog is used as it is (an admin's edits are kept).
 
-The pages are TMDB's: `last_page` is at most 500 and `total` at most 10 000 (TMDB serves no more).
+The pages are TMDB's: `last_page` is at most 500 and `total` at most 10 000 (TMDB serves no more). Each TMDB page is
+cached for **2 hours**, so a page opened again in that time does not call TMDB.
 
 **Who:** guest
 
@@ -185,7 +186,7 @@ TMDB's.
 
 **Response** `200`: same shape as popular
 
-**Errors:** `422` invalid `page` · `503` `"TMDB is unavailable."`
+**Errors:** `422` invalid `page` · `503` `"TMDB is unavailable."` (TMDB down and the page not cached)
 
 ## Genres
 

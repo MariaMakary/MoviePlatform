@@ -44,6 +44,18 @@ Token" (starts with `eyJ`, sent as `Authorization: Bearer`).
 Any other TMDB error or timeout throws `TmdbUnavailable`, which the API returns as `503 {"message": "TMDB is
 unavailable."}`. The key never reaches a log or a response: errors are logged with the path and status only.
 
+### List cache
+
+The four list methods (`popular`, `upcoming`, `search`, `discover`) cache their result in Redis for 2 hours
+(`TmdbClient::LIST_CACHE_HOURS`), so every caller gets it and repeated page views stay under TMDB's rate limit. Keys
+look like `tmdb:popular:page:1`, `tmdb:upcoming:US:page:1`, `tmdb:search:<sha1 of the lowercased query>:page:1` and
+`tmdb:discover:genre:878:year:any:page:1`, all under the cache tag `tmdb`. A failed call is not cached. `movie()`,
+`person()` and `genres()` are not cached: details live in the database (7-day re-sync in `MovieService`).
+
+`php artisan catalog:clear-cache` forgets only the `tmdb` tagged lists (it never flushes the whole Redis database, which
+other projects share). Redis is set up with `Illuminate\Redis\RedisServiceProvider` in `bootstrap/app.php`, the
+`predis` client and `CACHE_DRIVER=redis` in `.env` (see `.env.example`). Tests use the `array` cache (`phpunit.xml`).
+
 ## Filling the database from TMDB
 
 Each laptop has its own `catalog-db`, so run this once (needs your key in `secrets/tmdb_api_key`):
