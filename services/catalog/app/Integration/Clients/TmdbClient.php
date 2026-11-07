@@ -6,6 +6,8 @@ use App\Enums\CreditRole;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -13,24 +15,35 @@ class TmdbClient
 {
     public const CAST_LIMIT = 20;
 
+    public const CACHE_TAG = 'tmdb';
+
+    public const LIST_CACHE_HOURS = 2;
+
     public function popular(int $page = 1): array
     {
-        return $this->movieList('/movie/popular', ['page' => $page]);
+        return $this->cachedList("popular:page:{$page}", '/movie/popular', ['page' => $page]);
     }
 
     public function upcoming(int $page = 1): array
     {
-        return $this->movieList('/movie/upcoming', ['page' => $page, 'region' => config('services.tmdb.region')]);
+        $region = config('services.tmdb.region');
+
+        return $this->cachedList("upcoming:{$region}:page:{$page}", '/movie/upcoming', ['page' => $page, 'region' => $region]);
     }
 
     public function search(string $query, int $page = 1): array
     {
-        return $this->movieList('/search/movie', ['query' => $query, 'page' => $page, 'include_adult' => 'false']);
+        $hash = sha1(mb_strtolower(trim($query)));
+
+        return $this->cachedList("search:{$hash}:page:{$page}", '/search/movie', ['query' => $query, 'page' => $page, 'include_adult' => 'false']);
     }
 
     public function discover(?int $genreTmdbId = null, ?int $year = null, int $page = 1): array
     {
-        return $this->movieList('/discover/movie', array_filter([
+        $genre = $genreTmdbId ?? 'any';
+        $releaseYear = $year ?? 'any';
+
+        return $this->cachedList("discover:genre:{$genre}:year:{$releaseYear}:page:{$page}", '/discover/movie', array_filter([
             'with_genres' => $genreTmdbId,
             'primary_release_year' => $year,
             'sort_by' => 'popularity.desc',
@@ -114,6 +127,20 @@ class TmdbClient
         $data = $this->get('/genre/movie/list');
 
         return array_map(fn (array $genre) => $this->genreAttributes($genre), $data['genres'] ?? []);
+    }
+
+    public static function clearCache(): void
+    {
+        Cache::tags(self::CACHE_TAG)->flush();
+    }
+
+    private function cachedList(string $key, string $path, array $query): array
+    {
+        return Cache::tags(self::CACHE_TAG)->remember(
+            self::CACHE_TAG.':'.$key,
+            Carbon::now()->addHours(self::LIST_CACHE_HOURS),
+            fn () => $this->movieList($path, $query),
+        );
     }
 
     private function movieList(string $path, array $query): array
