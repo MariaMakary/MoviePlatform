@@ -5,7 +5,6 @@ namespace App\Integration\Handlers;
 use App\Services\SentimentService;
 use MoviePlatform\Common\Integration\EventHandler;
 
-/** ReviewCreated and ReviewUpdated: both carry the review's current text. */
 class AnalyzeReviewHandler implements EventHandler
 {
     public function __construct(private SentimentService $sentiment) {}

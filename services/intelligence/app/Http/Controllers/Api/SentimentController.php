@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AnalyzeSentimentRequest;
+use App\Http\Resources\SentimentResource;
 use App\Services\SentimentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 
 class SentimentController extends Controller
 {
@@ -17,6 +17,6 @@ class SentimentController extends Controller
     {
         $data = $this->validate($request, AnalyzeSentimentRequest::rules());
 
-        return (new JsonResource($this->sentiment->analyze($data['text'])))->response();
+        return (new SentimentResource($this->sentiment->analyze($data['text'])))->response();
     }
 }

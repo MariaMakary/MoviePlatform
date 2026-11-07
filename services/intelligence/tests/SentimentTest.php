@@ -21,12 +21,9 @@ class SentimentTest extends TestCase
 
     private const REVIEW = '0193a7d1-6666-7aaa-8bbb-000000000400';
 
-    private const URL = 'https://router.huggingface.co/hf-inference/models/cardiffnlp/twitter-roberta-base-sentiment-latest';
-
-    /** [routing key, data, transaction level when published] */
     private array $published = [];
 
-    private bool $hfDown = false;
+    private bool $azureDown = false;
 
     private array $scores = ['positive' => 0.94, 'neutral' => 0.05, 'negative' => 0.01];
 
@@ -36,13 +33,10 @@ class SentimentTest extends TestCase
 
         config([
             'jwt.public_key_path' => base_path('tests/Fixtures/jwt/test-public.pem'),
-            'services.huggingface.token' => 'hf_test_token',
-            'services.huggingface.url' => 'https://router.huggingface.co/hf-inference/models',
-            'services.huggingface.sentiment_model' => 'cardiffnlp/twitter-roberta-base-sentiment-latest',
+            'services.azure_language.key' => 'test-key',
+            'services.azure_language.endpoint' => 'https://kaia-test.cognitiveservices.azure.com',
         ]);
 
-        // The test's own transaction never commits: treat getting back to it (level 1) as the commit,
-        // so after-commit callbacks run exactly when the consumer's transaction commits.
         DB::connection()->setTransactionManager(new class extends DatabaseTransactionsManager
         {
             public function afterCommitCallbacksShouldBeExecuted($level)
@@ -60,12 +54,16 @@ class SentimentTest extends TestCase
         $rabbitMq->method('exchange')->willReturn('movieplatform.events');
         $this->app->instance(RabbitMqConnection::class, $rabbitMq);
 
-        Http::fake([self::URL => function () {
-            if ($this->hfDown) {
-                return Http::response(['error' => 'Model is currently loading'], 503);
+        Http::fake(['kaia-test.cognitiveservices.azure.com/*' => function () {
+            if ($this->azureDown) {
+                return Http::response(['error' => ['code' => '429', 'message' => 'Rate limit is exceeded.']], 429);
             }
 
-            return Http::response([array_map(fn ($label, $score) => compact('label', 'score'), array_keys($this->scores), $this->scores)]);
+            return Http::response(['kind' => 'SentimentAnalysisResults', 'results' => [
+                'documents' => [['id' => '1', 'sentiment' => 'positive', 'confidenceScores' => $this->scores, 'sentences' => [], 'warnings' => []]],
+                'errors' => [],
+                'modelVersion' => '2025-01-01',
+            ]]);
         }]);
     }
 
@@ -146,7 +144,7 @@ class SentimentTest extends TestCase
         $result = SentimentResult::where('review_id', self::REVIEW)->sole();
         $this->assertSame('positive', $result->label->value);
         $this->assertSame(0.94, $result->score);
-        Http::assertSent(fn ($request) => $request['inputs'] === 'Loved the ending, the soundtrack is amazing.');
+        Http::assertSent(fn ($request) => $request['analysisInput']['documents'][0]['text'] === 'Loved the ending, the soundtrack is amazing.');
 
         $this->assertSame([['review.analyzed', ['review_id' => self::REVIEW, 'label' => 'positive', 'score' => 0.94], 1]], $this->analyzed(),
             'Published once, with the agreed payload, only after the consumer transaction committed (back to the test level 1).');
@@ -176,15 +174,15 @@ class SentimentTest extends TestCase
         $this->assertCount(1, $this->analyzed());
     }
 
-    public function test_hugging_face_down_saves_nothing_and_publishes_nothing(): void
+    public function test_azure_down_saves_nothing_and_publishes_nothing(): void
     {
-        $this->hfDown = true;
+        $this->azureDown = true;
 
         $this->deliver('ReviewCreated', 'Loved the ending, the soundtrack is amazing.');
 
         $this->assertSame(0, SentimentResult::where('review_id', self::REVIEW)->count());
         $this->assertSame([], $this->analyzed());
-        Http::assertSentCount(4); // the first try and 3 retries, then the DLQ
+        Http::assertSentCount(1 + EventConsumer::RETRIES);
     }
 
     public function test_an_admin_can_analyze_a_text(): void
@@ -204,15 +202,15 @@ class SentimentTest extends TestCase
         Http::assertNothingSent();
     }
 
-    public function test_the_endpoint_validates_and_reports_hugging_face_down(): void
+    public function test_the_endpoint_validates_and_reports_azure_down(): void
     {
         foreach ([[], ['text' => '   '], ['text' => str_repeat('a', 5001)]] as $body) {
             $this->json('POST', '/api/sentiment/analyze', $body, $this->token('admin'))->seeStatusCode(422);
         }
 
-        $this->hfDown = true;
+        $this->azureDown = true;
         $this->json('POST', '/api/sentiment/analyze', ['text' => 'What a wonderful film.'], $this->token('admin'))
             ->seeStatusCode(503)
-            ->seeJsonEquals(['message' => 'Hugging Face is unavailable.']);
+            ->seeJsonEquals(['message' => 'Azure AI Language is unavailable.']);
     }
 }

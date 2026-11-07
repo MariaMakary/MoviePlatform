@@ -2,84 +2,75 @@
 
 namespace App\Integration\Clients;
 
+use App\Enums\SentimentLabel;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
-/** Review sentiment from the Hugging Face Inference API (cardiffnlp/twitter-roberta-base-sentiment-latest). */
 class SentimentClient
 {
-    /** Longer texts are cut: the model reads about 512 tokens anyway. */
-    public const MAX_CHARACTERS = 1500;
+    public const MAX_CHARACTERS = 1000;
 
-    public const LABELS = ['positive', 'neutral', 'negative'];
-
-    // Older versions of the model answer LABEL_0…2 instead of names.
-    private const NUMBERED_LABELS = ['label_0' => 'negative', 'label_1' => 'neutral', 'label_2' => 'positive'];
-
-    /**
-     * @return array{label: string, score: float} the label with the highest score
-     *
-     * @throws SentimentUnavailable
-     */
     public function analyze(string $text): array
     {
-        $token = (string) config('services.huggingface.token');
+        $key = (string) config('services.azure_language.key');
+        $endpoint = rtrim((string) config('services.azure_language.endpoint'), '/');
 
-        if ($token === '') {
-            throw new SentimentUnavailable('Hugging Face token missing: put it in secrets/hf_api_token.');
+        if ($key === '' || $endpoint === '') {
+            throw new SentimentUnavailable('Azure AI Language is not set up: put the key in secrets/azure_language_key and the endpoint in AZURE_LANGUAGE_ENDPOINT.');
         }
 
-        $model = config('services.huggingface.sentiment_model');
-
         try {
-            $response = Http::withToken($token)
+            $response = Http::withHeaders(['Ocp-Apim-Subscription-Key' => $key])
                 ->acceptJson()
-                ->timeout(config('services.huggingface.timeout'))
-                ->post(rtrim(config('services.huggingface.url'), '/').'/'.$model, [
-                    'inputs' => Str::limit(trim($text), self::MAX_CHARACTERS, ''),
+                ->timeout(config('services.azure_language.timeout'))
+                ->post($endpoint.'/language/:analyze-text?api-version='.config('services.azure_language.api_version'), [
+                    'kind' => 'SentimentAnalysis',
+                    'analysisInput' => ['documents' => [[
+                        'id' => '1',
+                        'language' => 'en',
+                        'text' => mb_substr(trim($text), 0, self::MAX_CHARACTERS),
+                    ]]],
                 ]);
         } catch (ConnectionException $e) {
-            throw $this->unavailable($model, null, $e->getMessage());
+            throw $this->unavailable(null, $e->getMessage());
         }
 
         if (! $response->successful()) {
-            throw $this->unavailable($model, $response);
+            throw $this->unavailable($response, $response->json('error.message'));
         }
 
-        return $this->bestLabel($response->json(), $model);
+        if ($response->json('results.errors.0') !== null) {
+            throw $this->unavailable($response, $response->json('results.errors.0.error.innererror.message')
+                ?? $response->json('results.errors.0.error.message'));
+        }
+
+        return $this->bestLabel($response->json('results.documents.0.confidenceScores'));
     }
 
-    private function bestLabel(mixed $body, string $model): array
+    private function bestLabel(mixed $scores): array
     {
-        // One input gives [[{label, score}, …]]; some versions answer the inner list directly.
-        $scores = is_array($body) && isset($body[0]) && is_array($body[0]) && array_is_list($body[0]) ? $body[0] : $body;
         $best = null;
 
-        foreach (is_array($scores) ? $scores : [] as $item) {
-            $label = strtolower((string) ($item['label'] ?? ''));
-            $label = self::NUMBERED_LABELS[$label] ?? $label;
+        foreach (SentimentLabel::cases() as $label) {
+            $score = is_array($scores) ? ($scores[$label->value] ?? null) : null;
 
-            if (in_array($label, self::LABELS, true) && is_numeric($item['score'] ?? null)
-                && ($best === null || $item['score'] > $best['score'])) {
-                $best = ['label' => $label, 'score' => (float) $item['score']];
+            if (is_numeric($score) && ($best === null || $score > $best['score'])) {
+                $best = ['label' => $label, 'score' => (float) $score];
             }
         }
 
-        return $best ?? throw $this->unavailable($model, null, 'unexpected answer');
+        return $best ?? throw $this->unavailable(null, 'unexpected answer');
     }
 
-    // Logged without the token or the review text.
-    private function unavailable(string $model, ?Response $response, ?string $error = null): SentimentUnavailable
+    private function unavailable(?Response $response, ?string $error): SentimentUnavailable
     {
-        Log::warning('Hugging Face sentiment failed', [
-            'model' => $model,
+        Log::warning('Azure AI Language sentiment failed', [
             'status' => $response?->status(),
-            'error' => $error ?? $response?->json('error'),
+            'error' => $error,
         ]);
 
-        return new SentimentUnavailable('Hugging Face is unavailable.');
+        return new SentimentUnavailable('Azure AI Language is unavailable.');
     }
 }
