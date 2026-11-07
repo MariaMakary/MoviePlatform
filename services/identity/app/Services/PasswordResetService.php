@@ -35,7 +35,7 @@ class PasswordResetService
 
         // Always the address saved in the database, never the request field (see services/identity/CLAUDE.md).
         try {
-            Mail::to($user->email)->send(new ResetPasswordMail($user->name, $this->resetUrl($user->email, $token)));
+            Mail::to($user->email)->queue(new ResetPasswordMail($user->name, $this->resetUrl($user->email, $token)));
         } catch (TransportExceptionInterface $e) {
             // The answer stays the same whether a mail went out or not, so nobody can tell which emails exist.
             report($e);

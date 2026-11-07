@@ -6,17 +6,12 @@ return [
     'mailers' => [
         'smtp' => [
             'transport' => 'smtp',
-            'host' => env('MAIL_HOST', 'sandbox.smtp.mailtrap.io'),
-            'port' => (int) env('MAIL_PORT', 2525),
+            'host' => env('MAIL_HOST', 'smtp-relay.brevo.com'),
+            'port' => (int) env('MAIL_PORT', 587),
             'encryption' => env('MAIL_ENCRYPTION', 'tls'),
             'username' => env('MAIL_USERNAME'),
             'password' => secret('mail_password'),
-            'timeout' => 5,
-        ],
-
-        'log' => [
-            'transport' => 'log',
-            'channel' => env('MAIL_LOG_CHANNEL'),
+            'timeout' => 10,
         ],
 
         'array' => [
@@ -25,10 +20,9 @@ return [
     ],
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'no-reply@movieplatform.test'),
+        'address' => env('MAIL_FROM_ADDRESS', 'kaiateam.noreply@gmail.com'),
         'name' => env('MAIL_FROM_NAME', 'KAIA'),
     ],
 
-    // The reset link in the email points to this Gateway page.
     'gateway_url' => rtrim(env('GATEWAY_URL', 'http://localhost:8000'), '/'),
 ];

@@ -6,10 +6,16 @@ use App\Services\PasswordResetService;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Symfony\Component\Mime\Email;
 
 class ResetPasswordMail extends Mailable
 {
     public function __construct(public string $name, public string $url) {}
+
+    public function build(): static
+    {
+        return $this->withSymfonyMessage(fn (Email $message) => $message->text($this->plainText()));
+    }
 
     public function envelope(): Envelope
     {
@@ -25,5 +31,15 @@ class ResetPasswordMail extends Mailable
             PasswordResetService::TOKEN_TTL_MINUTES,
             e($this->url),
         ));
+    }
+
+    public function plainText(): string
+    {
+        return sprintf(
+            "Hi %s,\n\nOpen this link to choose a new password. It works once, for %d minutes:\n%s\n\nIf you did not ask for this, you can ignore this email.\n",
+            $this->name,
+            PasswordResetService::TOKEN_TTL_MINUTES,
+            $this->url,
+        );
     }
 }
