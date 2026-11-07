@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Enums;
+namespace MoviePlatform\Common\Notifications;
 
 enum NotificationType: string
 {
