@@ -57,7 +57,7 @@ class WelcomeNotificationTest extends TestCase
 
         $notification = Notification::ownedBy(self::USER_ID)->sole();
         $this->assertSame(NotificationType::Welcome, $notification->type);
-        $this->assertSame('Welcome to MoviePlatform!', $notification->title);
+        $this->assertSame('Welcome to KAIA!', $notification->title);
         $this->assertStringContainsString('Joe Rohban', $notification->body);
         $this->assertNull($notification->data);
         $this->assertNull($notification->read_at);

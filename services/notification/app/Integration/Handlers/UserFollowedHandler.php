@@ -2,11 +2,10 @@
 
 namespace App\Integration\Handlers;
 
-use App\Enums\NotificationType;
 use App\Services\NotificationService;
 use MoviePlatform\Common\Integration\EventHandler;
+use MoviePlatform\Common\Notifications\NotificationType;
 
-/** Tells the followed user who started following them. The name comes in the event: no Identity call. */
 class UserFollowedHandler implements EventHandler
 {
     public function __construct(private NotificationService $notifications) {}

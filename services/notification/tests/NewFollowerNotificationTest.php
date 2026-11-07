@@ -2,7 +2,6 @@
 
 namespace Tests;
 
-use App\Enums\NotificationType;
 use App\Integration\Handlers\UserFollowedHandler;
 use App\Models\Notification;
 use App\Services\NotificationService;
@@ -10,6 +9,7 @@ use Illuminate\Support\Str;
 use Laravel\Lumen\Testing\DatabaseTransactions;
 use MoviePlatform\Common\Integration\EventConsumer;
 use MoviePlatform\Common\Integration\RabbitMqConnection;
+use MoviePlatform\Common\Notifications\NotificationType;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Message\AMQPMessage;
 
