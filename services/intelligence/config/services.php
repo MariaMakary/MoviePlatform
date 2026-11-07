@@ -1,11 +1,10 @@
 <?php
 
 return [
-    'huggingface' => [
-        'token' => secret('hf_api_token', ''),
-        // The current Inference endpoint (the old api-inference.huggingface.co URL is retired).
-        'url' => env('HF_INFERENCE_URL', 'https://router.huggingface.co/hf-inference/models'),
-        'sentiment_model' => env('HF_SENTIMENT_MODEL', 'cardiffnlp/twitter-roberta-base-sentiment-latest'),
-        'timeout' => (int) env('HF_TIMEOUT', 15),
+    'azure_language' => [
+        'key' => secret('azure_language_key', ''),
+        'endpoint' => env('AZURE_LANGUAGE_ENDPOINT', ''),
+        'api_version' => '2023-04-01',
+        'timeout' => 10,
     ],
 ];
