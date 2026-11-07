@@ -14,6 +14,8 @@ use App\Livewire\Engagement\Watchlist;
 use App\Livewire\Home;
 use App\Livewire\Intelligence\CinemaMap;
 use App\Livewire\Notifications\Index as Notifications;
+use App\Livewire\Social\FindPeople;
+use App\Livewire\Social\FollowList;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', Home::class)->name('home');
@@ -23,6 +25,10 @@ Route::get('/movies/{id}', MoviePage::class)->whereUuid('id')->name('movies.show
 Route::get('/search', Search::class)->name('search');
 
 Route::get('/cinemas',CinemaMap::class)->name('cinemas');
+
+Route::get('/users/{id}/followers', FollowList::class)->whereUuid('id')->name('users.followers');
+Route::get('/users/{id}/following', FollowList::class)->whereUuid('id')->name('users.following');
+Route::get('/people', FindPeople::class)->middleware('auth.jwt')->name('people');
 
 Route::get('/notifications', Notifications::class)->middleware('auth.jwt')->name('notifications');
 
