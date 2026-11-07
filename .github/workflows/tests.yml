@@ -1,0 +1,147 @@
+name: Tests
+
+on:
+  pull_request:
+    branches: [develop]
+  push:
+    branches: [develop]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  common:
+    name: common
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/common
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, pdo_pgsql, pdo_sqlite, sockets
+          coverage: none
+
+      - name: Find the Composer cache
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-common-${{ hashFiles('packages/common/composer.json') }}
+          restore-keys: composer-common-
+
+      - name: Install
+        run: composer update --no-interaction --no-progress --prefer-dist
+
+      - name: Test
+        run: vendor/bin/phpunit
+
+  services:
+    name: ${{ matrix.service }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [identity, catalog, engagement, social, intelligence, notification]
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: ${{ matrix.service }}_db
+          POSTGRES_USER: ${{ matrix.service }}_user
+          POSTGRES_PASSWORD: replaced-by-a-random-one
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U ${{ matrix.service }}_user -d ${{ matrix.service }}_db"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+    defaults:
+      run:
+        working-directory: services/${{ matrix.service }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, pdo_pgsql, pdo_sqlite, sockets
+          coverage: none
+
+      - name: Write throwaway secrets
+        working-directory: .
+        run: |
+          dir="$RUNNER_TEMP/secrets"
+          mkdir -p "$dir"
+          for file in secrets.example/*; do
+            openssl rand -hex 24 > "$dir/$(basename "$file")"
+          done
+          openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out "$dir/jwt_private_key" 2> /dev/null
+          openssl pkey -in "$dir/jwt_private_key" -pubout -out keys/jwt_public.pem
+          password="$(openssl rand -hex 24)"
+          echo "::add-mask::$password"
+          printf '%s' "$password" > "$dir/${{ matrix.service }}_db_password"
+          docker exec ${{ job.services.postgres.id }} psql -q -U ${{ matrix.service }}_user -d ${{ matrix.service }}_db -c "ALTER USER ${{ matrix.service }}_user PASSWORD '$password'"
+          echo "SECRETS_DIR=$dir" >> "$GITHUB_ENV"
+
+      - name: Create .env
+        run: cp .env.example .env
+
+      - name: Find the Composer cache
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ matrix.service }}-${{ hashFiles(format('services/{0}/composer.lock', matrix.service)) }}
+          restore-keys: composer-${{ matrix.service }}-
+
+      - name: Install
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Migrate
+        run: php artisan migrate --force
+
+      - name: Test
+        run: vendor/bin/phpunit
+
+  gateway:
+    name: gateway (install only)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: gateway
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, pdo_pgsql, pdo_sqlite, sockets
+          coverage: none
+
+      - name: Find the Composer cache
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-gateway-${{ hashFiles('gateway/composer.lock') }}
+          restore-keys: composer-gateway-
+
+      - name: Install
+        run: composer install --no-interaction --no-progress --prefer-dist

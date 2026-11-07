@@ -61,6 +61,7 @@ same `composer run dev` script, never as Docker containers. Details: `README.md`
 
 - Branches are created from the Azure DevOps task, **based on `develop`**: `feature/<taskId>-short-name`, `fix/…`, `docs/…`, `chore/…`.
 - Commit messages include `AB#<taskId>`. Pull requests target `develop` and end with `Fixes AB#<taskId>`.
+- A PR can only be merged when the **Tests** check (GitHub Actions, `.github/workflows/tests.yml`) is green.
 - 1 approval from a member who owns a different service. Squash and merge (merge commit for chained branches), then delete the branch.
 - **Never push directly to `main` or `develop`.** `main` is updated only at the end of a sprint.
 
