@@ -2,8 +2,12 @@
 
 namespace App\Integration\Clients;
 
-use RuntimeException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class SentimentUnavailable extends RuntimeException
+class SentimentUnavailable extends HttpException
 {
+    public function __construct(string $message = 'Azure AI Language is unavailable.')
+    {
+        parent::__construct(503, $message);
+    }
 }

@@ -20,7 +20,13 @@ Payloads and rules: `docs/events.md`.
   characters (`MAX_CHARACTERS`) and analyzed as English. Past the limit Azure refuses calls (403/429) instead of
   charging. Any failure (timeout, bad key, limit, refused document) throws `SentimentUnavailable`, so the event is
   retried and then dead-lettered; the log never holds the key or the review text. Hugging Face was dropped because its
-  free accounts no longer get monthly credits.
+  free accounts no longer get monthly credits. `SentimentUnavailable` is an `HttpException(503)`: in the consumer it
+  makes the event retry, in `POST /api/sentiment/analyze` (admin only) it answers 503.
+- `AnalyzeReviewHandler` handles both `ReviewCreated` and `ReviewUpdated` (both carry the current text) through
+  `SentimentService::analyzeReview()`: one `sentiment_results` row per review (`updateOrCreate` on the unique
+  `review_id`, Engagement's `reviews.id`, no foreign key), so an edit replaces the result. The handler runs inside the
+  consumer's transaction, so `ReviewAnalyzed` is published with `DB::afterCommit`. In tests the test's own transaction
+  never commits, so `SentimentTest` swaps in a transaction manager that treats getting back to level 1 as the commit.
 - Movie details come from Catalog's `/api/internal/*` routes with `X-Service-Token`, never from Catalog's database.
 
 ## Before coding
