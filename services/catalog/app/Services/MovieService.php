@@ -145,7 +145,11 @@ class MovieService
         ];
     }
 
-    private function ensureLocal(array $results): Collection
+    /**
+     * The local movies for TMDB list results (`['movie' => […], 'genre_tmdb_ids' => […]]`), in the same order.
+     * A movie seen for the first time is created from the list data, without an extra TMDB call.
+     */
+    public function ensureLocal(array $results): Collection
     {
         $tmdbIds = array_map(fn (array $result) => $result['movie']['tmdb_id'], $results);
         $movies = Movie::whereIn('tmdb_id', $tmdbIds)->get()->keyBy('tmdb_id');
