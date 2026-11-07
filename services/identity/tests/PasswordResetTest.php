@@ -31,6 +31,8 @@ class PasswordResetTest extends TestCase
             'jwt.public_key_path' => $fixtures.'/test-public.pem',
             'mail.gateway_url' => 'http://gateway.test',
         ]);
+
+        PasswordResetToken::query()->delete();
     }
 
     protected function tearDown(): void
@@ -64,7 +66,7 @@ class PasswordResetTest extends TestCase
         $this->forgot($email);
 
         $url = null;
-        Mail::assertSent(ResetPasswordMail::class, function (ResetPasswordMail $mail) use (&$url) {
+        Mail::assertQueued(ResetPasswordMail::class, function (ResetPasswordMail $mail) use (&$url) {
             $url = $mail->url;
 
             return true;
@@ -110,7 +112,7 @@ class PasswordResetTest extends TestCase
         $this->seeStatusCode(200)->seeJsonEquals(['data' => ['message' => PasswordResetController::LINK_SENT]]);
 
         $sent = null;
-        Mail::assertSent(ResetPasswordMail::class, function (ResetPasswordMail $mail) use (&$sent) {
+        Mail::assertQueued(ResetPasswordMail::class, function (ResetPasswordMail $mail) use (&$sent) {
             $sent = $mail;
 
             return $mail->hasTo('maria@example.com');
@@ -132,6 +134,7 @@ class PasswordResetTest extends TestCase
 
         $this->seeStatusCode(200)->seeJsonEquals(['data' => ['message' => PasswordResetController::LINK_SENT]]);
         Mail::assertNothingSent();
+        Mail::assertNothingQueued();
         $this->assertSame(0, PasswordResetToken::count());
     }
 
@@ -265,6 +268,7 @@ class PasswordResetTest extends TestCase
         }
 
         Mail::assertNothingSent();
+        Mail::assertNothingQueued();
         $this->assertSame($users, User::count());
         $this->assertSame(0, PasswordResetToken::count());
     }
@@ -272,7 +276,7 @@ class PasswordResetTest extends TestCase
     public function test_forgot_still_answers_200_when_the_mail_server_is_down(): void
     {
         $this->user();
-        Mail::shouldReceive('to->send')->andThrow(new TransportException('Connection refused'));
+        Mail::shouldReceive('to->queue')->andThrow(new TransportException('Connection refused'));
 
         $this->forgot();
 
@@ -294,5 +298,39 @@ class PasswordResetTest extends TestCase
         $this->assertSame('maria@example.com', $email->getTo()[0]->getAddress());
         $this->assertSame('Reset your KAIA password', $email->getSubject());
         $this->assertStringContainsString('http://gateway.test/reset-password?token=', $email->getHtmlBody());
+    }
+
+    public function test_the_plain_text_part_has_the_link_exactly_as_the_gateway_needs_it(): void
+    {
+        config(['mail.default' => 'array']);
+        $this->user();
+
+        $this->forgot();
+
+        $email = app('mail.manager')->mailer('array')->getSymfonyTransport()->messages()->first()->getOriginalMessage();
+        $this->assertMatchesRegularExpression(
+            '~^http://gateway\.test/reset-password\?token=[A-Za-z0-9]{64}&email=maria%40example\.com$~m',
+            $email->getTextBody(),
+        );
+        $this->assertStringNotContainsString('&amp;', $email->getTextBody());
+    }
+
+    public function test_forgot_only_queues_the_email_and_the_worker_sends_it(): void
+    {
+        $this->app->configure('queue');
+        config(['queue.default' => 'database', 'mail.default' => 'array']);
+        $this->user();
+        $sent = fn () => app('mail.manager')->mailer('array')->getSymfonyTransport()->messages()->count();
+
+        $this->forgot();
+
+        $this->seeStatusCode(200);
+        $this->assertSame(1, DB::table('jobs')->count());
+        $this->assertSame(0, $sent());
+
+        $this->artisan('queue:work', ['--once' => true]);
+
+        $this->assertSame(0, DB::table('jobs')->count());
+        $this->assertSame(1, $sent());
     }
 }

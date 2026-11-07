@@ -47,7 +47,16 @@ Read `docs/lumen.md` (how to write Lumen code here), `docs/api/identity.md` (thi
 
 ## Running
 
-`composer run dev` runs `composer install` and `php artisan migrate --force`, then starts `php -S 127.0.0.1:8001 -t public` (it only publishes events). Tests: `vendor/bin/phpunit`.
+`composer run dev` runs `composer install` and `php artisan migrate --force`, then starts `php -S 127.0.0.1:8001 -t public` and the `mail` worker (`php artisan queue:work --tries=3 --backoff=30`). Identity publishes events but consumes none. Tests: `vendor/bin/phpunit`.
+
+Emails are queued, never sent during the request: `Mail::to(...)->queue(...)` puts them in the `jobs` table
+(`QUEUE_CONNECTION=database`) and the worker sends them. Sending through a real SMTP server takes several seconds,
+longer than the Gateway's 3 s timeout, and the time would also show which emails have an account. A failed email is
+retried 3 times, then kept in `failed_jobs` (`php artisan queue:failed`, `queue:retry`). The queued job holds the reset
+link, so `php artisan queue:flush` clears failed ones. Lumen does not bind the queue or the mail factory by itself:
+`bootstrap/app.php` registers `QueueServiceProvider` and aliases `mail.manager` to `Illuminate\Contracts\Mail\Factory`.
+A queued Mailable cannot keep closures, so `ResetPasswordMail` adds its plain-text part in `build()`, which runs in the
+worker. With `QUEUE_CONNECTION=sync` (the tests) the email is sent at once.
 The tests use the real `identity-db` (CHECK constraint, unique email), so run `docker compose up -d` and
 `composer run dev` once first (it applies the migrations). They use `DatabaseTransactions`, so they leave no rows behind.
 

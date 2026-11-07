@@ -482,7 +482,7 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
       
-        <mxCell id="z21" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;fontFamily=Arial;fontSize=12;" value="&lt;b&gt;Constraints &amp;amp; indexes&lt;/b&gt;&lt;br&gt;• users.role: CHECK (role IN (&amp;#39;user&amp;#39;,&amp;#39;admin&amp;#39;))&lt;br&gt;• users.email UNIQUE; social_accounts UNIQUE (provider, provider_id)&lt;br&gt;• users.password is NULL for accounts created through social login&lt;br&gt;• Blocking an account sets is_blocked and publishes user.blocked; unblocking publishes user.unblocked"><mxGeometry x="40" y="640" width="1320" height="120" as="geometry" /></mxCell></root>
+        <mxCell id="z21" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;fontFamily=Arial;fontSize=12;" value="&lt;b&gt;Constraints &amp;amp; indexes&lt;/b&gt;&lt;br&gt;• users.role: CHECK (role IN (&amp;#39;user&amp;#39;,&amp;#39;admin&amp;#39;))&lt;br&gt;• users.email UNIQUE; social_accounts UNIQUE (provider, provider_id)&lt;br&gt;• users.password is NULL for accounts created through social login&lt;br&gt;• Blocking an account sets is_blocked and publishes user.blocked; unblocking publishes user.unblocked&lt;br&gt;• jobs, failed_jobs: Laravel&amp;#39;s queue tables (created by queue:table), used only to send emails in the background; not business data"><mxGeometry x="40" y="640" width="1320" height="120" as="geometry" /></mxCell></root>
     </mxGraphModel>
   </diagram>
 </mxfile>

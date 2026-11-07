@@ -74,6 +74,23 @@ Lumen has no `key:generate`, so the second line writes a random 32-character `AP
 No passwords go in `.env`: the apps read them from `secrets/` (`SECRETS_DIR` in `.env` points there), the same
 files the database and RabbitMQ containers use.
 
+**Emails** ("Forgot password") are sent to real inboxes through the team's Brevo account (free, 300 emails a day for
+the whole team), from `kaiateam.noreply@gmail.com`. Ask Maria privately for your own SMTP key and the SMTP login: put
+the key in `secrets/mail_password` and the login in `MAIL_USERNAME` in `services/identity/.env`. The other mail
+settings are already in `.env.example`:
+
+```
+MAIL_MAILER=smtp
+MAIL_HOST=smtp-relay.brevo.com
+MAIL_PORT=587
+MAIL_ENCRYPTION=tls
+MAIL_USERNAME=<the SMTP login>
+MAIL_FROM_ADDRESS=kaiateam.noreply@gmail.com
+```
+
+Restart Identity after changing it. The first emails may land in spam. Without a valid key, "Forgot password" still
+answers normally, but the email fails in the `mail` worker and ends up in `failed_jobs` (`php artisan queue:failed`).
+
 **4. Start the infrastructure.**
 
 ```powershell
@@ -108,7 +125,9 @@ cd services/identity; composer run dev     # in its own terminal, for each app y
    this step fails and the server does not start: run `docker compose up -d` and try again.
 3. Starts the app with `npx concurrently` (Node.js is needed): the service's `php -S` on its port from the table above.
    Engagement, social, intelligence and notification also start their `events:consume` worker; if RabbitMQ is down,
-   the worker restarts every 5 seconds until it is back, and the server keeps running. The Gateway starts
+   the worker restarts every 5 seconds until it is back, and the server keeps running. Identity starts its `mail`
+   worker (`queue:work`), which sends the emails in the background (add `QUEUE_CONNECTION=database` to an older
+   `services/identity/.env`). The Gateway starts
    `php artisan serve --port=8000` and `npm run dev` (CSS/JS with hot reload).
 
 Stop with `Ctrl+C`. Check a service with `http://localhost:8001/api/health`: `200` when its database and RabbitMQ are

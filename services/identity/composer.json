@@ -33,7 +33,7 @@
             "Composer\\Config::disableProcessTimeout",
             "@composer install --no-interaction",
             "@php artisan migrate --force",
-            "npx concurrently@9 -c \"#93c5fd\" -n server \"php -S 127.0.0.1:8001 -t public\""
+            "npx concurrently@9 --restart-tries -1 --restart-after 5000 -c \"#93c5fd,#86efac\" -n server,mail \"php -S 127.0.0.1:8001 -t public\" \"php artisan queue:work --tries=3 --backoff=30\""
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
