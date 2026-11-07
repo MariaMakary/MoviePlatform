@@ -37,7 +37,7 @@ Lists the current user's notifications, newest first.
 ```json
 {
   "data": [
-    {"id": "0193a7d0-5555-7aaa-8bbb-000000000600", "type": "new_follower", "title": "New follower", "body": "Maria started following you.", "data": {"follower_id": "0193a7c0-2222-7aaa-8bbb-000000000002"}, "read_at": null, "created_at": "2026-11-03T18:20:00Z"}
+    {"id": "0193a7d0-5555-7aaa-8bbb-000000000600", "type": "new_follower", "title": "Maria Makary started following you", "body": "See what they are watching on their profile.", "data": {"follower_id": "0193a7c0-2222-7aaa-8bbb-000000000002"}, "read_at": null, "created_at": "2026-11-03T18:20:00Z"}
   ],
   "meta": {"current_page": 1, "last_page": 1, "total": 1}
 }
@@ -68,7 +68,7 @@ Marks one of the current user's notifications as read. Marking an already read n
 **Response** `200`, the notification
 
 ```json
-{"data": {"id": "0193a7d0-5555-7aaa-8bbb-000000000600", "type": "new_follower", "title": "New follower", "body": "Maria started following you.", "data": {"follower_id": "0193a7c0-2222-7aaa-8bbb-000000000002"}, "read_at": "2026-11-03T18:25:00Z", "created_at": "2026-11-03T18:20:00Z"}}
+{"data": {"id": "0193a7d0-5555-7aaa-8bbb-000000000600", "type": "new_follower", "title": "Maria Makary started following you", "body": "See what they are watching on their profile.", "data": {"follower_id": "0193a7c0-2222-7aaa-8bbb-000000000002"}, "read_at": "2026-11-03T18:25:00Z", "created_at": "2026-11-03T18:20:00Z"}}
 ```
 
 **Errors:** `401` no or invalid token · `404` `"Notification not found."` (unknown id, or another user's notification)

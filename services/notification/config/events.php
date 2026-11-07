@@ -14,5 +14,6 @@ return [
 
     'handlers' => [
         'UserRegistered' => App\Integration\Handlers\UserRegisteredHandler::class,
+        'UserFollowed' => App\Integration\Handlers\UserFollowedHandler::class,
     ],
 ];
