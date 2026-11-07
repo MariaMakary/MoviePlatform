@@ -26,6 +26,12 @@ class IdentityClient extends BaseClient
         return $this->get('/api/users', ['ids' => implode(',', array_values(array_unique($ids)))])['data'];
     }
 
+    /** At most 10 users whose name contains $query (2 to 100 characters), sorted by name. */
+    public function searchUsers(string $query): array
+    {
+        return $this->get('/api/users/search', ['q' => $query])['data'];
+    }
+
     public function refresh(): array
     {
         return $this->post('/api/token/refresh')['data'];
