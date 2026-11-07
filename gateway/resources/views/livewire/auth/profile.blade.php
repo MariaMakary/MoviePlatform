@@ -57,6 +57,8 @@
             </div>
         </form>
 
+        <livewire:auth.favorite-genres embedded />
+
         <form wire:submit="changePassword" class="space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
             <h2 class="text-lg font-semibold text-white">Password</h2>
 

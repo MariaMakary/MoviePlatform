@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-/** The {userId} route parameter of the follow routes. */
+/** A user id route parameter ({userId} / {id}) of the follow and privacy routes. */
 class FollowRequest
 {
     public static function rules(): array
