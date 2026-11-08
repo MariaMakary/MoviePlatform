@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LogoutController;
+use App\Livewire\Admin\Dashboard;
 use App\Livewire\Auth\FavoriteGenres;
 use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Auth\Login;
@@ -32,6 +33,10 @@ Route::get('/genres', FavoriteGenres::class)->middleware('auth.jwt')->name('genr
 
 Route::get('/watchlist', Watchlist::class)->middleware('auth.jwt')->name('watchlist');
 Route::get('/history', History::class)->middleware('auth.jwt')->name('history');
+
+Route::middleware(['auth.jwt', 'admin.page'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', Dashboard::class)->name('dashboard');
+});
 
 Route::get('/login', Login::class)->name('login');
 Route::get('/register', Register::class)->name('register');

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\RefreshJwt;
+use App\Http\Middleware\RequireAdmin;
 use App\Http\Middleware\RequireLogin;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -14,7 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [RefreshJwt::class]);
-        $middleware->alias(['auth.jwt' => RequireLogin::class]);
+        // Not 'admin': packages/common already registers that alias for a JWT bearer token.
+        $middleware->alias(['auth.jwt' => RequireLogin::class, 'admin.page' => RequireAdmin::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

@@ -6,6 +6,7 @@
     $loggedIn ? ['label' => 'History', 'href' => route('history'), 'active' => request()->routeIs('history')] : null,
     ['label' => 'Movie nights', 'href' => '#', 'active' => false],
     ['label' => 'Cinemas', 'href' => route('cinemas'), 'active' => request()->routeIs('cinemas')],
+    app(\App\Services\AuthSession::class)->isAdmin() ? ['label' => 'Admin', 'href' => route('admin.dashboard'), 'active' => request()->routeIs('admin.*')] : null,
 ])))
 
 <header x-data="{ open: false }" class="sticky top-0 z-40 border-b border-white/10 bg-jet/90 backdrop-blur">
