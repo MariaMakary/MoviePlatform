@@ -4,6 +4,7 @@
     ['label' => 'Movies', 'href' => '#', 'active' => false],
     $loggedIn ? ['label' => 'Watchlist', 'href' => route('watchlist'), 'active' => request()->routeIs('watchlist')] : null,
     $loggedIn ? ['label' => 'History', 'href' => route('history'), 'active' => request()->routeIs('history')] : null,
+    $loggedIn ? ['label' => 'Lists', 'href' => route('lists.index'), 'active' => request()->routeIs('lists.*')] : null,
     ['label' => 'Movie nights', 'href' => '#', 'active' => false],
     ['label' => 'Cinemas', 'href' => route('cinemas'), 'active' => request()->routeIs('cinemas')],
 ])))

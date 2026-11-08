@@ -61,6 +61,7 @@
                         <livewire:engagement.rate-movie :movie-id="$movie['id']" :key="'rating-'.$movie['id']" />
                         <livewire:engagement.watchlist-button :movie-id="$movie['id']" :key="'watchlist-'.$movie['id']" />
                         <livewire:engagement.mark-watched-button :movie-id="$movie['id']" :key="'watched-'.$movie['id']" />
+                        <livewire:engagement.add-to-list-button :movie-id="$movie['id']" :key="'lists-'.$movie['id']" />
                         @if ($upcoming)
                             <livewire:intelligence.add-to-calendar :movie-id="$movie['id']" :title="$movie['title']"
                                 :release-date="$movie['release_date']" :overview="$movie['overview']" :key="'calendar-'.$movie['id']" />

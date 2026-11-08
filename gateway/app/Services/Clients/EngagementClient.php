@@ -83,6 +83,41 @@ class EngagementClient extends BaseClient
         return array_column($this->contains('/api/history/contains', $movieIds), 'watched_at', 'movie_id');
     }
 
+    public function lists(int $page = 1, int $perPage = 20, ?string $movieId = null): array
+    {
+        return $this->get('/api/lists', array_filter(['page' => $page, 'per_page' => $perPage, 'movie_id' => $movieId]));
+    }
+
+    public function list(string $listId): array
+    {
+        return $this->get('/api/lists/'.rawurlencode($listId))['data'];
+    }
+
+    public function createList(array $data): array
+    {
+        return $this->post('/api/lists', $data)['data'];
+    }
+
+    public function updateList(string $listId, array $data): array
+    {
+        return $this->put('/api/lists/'.rawurlencode($listId), $data)['data'];
+    }
+
+    public function deleteList(string $listId): void
+    {
+        $this->delete('/api/lists/'.rawurlencode($listId));
+    }
+
+    public function addToList(string $listId, string $movieId): array
+    {
+        return $this->post('/api/lists/'.rawurlencode($listId).'/movies', ['movie_id' => $movieId])['data'];
+    }
+
+    public function removeFromList(string $listId, string $movieId): void
+    {
+        $this->delete('/api/lists/'.rawurlencode($listId).'/movies/'.rawurlencode($movieId));
+    }
+
     private function contains(string $path, array $movieIds): array
     {
         $found = [];
