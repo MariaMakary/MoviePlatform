@@ -51,7 +51,7 @@ class ReviewAnalyzedHandlerTest extends TestCase
         ]);
     }
 
-    private function deliver(string $reviewId, string $label = 'positive', float $score = 0.9731, ?string $id = null): string
+    private function deliver(string $reviewId, string $label = 'positive', mixed $score = 0.9731, ?string $id = null): string
     {
         $id ??= (string) Str::uuid();
         $message = new AMQPMessage(json_encode([
@@ -125,6 +125,34 @@ class ReviewAnalyzedHandlerTest extends TestCase
 
         $this->assertSame('neutral', $review->fresh()->sentiment_label->value, 'The second copy was skipped.');
         $this->assertSame(1, DB::table('processed_events')->where('event_id', $id)->count());
+    }
+
+    public function test_a_score_outside_0_to_1_or_not_a_number_goes_to_the_dlq_and_changes_nothing(): void
+    {
+        foreach ([1.7, -0.1, 'abc', '0.9', null] as $score) {
+            $review = $this->review();
+            $this->answers = [];
+
+            $this->deliver($review->id, 'positive', $score);
+
+            $review->refresh();
+            $this->assertNull($review->sentiment_label, 'score '.var_export($score, true));
+            $this->assertNull($review->sentiment_score);
+            $this->assertSame(['reject'], $this->answers, 'score '.var_export($score, true).' must go to the DLQ.');
+            $review->delete();
+        }
+    }
+
+    public function test_the_limits_0_and_1_are_accepted(): void
+    {
+        foreach ([0, 1] as $score) {
+            $review = $this->review();
+
+            $this->deliver($review->id, 'neutral', $score);
+
+            $this->assertSame((float) $score, $review->fresh()->sentiment_score);
+            $review->delete();
+        }
     }
 
     public function test_an_unknown_label_goes_to_the_dlq_and_changes_nothing(): void
