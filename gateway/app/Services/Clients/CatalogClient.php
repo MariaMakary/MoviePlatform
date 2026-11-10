@@ -6,14 +6,18 @@ class CatalogClient extends BaseClient
 {
     protected string $service = 'catalog';
 
-    /** Movie cards in the order of $ids (at most 100); unknown ids are skipped. */
+    private const MAX_IDS = 100;
+
+    /** Movie cards in the order of $ids; unknown ids are skipped. */
     public function movies(array $ids): array
     {
-        if ($ids === []) {
-            return [];
+        $cards = [];
+
+        foreach (array_chunk(array_values($ids), self::MAX_IDS) as $chunk) {
+            $cards = [...$cards, ...$this->get('/api/movies', ['ids' => implode(',', $chunk)])['data']];
         }
 
-        return $this->get('/api/movies', ['ids' => implode(',', $ids)])['data'];
+        return $cards;
     }
 
     public function movie(string $id): array

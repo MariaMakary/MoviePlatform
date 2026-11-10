@@ -12,6 +12,9 @@ use App\Livewire\Catalog\MoviePage;
 use App\Livewire\Catalog\Search;
 use App\Livewire\Dev\ServiceStatus;
 use App\Livewire\Engagement\History;
+use App\Livewire\Engagement\ListForm;
+use App\Livewire\Engagement\ListPage;
+use App\Livewire\Engagement\MyLists;
 use App\Livewire\Engagement\Watchlist;
 use App\Livewire\Home;
 use App\Livewire\Intelligence\CinemaMap;
@@ -34,6 +37,12 @@ Route::get('/genres', FavoriteGenres::class)->middleware('auth.jwt')->name('genr
 Route::get('/watchlist', Watchlist::class)->middleware('auth.jwt')->name('watchlist');
 Route::get('/history', History::class)->middleware('auth.jwt')->name('history');
 
+Route::middleware('auth.jwt')->group(function () {
+    Route::get('/lists', MyLists::class)->name('lists.index');
+    Route::get('/lists/create', ListForm::class)->name('lists.create');
+    Route::get('/lists/{id}/edit', ListForm::class)->whereUuid('id')->name('lists.edit');
+});
+Route::get('/lists/{id}', ListPage::class)->whereUuid('id')->name('lists.show');
 Route::middleware(['auth.jwt', 'admin.page'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', Dashboard::class)->name('dashboard');
 });
