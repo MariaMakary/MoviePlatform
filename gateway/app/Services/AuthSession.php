@@ -6,6 +6,7 @@ use App\Services\Clients\BaseClient;
 use App\Services\Clients\IdentityClient;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Arr;
+use MoviePlatform\Common\Auth\Role;
 
 class AuthSession
 {
@@ -47,6 +48,11 @@ class AuthSession
     public function user(): ?array
     {
         return $this->check() ? session(self::USER) : null;
+    }
+
+    public function isAdmin(): bool
+    {
+        return ($this->user()['role'] ?? null) === Role::Admin->value;
     }
 
     public function expiresSoon(): bool

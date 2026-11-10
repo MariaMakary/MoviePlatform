@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LogoutController;
+use App\Livewire\Admin\Dashboard;
 use App\Livewire\Auth\FavoriteGenres;
 use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Auth\Login;
@@ -42,6 +43,9 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('/lists/{id}/edit', ListForm::class)->whereUuid('id')->name('lists.edit');
 });
 Route::get('/lists/{id}', ListPage::class)->whereUuid('id')->name('lists.show');
+Route::middleware(['auth.jwt', 'admin.page'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', Dashboard::class)->name('dashboard');
+});
 
 Route::get('/login', Login::class)->name('login');
 Route::get('/register', Register::class)->name('register');

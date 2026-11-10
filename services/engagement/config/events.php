@@ -12,5 +12,6 @@ return [
     ],
 
     'handlers' => [
+        'ReviewAnalyzed' => App\Integration\Handlers\ReviewAnalyzedHandler::class,
     ],
 ];
