@@ -1,0 +1,11 @@
+{
+    "mcpServers": {
+        "azure-devops": {
+            "command": "cmd",
+            "args": ["/c", "mcp-server-azuredevops", "2023125150197", "-d", "core", "work", "work-items", "--authentication", "pat"],
+            "env": {
+                "PERSONAL_ACCESS_TOKEN": "${PERSONAL_ACCESS_TOKEN}"
+            }
+        }
+    }
+}
