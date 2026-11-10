@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Http\Middleware\RequireAdmin;
 use App\Http\Middleware\RequireLogin;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
@@ -14,6 +15,6 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        Livewire::addPersistentMiddleware([RequireLogin::class]);
+        Livewire::addPersistentMiddleware([RequireLogin::class, RequireAdmin::class]);
     }
 }
