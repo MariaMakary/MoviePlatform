@@ -2,11 +2,11 @@
 
 namespace Tests;
 
-use App\Enums\ParticipantStatus;
 use App\Models\MovieNight;
 use Firebase\JWT\JWT;
 use Illuminate\Support\Carbon;
 use Laravel\Lumen\Testing\DatabaseTransactions;
+use MoviePlatform\Common\MovieNights\ParticipantStatus;
 
 class MovieNightApiTest extends TestCase
 {

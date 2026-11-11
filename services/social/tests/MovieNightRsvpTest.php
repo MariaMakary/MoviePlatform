@@ -2,14 +2,14 @@
 
 namespace Tests;
 
-use App\Enums\MovieNightStatus;
-use App\Enums\ParticipantStatus;
 use App\Models\MovieNight;
 use App\Models\Participant;
 use Firebase\JWT\JWT;
 use Illuminate\Support\Carbon;
 use Laravel\Lumen\Testing\DatabaseTransactions;
 use MoviePlatform\Common\Integration\RabbitMqConnection;
+use MoviePlatform\Common\MovieNights\MovieNightStatus;
+use MoviePlatform\Common\MovieNights\ParticipantStatus;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Message\AMQPMessage;
 

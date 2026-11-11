@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\ParticipantStatus;
 use Illuminate\Validation\Rule;
+use MoviePlatform\Common\MovieNights\ParticipantStatus;
 
 class RsvpRequest
 {

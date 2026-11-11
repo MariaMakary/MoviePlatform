@@ -5,4 +5,24 @@ namespace App\Services\Clients;
 class SocialClient extends BaseClient
 {
     protected string $service = 'social';
+
+    public function createMovieNight(array $data): array
+    {
+        return $this->post('/api/movie-nights', $data)['data'];
+    }
+
+    public function movieNights(int $page, int $perPage): array
+    {
+        return $this->get('/api/movie-nights', ['page' => $page, 'per_page' => $perPage]);
+    }
+
+    public function movieNight(string $id): array
+    {
+        return $this->get("/api/movie-nights/{$id}")['data'];
+    }
+
+    public function inviteToMovieNight(string $id, array $userIds): array
+    {
+        return $this->post("/api/movie-nights/{$id}/invites", ['user_ids' => array_values($userIds)])['data'];
+    }
 }

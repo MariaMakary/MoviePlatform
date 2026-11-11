@@ -19,6 +19,9 @@ use App\Livewire\Engagement\Watchlist;
 use App\Livewire\Home;
 use App\Livewire\Intelligence\CinemaMap;
 use App\Livewire\Notifications\Index as Notifications;
+use App\Livewire\Social\CreateMovieNight;
+use App\Livewire\Social\MovieNightPage;
+use App\Livewire\Social\MovieNights;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', Home::class)->name('home');
@@ -43,9 +46,14 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('/lists/{id}/edit', ListForm::class)->whereUuid('id')->name('lists.edit');
 });
 Route::get('/lists/{id}', ListPage::class)->whereUuid('id')->name('lists.show');
+
 Route::middleware(['auth.jwt', 'admin.page'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', Dashboard::class)->name('dashboard');
 });
+
+Route::get('/movie-nights', MovieNights::class)->middleware('auth.jwt')->name('movie-nights.index');
+Route::get('/movie-nights/create', CreateMovieNight::class)->middleware('auth.jwt')->name('movie-nights.create');
+Route::get('/movie-nights/{id}', MovieNightPage::class)->whereUuid('id')->middleware('auth.jwt')->name('movie-nights.show');
 
 Route::get('/login', Login::class)->name('login');
 Route::get('/register', Register::class)->name('register');

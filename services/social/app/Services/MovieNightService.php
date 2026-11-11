@@ -2,13 +2,13 @@
 
 namespace App\Services;
 
-use App\Enums\ParticipantStatus;
 use App\Models\MovieNight;
 use App\Models\Participant;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use MoviePlatform\Common\Auth\JwtUser;
+use MoviePlatform\Common\MovieNights\ParticipantStatus;
 
 class MovieNightService
 {

@@ -2,8 +2,6 @@
 
 namespace Tests;
 
-use App\Enums\MovieNightStatus;
-use App\Enums\ParticipantStatus;
 use App\Models\Candidate;
 use App\Models\MovieNight;
 use App\Models\Participant;
@@ -13,6 +11,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Laravel\Lumen\Testing\DatabaseTransactions;
+use MoviePlatform\Common\MovieNights\MovieNightStatus;
+use MoviePlatform\Common\MovieNights\ParticipantStatus;
 
 class MovieNightTablesTest extends TestCase
 {

@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use App\Enums\ParticipantStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use MoviePlatform\Common\MovieNights\ParticipantStatus;
 
 class Participant extends Model
 {

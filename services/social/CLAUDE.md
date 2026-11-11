@@ -33,11 +33,12 @@ Payloads and rules: `docs/events.md`.
 
 ## Models
 
-- `MovieNight` (UUID, `HasUuids`, `MovieNightFactory`): `status` is the `App\Enums\MovieNightStatus` enum (`Open`,
+- `MovieNight` (UUID, `HasUuids`, `MovieNightFactory`): `status` is the `MoviePlatform\Common\MovieNights\MovieNightStatus` enum (`Open`,
   `Finalized`, `Cancelled`), `open` by default and not fillable, so only the service changes it. `host_id` and
   `winner_movie_id` are plain ids from Identity and Catalog. Relations: `participants`, `candidates`, `votes`.
 - `Participant`: primary key (`movie_night_id`, `user_id`), so a user is invited once per night; only `created_at`.
-  `status` is `App\Enums\ParticipantStatus` (`Pending`, `Accepted`, `Declined`), `pending` by default; `responded_at`
+  `status` is `MoviePlatform\Common\MovieNights\ParticipantStatus` (`Pending`, `Accepted`, `Declined`, shared with the
+  Gateway), `pending` by default; `responded_at`
   is set when the user answers. Change rows with a query (`Participant::where(...)->update(...)`), like `Follow`.
 - `Candidate` (UUID): UNIQUE (`movie_night_id`, `movie_id`), so a movie is proposed once per night; `added_by` is the
   user who proposed it; only `created_at`. Relation: `votes`.

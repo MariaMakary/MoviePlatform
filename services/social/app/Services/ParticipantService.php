@@ -2,8 +2,6 @@
 
 namespace App\Services;
 
-use App\Enums\MovieNightStatus;
-use App\Enums\ParticipantStatus;
 use App\Integration\Events\MovieNightInviteAnswered;
 use App\Integration\Events\MovieNightInviteSent;
 use App\Models\MovieNight;
@@ -12,6 +10,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use MoviePlatform\Common\Auth\JwtUser;
 use MoviePlatform\Common\Integration\EventPublisher;
+use MoviePlatform\Common\MovieNights\MovieNightStatus;
+use MoviePlatform\Common\MovieNights\ParticipantStatus;
 
 class ParticipantService
 {

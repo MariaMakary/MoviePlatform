@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Enums;
+namespace MoviePlatform\Common\MovieNights;
 
 enum ParticipantStatus: string
 {
