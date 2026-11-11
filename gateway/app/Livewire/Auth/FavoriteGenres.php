@@ -11,7 +11,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 
 /**
- * Favorite genre picker: a full page right after registration (/genres, with "Skip for now"), and a section of the
+ * Favorite genre picker: a full page right after registration (/profile/genres, with "Skip for now"), and a section of the
  * profile page (`<livewire:auth.favorite-genres embedded />`). Genres come from Catalog, the choice is saved in Identity.
  */
 #[Title('Your favorite genres')]

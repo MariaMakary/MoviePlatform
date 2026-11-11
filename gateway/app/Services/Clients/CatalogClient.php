@@ -46,4 +46,14 @@ class CatalogClient extends BaseClient
     {
         return $this->get('/api/genres')['data'];
     }
+
+    public function genreMovies(string $genreId, string $sort, int $page = 1): array
+    {
+        return $this->get('/api/genres/'.rawurlencode($genreId).'/movies', ['sort' => $sort, 'page' => $page]);
+    }
+
+    public function person(string $id): array
+    {
+        return $this->get('/api/people/'.rawurlencode($id))['data'];
+    }
 }

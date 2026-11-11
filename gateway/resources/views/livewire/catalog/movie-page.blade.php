@@ -51,7 +51,10 @@
                     @if ($movie['genres'] !== [])
                         <ul class="flex flex-wrap gap-2" aria-label="Genres">
                             @foreach ($movie['genres'] as $genre)
-                                <li class="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium text-gray-200">{{ $genre['name'] }}</li>
+                                <li>
+                                    <a href="{{ route('genres.show', $genre['id']) }}"
+                                       class="inline-flex rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium text-gray-200 transition hover:border-cerulean/60 hover:text-white">{{ $genre['name'] }}</a>
+                                </li>
                             @endforeach
                         </ul>
                     @endif
@@ -84,10 +87,11 @@
                     <h2 class="text-xl font-bold text-white">{{ count($movie['directors']) > 1 ? 'Directors' : 'Director' }}</h2>
                     <ul class="space-y-3">
                         @foreach ($movie['directors'] as $director)
-                            <li class="flex items-center gap-3">
-                                <x-avatar :name="$director['name']" :src="$director['photo_url']" size="md" />
-                                {{-- Link to the person page once 1174 exists --}}
-                                <span class="font-medium text-gray-100">{{ $director['name'] }}</span>
+                            <li>
+                                <a href="{{ route('people.show', $director['id']) }}" class="group flex items-center gap-3">
+                                    <x-avatar :name="$director['name']" :src="$director['photo_url']" size="md" />
+                                    <span class="font-medium text-gray-100 group-hover:text-white group-hover:underline">{{ $director['name'] }}</span>
+                                </a>
                             </li>
                         @endforeach
                     </ul>
@@ -102,12 +106,13 @@
                 <ul class="-mx-4 flex snap-x gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
                     @foreach ($movie['cast'] as $person)
                         <li wire:key="cast-{{ $person['id'] }}" class="w-28 shrink-0 snap-start text-center">
-                            <x-avatar :name="$person['name']" :src="$person['photo_url']" size="xl" class="mx-auto" />
-                            {{-- Link to the person page once 1174 exists --}}
-                            <p class="mt-2 line-clamp-2 text-sm font-semibold text-gray-100">{{ $person['name'] }}</p>
-                            @if ($person['character'])
-                                <p class="line-clamp-2 text-xs text-gray-400">{{ $person['character'] }}</p>
-                            @endif
+                            <a href="{{ route('people.show', $person['id']) }}" class="group block rounded-xl focus-visible:ring-2 focus-visible:ring-cerulean focus-visible:outline-none">
+                                <x-avatar :name="$person['name']" :src="$person['photo_url']" size="xl" class="mx-auto transition group-hover:opacity-85" />
+                                <p class="mt-2 line-clamp-2 text-sm font-semibold text-gray-100 group-hover:text-white group-hover:underline">{{ $person['name'] }}</p>
+                                @if ($person['character'])
+                                    <p class="line-clamp-2 text-xs text-gray-400">{{ $person['character'] }}</p>
+                                @endif
+                            </a>
                         </li>
                     @endforeach
                 </ul>
