@@ -9,11 +9,24 @@
 
     @if ($this->isUnavailable('nights'))
         <x-service-unavailable :service="$unavailable['nights']" :retry="true" />
-    @elseif ($upcoming->isEmpty() && $past->isEmpty())
+    @elseif ($invitations->isEmpty() && $upcoming->isEmpty() && $past->isEmpty())
         <x-empty-state title="No movie nights yet" description="Plan one and invite your friends, or wait for an invitation.">
             <x-button :href="route('movie-nights.create')">Plan a movie night</x-button>
         </x-empty-state>
     @else
+        @if ($answerError)
+            <p role="alert" class="rounded-lg border border-neon-rose/40 bg-neon-rose/10 px-3 py-2 text-sm text-pink-100">{{ $answerError }}</p>
+        @endif
+
+        @if ($invitations->isNotEmpty())
+            <section aria-labelledby="invitations-title" class="space-y-3">
+                <h2 id="invitations-title" class="text-lg font-semibold text-white">Invitations</h2>
+                @foreach ($invitations as $night)
+                    @include('livewire.social.partials.invitation-row', ['night' => $night, 'host' => $hosts->get($night['host_id'])])
+                @endforeach
+            </section>
+        @endif
+
         <section aria-labelledby="upcoming-title" class="space-y-3">
             <h2 id="upcoming-title" class="text-lg font-semibold text-white">Upcoming</h2>
             @forelse ($upcoming as $night)

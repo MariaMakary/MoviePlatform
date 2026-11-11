@@ -2,6 +2,8 @@
 
 namespace App\Services\Clients;
 
+use MoviePlatform\Common\MovieNights\ParticipantStatus;
+
 class SocialClient extends BaseClient
 {
     protected string $service = 'social';
@@ -24,5 +26,10 @@ class SocialClient extends BaseClient
     public function inviteToMovieNight(string $id, array $userIds): array
     {
         return $this->post("/api/movie-nights/{$id}/invites", ['user_ids' => array_values($userIds)])['data'];
+    }
+
+    public function answerInvitation(string $id, ParticipantStatus $status): array
+    {
+        return $this->patch("/api/movie-nights/{$id}/rsvp", ['status' => $status->value])['data'];
     }
 }

@@ -85,6 +85,10 @@ resources/js/                  Echo (Reverb), Leaflet
   the picker and the rest of the form keeps working.
 - **Movie night statuses** are the shared enums `MoviePlatform\Common\MovieNights\MovieNightStatus` and
   `ParticipantStatus` (`tryFrom()` on Social's strings); `livewire.social.partials.status-badges` shows both.
+- **Answering an invitation:** `use AnswersInvitations` and call `answer(nightId, 'accepted' | 'declined')` from the
+  view. It calls Social's RSVP, puts Social's message in `$answerError` when it refuses (night no longer open…) or is
+  down, and on success flashes a toast and redirects to `afterAnswerUrl()`, which the component defines. Used by "My
+  movie nights" (pending invitations) and the night page (change of mind while the night is open).
 - **TMDB images:** build poster, backdrop and profile URLs with `App\Services\TmdbImage::url($path, 'w342')` (size
   from TMDB: `w185`, `w342`, `w780`, `original`…). Never build `image.tmdb.org` URLs by hand.
 
