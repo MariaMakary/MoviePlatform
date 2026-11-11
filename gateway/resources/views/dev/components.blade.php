@@ -60,6 +60,18 @@
         </section>
 
         <section class="space-y-4">
+            <h2 class="text-lg font-semibold text-white"><code>&lt;x-movie-row label="…" :more="'loadMore()'"&gt;</code> with <code>&lt;x-movie-row.item&gt;</code></h2>
+            <p class="text-sm text-gray-400">One sideways-scrolling row of movie cards: trackpad, swipe, and arrow buttons on desktop. <code>more</code> is a Livewire call (for example <code>"loadMore('popular')"</code>) run when the end of the row comes into view, with a loading card at the end; leave it <code>null</code> after the last page. <code>&lt;x-movie-row.item width="w-28"&gt;</code> changes the item width (default: a movie card). Used by the home page rows and the movie page's cast.</p>
+            <x-movie-row label="Example row">
+                @foreach (array_merge($movies, $movies) as $i => $movie)
+                    <x-movie-row.item wire:key="row-demo-{{ $i }}">
+                        <x-movie-card :movie="$movie" href="#" />
+                    </x-movie-row.item>
+                @endforeach
+            </x-movie-row>
+        </section>
+
+        <section class="space-y-4">
             <h2 class="text-lg font-semibold text-white"><code>&lt;x-rating-stars :value="3.5" size="sm|md|lg" /&gt;</code></h2>
             <div class="flex flex-wrap items-center gap-6">
                 <x-rating-stars :value="1" size="sm" />

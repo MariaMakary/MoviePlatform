@@ -8,7 +8,6 @@ use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Profile;
 use App\Livewire\Auth\Register;
 use App\Livewire\Auth\ResetPassword;
-use App\Livewire\Catalog\GenrePage;
 use App\Livewire\Catalog\MoviePage;
 use App\Livewire\Catalog\PersonPage;
 use App\Livewire\Catalog\Search;
@@ -29,8 +28,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', Home::class)->name('home');
 
 Route::get('/movies/{id}', MoviePage::class)->whereUuid('id')->name('movies.show');
-
-Route::get('/genres/{id}', GenrePage::class)->whereUuid('id')->name('genres.show');
 
 Route::get('/people/{id}', PersonPage::class)->whereUuid('id')->name('people.show');
 
