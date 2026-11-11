@@ -15,5 +15,8 @@ return [
     'handlers' => [
         'UserRegistered' => App\Integration\Handlers\UserRegisteredHandler::class,
         'UserFollowed' => App\Integration\Handlers\UserFollowedHandler::class,
+        'MovieNightInviteSent' => App\Integration\Handlers\MovieNightInviteSentHandler::class,
+        'MovieNightInviteAnswered' => App\Integration\Handlers\MovieNightInviteAnsweredHandler::class,
+        'MovieNightFinalized' => App\Integration\Handlers\MovieNightFinalizedHandler::class,
     ],
 ];
