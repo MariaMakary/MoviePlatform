@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Social;
 
+use App\Livewire\Concerns\AnswersInvitations;
 use App\Livewire\Concerns\PicksUsers;
 use App\Livewire\Concerns\WithServiceFallback;
 use App\Services\AuthSession;
@@ -11,9 +12,11 @@ use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 use MoviePlatform\Common\MovieNights\MovieNightStatus;
+use MoviePlatform\Common\MovieNights\ParticipantStatus;
 
 class MovieNightPage extends Component
 {
+    use AnswersInvitations;
     use PicksUsers;
     use WithServiceFallback;
 
@@ -50,18 +53,25 @@ class MovieNightPage extends Component
         $night = $this->fromService('night', fn () => $social->movieNight($this->id));
         $userId = $auth->user()['id'] ?? null;
 
-        $this->participantIds = array_column($night['participants'] ?? [], 'user_id');
+        $participants = collect($night['participants'] ?? []);
+        $this->participantIds = $participants->pluck('user_id')->all();
 
-        $host = $night === null ? null
-            : collect($this->fromService('host', fn () => $identity->users([$night['host_id']]), []))->first();
+        $people = $night === null ? collect()
+            : collect($this->fromService('people', fn () => $identity->users($this->participantIds), []))->keyBy('id');
+
+        $open = $night !== null && MovieNightStatus::tryFrom($night['status']) === MovieNightStatus::Open;
+        $hosting = $night !== null && $night['host_id'] === $userId;
 
         return view('livewire.social.movie-night-page', [
             'night' => $night,
-            'host' => $host,
+            'host' => $night === null ? null : $people->get($night['host_id']),
+            'people' => $people,
+            'participants' => $participants,
+            'counts' => $participants->countBy(fn (array $participant) => $participant['status']),
             'userId' => $userId,
-            'canInvite' => $night !== null
-                && $night['host_id'] === $userId
-                && MovieNightStatus::tryFrom($night['status']) === MovieNightStatus::Open,
+            'myStatus' => ParticipantStatus::tryFrom($night['my_status'] ?? ''),
+            'canInvite' => $open && $hosting,
+            'canAnswer' => $open && ! $hosting && $night['my_status'] !== null,
             'maxInvitees' => self::MAX_INVITEES,
         ])->title($night['title'] ?? 'Movie night');
     }
@@ -69,5 +79,10 @@ class MovieNightPage extends Component
     protected function excludedUserIds(): array
     {
         return $this->participantIds;
+    }
+
+    protected function afterAnswerUrl(string $nightId): string
+    {
+        return route('movie-nights.show', $this->id);
     }
 }

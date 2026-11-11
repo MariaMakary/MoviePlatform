@@ -6,6 +6,8 @@ class IdentityClient extends BaseClient
 {
     protected string $service = 'identity';
 
+    private const MAX_IDS = 100;
+
     public function register(array $data): array
     {
         return $this->post('/api/register', $data)['data'];
@@ -16,14 +18,16 @@ class IdentityClient extends BaseClient
         return $this->post('/api/login', ['email' => $email, 'password' => $password])['data'];
     }
 
-    /** Public profiles (id, name, avatar…) for up to 100 ids, from task 1145; unknown ids are skipped. */
+    /** Public profiles (id, name, avatar…) in batches of 100 ids, from task 1145; unknown ids are skipped. */
     public function users(array $ids): array
     {
-        if ($ids === []) {
-            return [];
+        $users = [];
+
+        foreach (array_chunk(array_values(array_unique($ids)), self::MAX_IDS) as $chunk) {
+            $users = [...$users, ...$this->get('/api/users', ['ids' => implode(',', $chunk)])['data']];
         }
 
-        return $this->get('/api/users', ['ids' => implode(',', array_values(array_unique($ids)))])['data'];
+        return $users;
     }
 
     public function searchUsers(string $query): array

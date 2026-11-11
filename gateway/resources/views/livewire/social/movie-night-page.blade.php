@@ -1,3 +1,5 @@
+@use('MoviePlatform\Common\MovieNights\ParticipantStatus')
+
 <div class="mx-auto max-w-3xl space-y-6">
     <a href="{{ route('movie-nights.index') }}" class="text-sm text-gray-400 hover:text-white hover:underline">&larr; My movie nights</a>
 
@@ -45,6 +47,34 @@
             @if ($night['description'])
                 <p class="text-sm whitespace-pre-line text-gray-200">{{ $night['description'] }}</p>
             @endif
+
+            @if ($canAnswer)
+                <div class="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4">
+                    <p class="text-sm text-gray-200">
+                        @if ($myStatus === ParticipantStatus::Accepted)
+                            You're going. Changed your mind?
+                        @elseif ($myStatus === ParticipantStatus::Declined)
+                            You declined. You can still join while the night is open.
+                        @else
+                            Are you coming?
+                        @endif
+                    </p>
+                    <div class="flex gap-2">
+                        @unless ($myStatus === ParticipantStatus::Accepted)
+                            <x-button size="sm" wire:click="answer('{{ $night['id'] }}', '{{ ParticipantStatus::Accepted->value }}')"
+                                      wire:loading.attr="disabled" wire:target="answer">Accept</x-button>
+                        @endunless
+                        @unless ($myStatus === ParticipantStatus::Declined)
+                            <x-button size="sm" variant="ghost" wire:click="answer('{{ $night['id'] }}', '{{ ParticipantStatus::Declined->value }}')"
+                                      wire:loading.attr="disabled" wire:target="answer">Decline</x-button>
+                        @endunless
+                    </div>
+                </div>
+            @endif
+
+            @if ($answerError)
+                <p role="alert" class="rounded-lg border border-neon-rose/40 bg-neon-rose/10 px-3 py-2 text-sm text-pink-100">{{ $answerError }}</p>
+            @endif
         </section>
 
         @if ($canInvite)
@@ -67,7 +97,7 @@
             </form>
         @endif
 
-        <x-reserved id="participants-section" title="Who's coming" subtitle="Everyone invited, with their answer." />   {{-- 1224 --}}
+        @include('livewire.social.partials.participants')
         <x-reserved id="shortlist-section" title="Shortlist and votes" subtitle="Pick the movie together." />          {{-- 1227 --}}
     @endif
 </div>
