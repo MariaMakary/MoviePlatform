@@ -25,6 +25,8 @@
         'showReleaseDate' => false,
     ])
 
+    <livewire:catalog.genre-browser lazy />
+
     <x-reserved id="weather-row" title="For today's weather" subtitle="Movies that fit the weather outside." />
 
     @include('livewire.home.movie-section', [

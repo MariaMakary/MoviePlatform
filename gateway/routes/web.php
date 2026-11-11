@@ -8,7 +8,9 @@ use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Profile;
 use App\Livewire\Auth\Register;
 use App\Livewire\Auth\ResetPassword;
+use App\Livewire\Catalog\GenrePage;
 use App\Livewire\Catalog\MoviePage;
+use App\Livewire\Catalog\PersonPage;
 use App\Livewire\Catalog\Search;
 use App\Livewire\Dev\ServiceStatus;
 use App\Livewire\Engagement\History;
@@ -28,6 +30,10 @@ Route::get('/', Home::class)->name('home');
 
 Route::get('/movies/{id}', MoviePage::class)->whereUuid('id')->name('movies.show');
 
+Route::get('/genres/{id}', GenrePage::class)->whereUuid('id')->name('genres.show');
+
+Route::get('/people/{id}', PersonPage::class)->whereUuid('id')->name('people.show');
+
 Route::get('/search', Search::class)->name('search');
 
 Route::get('/cinemas',CinemaMap::class)->name('cinemas');
@@ -35,7 +41,7 @@ Route::get('/cinemas',CinemaMap::class)->name('cinemas');
 Route::get('/notifications', Notifications::class)->middleware('auth.jwt')->name('notifications');
 
 Route::get('/profile', Profile::class)->middleware('auth.jwt')->name('profile');
-Route::get('/genres', FavoriteGenres::class)->middleware('auth.jwt')->name('genres');
+Route::get('/profile/genres', FavoriteGenres::class)->middleware('auth.jwt')->name('profile.genres');
 
 Route::get('/watchlist', Watchlist::class)->middleware('auth.jwt')->name('watchlist');
 Route::get('/history', History::class)->middleware('auth.jwt')->name('history');
