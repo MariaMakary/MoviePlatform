@@ -19,7 +19,12 @@ Payloads and rules: `docs/events.md`.
   notifications with its cases (`NotificationType::Welcome`), never with strings. A new kind of notification needs a
   new case **and** a new migration that replaces the `notifications_type_check` CHECK (`docs/database.md`).
 - Handlers live in `app/Integration/Handlers` (one per event, listed in `config/events.php`) and create notifications
-  only through `NotificationService::notify()`. Example: `UserRegisteredHandler` (welcome).
+  only through `NotificationService::notify()`. Example: `UserRegisteredHandler` (welcome). The movie night handlers put
+  `{movie_night_id}` in `data` so the Gateway links to the night; `MovieNightFinalizedHandler` creates one notification
+  per id in `participant_ids` (never the host).
+- A date inside a notification's text (the invite's `scheduled_at`) is shown in `APP_DISPLAY_TIMEZONE`
+  (`config/notifications.php`, default Asia/Beirut, the same as the Gateway) with the Gateway's `x-date` format
+  `j M Y, H:i`. The text is stored once, so the time zone is chosen here, not by the reader.
 
 ## Before coding
 
