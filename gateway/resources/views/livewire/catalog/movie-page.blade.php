@@ -52,7 +52,7 @@
                         <ul class="flex flex-wrap gap-2" aria-label="Genres">
                             @foreach ($movie['genres'] as $genre)
                                 <li>
-                                    <a href="{{ route('genres.show', $genre['id']) }}"
+                                    <a href="{{ route('search', ['genre' => $genre['id']]) }}"
                                        class="inline-flex rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium text-gray-200 transition hover:border-cerulean/60 hover:text-white">{{ $genre['name'] }}</a>
                                 </li>
                             @endforeach
@@ -103,9 +103,9 @@
         @if ($movie['cast'] !== [])
             <section aria-labelledby="cast-title" class="space-y-4">
                 <h2 id="cast-title" class="text-xl font-bold text-white">Cast</h2>
-                <ul class="-mx-4 flex snap-x gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
+                <x-movie-row label="Cast">
                     @foreach ($movie['cast'] as $person)
-                        <li wire:key="cast-{{ $person['id'] }}" class="w-28 shrink-0 snap-start text-center">
+                        <x-movie-row.item wire:key="cast-{{ $person['id'] }}" width="w-28" class="text-center">
                             <a href="{{ route('people.show', $person['id']) }}" class="group block rounded-xl focus-visible:ring-2 focus-visible:ring-cerulean focus-visible:outline-none">
                                 <x-avatar :name="$person['name']" :src="$person['photo_url']" size="xl" class="mx-auto transition group-hover:opacity-85" />
                                 <p class="mt-2 line-clamp-2 text-sm font-semibold text-gray-100 group-hover:text-white group-hover:underline">{{ $person['name'] }}</p>
@@ -113,9 +113,9 @@
                                     <p class="line-clamp-2 text-xs text-gray-400">{{ $person['character'] }}</p>
                                 @endif
                             </a>
-                        </li>
+                        </x-movie-row.item>
                     @endforeach
-                </ul>
+                </x-movie-row>
             </section>
         @endif
 

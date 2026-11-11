@@ -9,9 +9,11 @@
     @elseif ($movies[$section] === [] && ! $this->hasMore($section))
         <x-empty-state title="No movies to show yet" description="Come back a bit later." />
     @else
-        <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+        @php($more = $this->hasMore($section) && ! $this->isUnavailable($section) ? "loadMore('{$section}')" : null)
+
+        <x-movie-row :label="$title" :more="$more">
             @foreach ($movies[$section] as $movie)
-                <div wire:key="{{ $section }}-{{ $movie['id'] }}" class="relative">
+                <x-movie-row.item wire:key="{{ $section }}-{{ $movie['id'] }}" class="relative">
                     <x-movie-card :movie="$movie" :href="route('movies.show', $movie['id'])" :show-release-date="$showReleaseDate" />
 
                     {{-- Logged in: only once its state is known (Engagement may be down, see the notice above) --}}
@@ -21,20 +23,16 @@
                                                                   :key="'watchlist-'.$section.'-'.$movie['id']" />
                         </div>
                     @endif
-                </div>
+                </x-movie-row.item>
             @endforeach
-        </div>
+        </x-movie-row>
 
         @if ($this->isUnavailable($section))
-            <x-service-unavailable :service="$unavailable[$section]" />
-        @endif
-
-        @if ($this->hasMore($section))
-            <div class="flex justify-center">
-                <x-button variant="ghost" wire:click="loadMore('{{ $section }}')" wire:loading.attr="disabled" wire:target="loadMore('{{ $section }}')">
-                    <span wire:loading.remove wire:target="loadMore('{{ $section }}')">Load more</span>
-                    <span wire:loading wire:target="loadMore('{{ $section }}')">Loading…</span>
-                </x-button>
+            <div class="flex flex-wrap items-center gap-3">
+                <x-service-unavailable :service="$unavailable[$section]" compact />
+                @if ($this->hasMore($section))
+                    <x-button variant="ghost" size="sm" wire:click="loadMore('{{ $section }}')" wire:loading.attr="disabled" wire:target="loadMore('{{ $section }}')">Try again</x-button>
+                @endif
             </div>
         @endif
     @endif
