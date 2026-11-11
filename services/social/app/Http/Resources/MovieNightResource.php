@@ -2,8 +2,8 @@
 
 namespace App\Http\Resources;
 
-use App\Enums\ParticipantStatus;
 use Illuminate\Http\Resources\Json\JsonResource;
+use MoviePlatform\Common\MovieNights\ParticipantStatus;
 
 class MovieNightResource extends JsonResource
 {

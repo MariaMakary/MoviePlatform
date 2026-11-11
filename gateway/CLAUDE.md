@@ -78,6 +78,13 @@ resources/js/                  Echo (Reverb), Leaflet
 - **Dates:** services send UTC. Show them with `<x-date :value="$movieNight['scheduled_at']" />` (optional `format`),
   which uses `APP_DISPLAY_TIMEZONE` (Asia/Beirut). Convert a date typed in a form back with
   `App\Services\DisplayTime::toService($input)` before sending it to a service. Never format service dates by hand.
+- **Picking people** (invites): `use PicksUsers` (`App\Livewire\Concerns`, with `WithServiceFallback`) and
+  `@include('livewire.social.partials.user-picker')` with `$maxInvitees`. It searches Identity (`GET /api/users/search`,
+  from 2 letters, debounced) and keeps the chosen users in `$invitees`; read their ids with `inviteeIds()`. Override
+  `excludedUserIds()` to hide people already in (default: the logged-in user). Identity down shows a one-line notice in
+  the picker and the rest of the form keeps working.
+- **Movie night statuses** are the shared enums `MoviePlatform\Common\MovieNights\MovieNightStatus` and
+  `ParticipantStatus` (`tryFrom()` on Social's strings); `livewire.social.partials.status-badges` shows both.
 - **TMDB images:** build poster, backdrop and profile URLs with `App\Services\TmdbImage::url($path, 'w342')` (size
   from TMDB: `w185`, `w342`, `w780`, `original`…). Never build `image.tmdb.org` URLs by hand.
 

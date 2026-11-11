@@ -2,8 +2,8 @@
 
 namespace App\Integration\Events;
 
-use App\Enums\ParticipantStatus;
 use App\Models\MovieNight;
+use MoviePlatform\Common\MovieNights\ParticipantStatus;
 
 final class MovieNightInviteAnswered
 {

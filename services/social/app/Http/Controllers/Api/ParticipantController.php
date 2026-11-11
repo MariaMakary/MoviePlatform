@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Enums\ParticipantStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\InviteRequest;
 use App\Http\Requests\RsvpRequest;
@@ -11,6 +10,7 @@ use App\Services\MovieNightService;
 use App\Services\ParticipantService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use MoviePlatform\Common\MovieNights\ParticipantStatus;
 
 class ParticipantController extends Controller
 {

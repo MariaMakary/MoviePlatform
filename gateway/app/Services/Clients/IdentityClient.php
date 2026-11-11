@@ -26,6 +26,11 @@ class IdentityClient extends BaseClient
         return $this->get('/api/users', ['ids' => implode(',', array_values(array_unique($ids)))])['data'];
     }
 
+    public function searchUsers(string $query): array
+    {
+        return $this->get('/api/users/search', ['q' => $query])['data'];
+    }
+
     public function refresh(): array
     {
         return $this->post('/api/token/refresh')['data'];
