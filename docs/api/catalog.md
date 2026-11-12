@@ -188,6 +188,42 @@ TMDB's.
 
 **Errors:** `422` invalid `page` · `503` `"TMDB is unavailable."` (TMDB down and the page not cached)
 
+## Internal
+
+For other services only: the `service` middleware refuses every call without the right `X-Service-Token`
+(`docs/api/conventions.md`). Call them with `MoviePlatform\Common\Integration\InternalClient`.
+
+### GET /api/internal/discover
+
+The most popular **local** movies in some genres, as movie cards. TMDB is not called. Used by Intelligence's weather
+suggestions.
+
+**Who:** service (`X-Service-Token`)
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `genres` | string | query, required, comma-separated genre names as in `GET /api/genres` (e.g. `Drama,Romance`), at most 10; a movie in any of them matches |
+| `exclude_ids` | string | query, optional, comma-separated Catalog movie ids to leave out, at most 100 |
+| `limit` | integer | query, optional, default 10, 1–50 |
+
+`GET /api/internal/discover?genres=Comedy,Adventure&limit=10`
+
+**Response** `200`, sorted by popularity, highest first; a movie in several of the genres appears once. Unknown genre
+names match nothing.
+
+```json
+{
+  "data": [
+    {"id": "0193a7c1-3333-7aaa-8bbb-000000000100", "title": "Project Hail Mary", "poster_url": "https://image.tmdb.org/t/p/w342/abc.jpg", "year": 2026, "release_date": "2026-03-20", "vote_average": 7.9, "genres": ["Adventure", "Science Fiction"]}
+  ]
+}
+```
+
+**Errors:** `401` no or wrong service token · `422` `genres` missing, too many, an `exclude_ids` entry that is not a
+UUID, or `limit` out of range
+
 ## Genres
 
 ### GET /api/genres

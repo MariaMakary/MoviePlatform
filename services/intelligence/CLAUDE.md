@@ -16,7 +16,7 @@ Payloads and rules: `docs/events.md`.
 - External APIs only through Clients in `app/Integration/Clients`: Azure AI Language (`secret('azure_language_key')`) for sentiment, Open-Meteo and OpenStreetMap Nominatim for weather (no key), cached in Redis.
 - `WeatherClient::current($lat, $lon)` returns `['icon_code' => int, 'phrase' => string, 'temp' => float, 'city' => ?string]`.
   The weather comes from Open-Meteo (`/v1/forecast?current=temperature_2m,weather_code`, °C): `icon_code` is the WMO
-  weather code and `phrase` its English text from the `WeatherCondition` enum. Open-Meteo has no city name, so the city
+  weather code and `phrase` its English text from the `WeatherCode` enum. Open-Meteo has no city name, so the city
   comes from Nominatim reverse geocoding (`city`, else `town`, `village` or `municipality`, in English; `null` when
   there is none). Coordinates are rounded to 2 decimals (about 1 km): the weather is cached in Redis for 30 minutes
   and the city for 7 days under those rounded coordinates, so nearby users share one call. Nominatim allows one
@@ -26,6 +26,12 @@ Payloads and rules: `docs/events.md`.
   subscriptions only allow a few regions and none of them offers Azure Maps; OpenWeatherMap was dropped to avoid
   another key. Redis comes from `illuminate/redis` + `predis/predis` (`CACHE_DRIVER=redis` in `.env`); tests use the
   `array` cache (`phpunit.xml`).
+- `GET /api/suggestions/weather` (`WeatherSuggestionService`): `WeatherCondition::fromCode()` sorts the WMO code into
+  `clear`, `clouds`, `rain`, `storm` or `snow` (an unknown code counts as `clouds`), `genres()` gives that condition's
+  genres, and `CatalogClient::discover()` asks Catalog's `GET /api/internal/discover` for 10 movies through
+  `InternalClient` (`packages/common`, `CATALOG_URL`). The task was written for Azure Maps icon codes; the same five
+  conditions are mapped from WMO codes instead. Weather down → `WeatherUnavailable`, Catalog down →
+  `ServiceUnavailable`: both answer 503.
 - `SentimentClient::analyze($text)` returns `['label' => SentimentLabel, 'score' => float]`: the highest of Azure's three
   confidence scores, so Azure's `mixed` answer never reaches us. The team shares one free F0 resource
   (`kaia-language`, UAE North): 5,000 texts a month, one text = up to 1,000 characters, so reviews are cut at 1,000

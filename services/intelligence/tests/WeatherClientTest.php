@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use App\Enums\WeatherCondition;
+use App\Enums\WeatherCode;
 use App\Integration\Clients\WeatherClient;
 use App\Integration\Clients\WeatherUnavailable;
 use Illuminate\Http\Client\ConnectionException;
@@ -139,7 +139,7 @@ class WeatherClientTest extends TestCase
 
     public function test_every_weather_code_has_a_phrase(): void
     {
-        foreach (WeatherCondition::cases() as $condition) {
+        foreach (WeatherCode::cases() as $condition) {
             $this->assertNotSame('', $condition->phrase());
         }
 

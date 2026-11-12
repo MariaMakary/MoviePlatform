@@ -103,6 +103,17 @@ class MovieService
             ->paginate(self::PER_PAGE, ['*'], 'page', $page);
     }
 
+    public function discover(array $genreNames, array $excludeIds, int $limit): Collection
+    {
+        return Movie::with('genres')
+            ->whereHas('genres', fn (Builder $genres) => $genres->whereIn('genres.name', $genreNames))
+            ->when($excludeIds !== [], fn (Builder $query) => $query->whereNotIn('id', $excludeIds))
+            ->orderByDesc('popularity')
+            ->orderBy('id')
+            ->limit($limit)
+            ->get();
+    }
+
     private function matching(array $filters): Builder
     {
         return Movie::query()
