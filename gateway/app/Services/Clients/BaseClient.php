@@ -29,7 +29,7 @@ abstract class BaseClient
 
     public function health(): ?array
     {
-        return $this->send('GET', '/api/health', [], retry: false, accept: [503]);
+        return $this->send('GET', '/api/health', [], retry: false, accept: [503], skipIfDown: false);
     }
 
     protected function get(string $path, array $query = []): ?array
@@ -70,16 +70,20 @@ abstract class BaseClient
         return $this->respond('POST', $path, ['json' => $data])->body();
     }
 
-    private function send(string $method, string $path, array $options, bool $retry = false, array $accept = [], bool $multipart = false): ?array
+    private function send(string $method, string $path, array $options, bool $retry = false, array $accept = [], bool $multipart = false, bool $skipIfDown = true): ?array
     {
-        $response = $this->respond($method, $path, $options, $retry, $accept, $multipart);
+        $response = $this->respond($method, $path, $options, $retry, $accept, $multipart, $skipIfDown);
 
         return $response->status() === 204 ? null : $response->json();
     }
 
     /** Sends the request and returns a successful (or accepted) response; throws for everything else. */
-    private function respond(string $method, string $path, array $options, bool $retry = false, array $accept = [], bool $multipart = false): Response
+    private function respond(string $method, string $path, array $options, bool $retry = false, array $accept = [], bool $multipart = false, bool $skipIfDown = true): Response
     {
+        if ($skipIfDown && $this->outages()->isDown($this->service)) {
+            throw new ServiceUnavailable($this->name());
+        }
+
         try {
             $response = $this->request($retry, $multipart)->send($method, $path, $options);
         } catch (ConnectionException $e) {
@@ -127,14 +131,21 @@ abstract class BaseClient
 
     private function unavailable(string $method, string $path, ?Throwable $previous, ?int $status = null): ServiceUnavailable
     {
-        Log::warning("{$this->name()} service unavailable", [
-            'method' => $method,
-            'path' => $path,
-            'status' => $status,
-            'error' => $previous?->getMessage(),
-        ]);
+        if ($this->outages()->markDown($this->service)) {
+            Log::warning("{$this->name()} service unavailable", [
+                'method' => $method,
+                'path' => $path,
+                'status' => $status,
+                'error' => $previous?->getMessage(),
+            ]);
+        }
 
         return new ServiceUnavailable($this->name(), $previous);
+    }
+
+    private function outages(): ServiceOutages
+    {
+        return app(ServiceOutages::class);
     }
 
     private function name(): string
