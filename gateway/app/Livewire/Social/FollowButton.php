@@ -15,6 +15,7 @@ use Livewire\Component;
 
 /**
  * Follow / Unfollow for one user. Hidden on the user's own profile; a guest is sent to log in.
+ * Lists pass `following` from one bulk call; the button calls follow-stats itself only when nothing was passed.
  * Dispatches `follow-changed` (userId, following) so the counts on the page update.
  */
 class FollowButton extends Component

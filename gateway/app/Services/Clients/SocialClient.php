@@ -60,4 +60,15 @@ class SocialClient extends BaseClient
     {
         return $this->get('/api/users/'.rawurlencode($userId).'/follow-stats')['data'];
     }
+
+    /**
+     * Whether the current user follows each id (max 100), in the same order.
+     *
+     * @param  string[]  $userIds
+     * @return list<array{user_id: string, is_following: bool}>
+     */
+    public function followStatus(array $userIds): array
+    {
+        return $this->get('/api/follow/status', ['ids' => implode(',', $userIds)])['data'];
+    }
 }

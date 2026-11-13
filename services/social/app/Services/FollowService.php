@@ -66,4 +66,24 @@ class FollowService
                 : Follow::followedBy($viewerId)->where('following_id', $userId)->exists(),
         ];
     }
+
+    /**
+     * Whether $viewerId follows each of $userIds, in the order given, with one query.
+     *
+     * @param  string[]  $userIds
+     * @return list<array{user_id: string, is_following: bool}>
+     */
+    public function statuses(string $viewerId, array $userIds): array
+    {
+        $followed = Follow::followedBy($viewerId)
+            ->whereIn('following_id', array_unique($userIds))
+            ->pluck('following_id')
+            ->map(fn (string $id) => strtolower($id))
+            ->flip();
+
+        return array_map(fn (string $id) => [
+            'user_id' => $id,
+            'is_following' => $followed->has(strtolower($id)),
+        ], $userIds);
+    }
 }

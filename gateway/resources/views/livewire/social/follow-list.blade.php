@@ -32,9 +32,13 @@
     @elseif ($users === [])
         <x-empty-state :title="$type === 'following' ? 'Not following anyone yet' : 'No followers yet'" />
     @else
+        @if ($this->isUnavailable('follow'))
+            <x-service-unavailable :service="$unavailable['follow']" :retry="true" compact />
+        @endif
+
         <ul class="divide-y divide-white/10">
             @foreach ($users as $user)
-                @include('livewire.social.partials.user-row', ['user' => $user])
+                @include('livewire.social.partials.user-row', ['user' => $user, 'following' => $following])
             @endforeach
         </ul>
 

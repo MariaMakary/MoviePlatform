@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Social;
 
+use App\Livewire\Concerns\LoadsFollowStatus;
 use App\Livewire\Concerns\WithServiceFallback;
 use App\Services\Clients\IdentityClient;
 use App\Services\Clients\SocialClient;
@@ -13,6 +14,7 @@ use Livewire\Component;
 /** /users/{id}/followers and /users/{id}/following: one Social page of ids, then one Identity call for the names. */
 class FollowList extends Component
 {
+    use LoadsFollowStatus;
     use WithServiceFallback;
 
     private const PER_PAGE = 20;
@@ -57,6 +59,7 @@ class FollowList extends Component
         return view('livewire.social.follow-list', [
             'owner' => $owner,
             'users' => $users,
+            'following' => $this->followStatus($users),
             'lastPage' => $result['meta']['last_page'] ?? 1,
         ])->title($this->type === 'following' ? "People {$name} follows" : "{$name}'s followers");
     }

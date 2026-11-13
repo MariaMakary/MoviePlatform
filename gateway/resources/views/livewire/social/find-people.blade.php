@@ -14,9 +14,13 @@
     @elseif ($users === [])
         <x-empty-state title="Nobody found" description="Try another part of the name." />
     @else
+        @if ($this->isUnavailable('follow'))
+            <x-service-unavailable :service="$unavailable['follow']" :retry="true" compact />
+        @endif
+
         <ul class="divide-y divide-white/10" wire:loading.class="opacity-60">
             @foreach ($users as $user)
-                @include('livewire.social.partials.user-row', ['user' => $user])
+                @include('livewire.social.partials.user-row', ['user' => $user, 'following' => $following])
             @endforeach
         </ul>
     @endif

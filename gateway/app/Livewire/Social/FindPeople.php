@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Social;
 
+use App\Livewire\Concerns\LoadsFollowStatus;
 use App\Livewire\Concerns\WithServiceFallback;
 use App\Services\Clients\IdentityClient;
 use Illuminate\Contracts\View\View;
@@ -12,6 +13,7 @@ use Livewire\Component;
 #[Title('Find people')]
 class FindPeople extends Component
 {
+    use LoadsFollowStatus;
     use WithServiceFallback;
 
     #[Url(except: '')]
@@ -22,9 +24,12 @@ class FindPeople extends Component
         $query = mb_substr(trim($this->q), 0, 100);
         $searching = mb_strlen($query) >= 2;
 
+        $users = $searching ? $this->fromService('identity', fn () => $identity->searchUsers($query), []) : [];
+
         return view('livewire.social.find-people', [
             'searching' => $searching,
-            'users' => $searching ? $this->fromService('identity', fn () => $identity->searchUsers($query), []) : [],
+            'users' => $users,
+            'following' => $this->followStatus($users),
         ]);
     }
 }
