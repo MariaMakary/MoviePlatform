@@ -104,6 +104,19 @@ open. A movie added by an admin (no `tmdb_id`) is never synced, and an admin's e
 
 **Errors:** `404` `"Movie not found."` (unknown id, or not a UUID)
 
+### GET /api/movies/{id}/similar
+
+Up to **12** movies TMDB finds similar to this one, as movie cards with their Catalog ids, in TMDB's order (the movie
+itself is never in the list). New movies are created from the list data as in popular. TMDB's answer is cached for
+**2 hours**. A movie added by an admin (no `tmdb_id`), or one TMDB no longer knows, gives an empty list. Not paginated.
+
+**Who:** guest
+
+**Response** `200`: `{"data": [movie card, …]}`
+
+**Errors:** `404` `"Movie not found."` (unknown id, or not a UUID) · `503` `"TMDB is unavailable."` (TMDB down and the
+list not cached)
+
 ### GET /api/movies/popular
 
 TMDB's popular movies, 20 per page, as movie cards with their **Catalog** ids. Every movie on the page is made sure to
