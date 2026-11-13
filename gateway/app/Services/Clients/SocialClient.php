@@ -71,4 +71,10 @@ class SocialClient extends BaseClient
     {
         return $this->get('/api/follow/status', ['ids' => implode(',', $userIds)])['data'];
     }
+
+    /** `{user_id, show_reviews, show_ratings, show_lists, show_history}`; all true for a user who never saved. */
+    public function userPrivacy(string $userId): array
+    {
+        return $this->get('/api/users/'.rawurlencode($userId).'/privacy')['data'];
+    }
 }

@@ -3,7 +3,7 @@
 <li class="flex items-center gap-4 py-4">
     <x-avatar :name="$user['name']" :src="$user['avatar']" />
     <div class="min-w-0 flex-1">
-        <p class="truncate font-semibold text-white">{{ $user['name'] }}</p>
+        <a href="{{ route('users.show', $user['id']) }}" class="block truncate font-semibold text-white hover:underline">{{ $user['name'] }}</a>
         @if ($user['bio'])
             <p class="truncate text-sm text-gray-400">{{ $user['bio'] }}</p>
         @endif
