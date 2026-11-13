@@ -87,7 +87,7 @@ Counts for a profile, and whether the current user follows `id`.
 
 **Errors:** `422` `id` is not a UUID
 
-### GET /api/follow/status?ids={id},{id},…
+### GET /api/follow/status?ids={id},{id},â€¦
 
 Whether the current user follows each of the given users, in one query. Lets a page of people (followers list, people
 search) load every Follow button with one call instead of one `follow-stats` call per row.
@@ -102,7 +102,7 @@ search) load every Follow button with one call instead of one `follow-stats` cal
 {"data": [{"user_id": "0193a7c0-2222-7aaa-8bbb-000000000002", "is_following": true}, {"user_id": "0193a7c0-3333-7aaa-8bbb-000000000003", "is_following": false}]}
 ```
 
-**Errors:** `401` no or invalid token · `422` `ids` missing, more than 100, or one is not a UUID
+**Errors:** `401` no or invalid token Â· `422` `ids` missing, more than 100, or one is not a UUID
 
 ## Privacy
 
