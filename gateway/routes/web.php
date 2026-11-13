@@ -23,6 +23,7 @@ use App\Livewire\Notifications\Index as Notifications;
 use App\Livewire\Social\CreateMovieNight;
 use App\Livewire\Social\MovieNightPage;
 use App\Livewire\Social\MovieNights;
+use App\Livewire\Social\PrivacySettings;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', Home::class)->name('home');
@@ -38,6 +39,7 @@ Route::get('/cinemas',CinemaMap::class)->name('cinemas');
 Route::get('/notifications', Notifications::class)->middleware('auth.jwt')->name('notifications');
 
 Route::get('/profile', Profile::class)->middleware('auth.jwt')->name('profile');
+Route::get('/settings/privacy', PrivacySettings::class)->middleware('auth.jwt')->name('settings.privacy');
 Route::get('/profile/genres', FavoriteGenres::class)->middleware('auth.jwt')->name('profile.genres');
 
 Route::get('/watchlist', Watchlist::class)->middleware('auth.jwt')->name('watchlist');
