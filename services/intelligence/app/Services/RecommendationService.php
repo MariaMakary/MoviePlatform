@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Integration\Clients\CatalogClient;
+use App\Integration\Clients\CatalogUnavailable;
 use App\Models\Recommendation;
 use App\Models\UserTasteProfile;
 use Illuminate\Support\Carbon;
@@ -49,6 +50,23 @@ class RecommendationService
 
     public function __construct(private CatalogClient $catalog) {}
 
+    /**
+     * What GET /api/recommendations returns: the stored picks, recomputed first when they are older than an hour.
+     * If Catalog is down while recomputing, the stored picks are returned as they are.
+     */
+    public function forUser(string $userId): Collection
+    {
+        if (! $this->isStale($userId)) {
+            return $this->stored($userId);
+        }
+
+        try {
+            return $this->recompute($userId);
+        } catch (CatalogUnavailable) {
+            return $this->stored($userId);
+        }
+    }
+
     /** The user's stored recommendations, best first. */
     public function stored(string $userId): Collection
     {
@@ -66,7 +84,7 @@ class RecommendationService
     /**
      * Scores, saves and returns the user's best 20. A user without a taste profile gets none.
      *
-     * @throws \App\Integration\Clients\CatalogUnavailable (the stored results are then left as they were)
+     * @throws CatalogUnavailable (the stored results are then left as they were)
      */
     public function recompute(string $userId): Collection
     {
