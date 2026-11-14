@@ -88,6 +88,12 @@ class EngagementClient extends BaseClient
         return $this->get('/api/lists', array_filter(['page' => $page, 'per_page' => $perPage, 'movie_id' => $movieId]));
     }
 
+    /** A user's public lists, newest first, for their profile. */
+    public function userLists(string $userId, int $page = 1, int $perPage = 20): array
+    {
+        return $this->get('/api/users/'.rawurlencode($userId).'/lists', ['page' => $page, 'per_page' => $perPage]);
+    }
+
     public function list(string $listId): array
     {
         return $this->get('/api/lists/'.rawurlencode($listId))['data'];
