@@ -7,6 +7,7 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use MoviePlatform\Common\CommonServiceProvider;
+use MoviePlatform\Common\Exceptions\InternalRequestFailed;
 use MoviePlatform\Common\Exceptions\JsonExceptionRenderer;
 use MoviePlatform\Common\Exceptions\ServiceUnavailable;
 use MoviePlatform\Common\Integration\InternalClient;
@@ -108,18 +109,54 @@ class InternalClientTest extends TestCase
         $this->assertSame(1, $attempts);
     }
 
-    public function test_an_error_answer_is_not_retried_and_throws(): void
+    public function test_a_server_error_is_not_retried_and_throws_service_unavailable(): void
     {
         $status = 0;
         Http::fake(function () use (&$status) {
             return Http::response(['message' => 'x'], $status);
         });
 
-        foreach ([500, 503, 401, 404, 422] as $status) {
+        foreach ([500, 503] as $status) {
             $this->assertUnavailable(fn () => InternalClient::to('catalog')->get('/api/internal/discover'));
         }
 
-        Http::assertSentCount(5);
+        Http::assertSentCount(2);
+    }
+
+    public function test_a_404_returns_null(): void
+    {
+        Http::fake(['catalog.test/*' => Http::response(['message' => 'Movie not found.'], 404)]);
+
+        $this->assertNull(InternalClient::to('catalog')->get('/api/internal/movies/x/features'));
+        Http::assertSentCount(1);
+    }
+
+    public function test_another_client_error_throws_internal_request_failed_with_the_status(): void
+    {
+        $status = 0;
+        Http::fake(function () use (&$status) {
+            return Http::response(['message' => 'The ids field is required.'], $status);
+        });
+
+        foreach ([401, 403, 422] as $status) {
+            try {
+                InternalClient::to('catalog')->get('/api/internal/movies');
+                $this->fail("Status {$status} should throw.");
+            } catch (InternalRequestFailed $e) {
+                $this->assertSame('catalog', $e->service);
+                $this->assertSame($status, $e->status);
+                $this->assertStringContainsString('The ids field is required.', $e->getMessage());
+            }
+        }
+
+        Http::assertSentCount(3);
+    }
+
+    public function test_internal_request_failed_renders_as_500(): void
+    {
+        $response = (new JsonExceptionRenderer())->render(request(), new InternalRequestFailed('catalog', 422, 'x'));
+
+        $this->assertSame(500, $response->getStatusCode());
     }
 
     public function test_a_service_without_a_url_throws_without_calling(): void

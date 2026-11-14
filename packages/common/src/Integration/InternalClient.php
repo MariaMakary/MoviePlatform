@@ -7,6 +7,7 @@ use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use MoviePlatform\Common\Exceptions\InternalRequestFailed;
 use MoviePlatform\Common\Exceptions\ServiceUnavailable;
 use Throwable;
 
@@ -39,6 +40,14 @@ class InternalClient
             $response = $this->request($retry)->send($method, $path, $options);
         } catch (ConnectionException $e) {
             throw $this->unavailable($method, $path, null, $e);
+        }
+
+        if ($response->status() === 404) {
+            return null;
+        }
+
+        if ($response->clientError()) {
+            throw $this->refused($method, $path, $response);
         }
 
         if (! $response->successful()) {
@@ -79,5 +88,19 @@ class InternalClient
         ]);
 
         return new ServiceUnavailable($this->service, $previous);
+    }
+
+    private function refused(string $method, string $path, Response $response): InternalRequestFailed
+    {
+        $message = is_string($response->json('message')) ? $response->json('message') : 'Request refused.';
+
+        Log::warning("Internal call to {$this->service} was refused", [
+            'method' => $method,
+            'path' => $path,
+            'status' => $response->status(),
+            'error' => $message,
+        ]);
+
+        return new InternalRequestFailed($this->service, $response->status(), $message);
     }
 }

@@ -15,6 +15,8 @@ return [
 
     'handlers' => [
         'RatingAdded' => App\Integration\Handlers\RatingAddedHandler::class,
+        'MovieWatched' => App\Integration\Handlers\MovieWatchedHandler::class,
+        'UserGenresUpdated' => App\Integration\Handlers\UserGenresUpdatedHandler::class,
         'ReviewCreated' => App\Integration\Handlers\AnalyzeReviewHandler::class,
         'ReviewUpdated' => App\Integration\Handlers\AnalyzeReviewHandler::class,
     ],
