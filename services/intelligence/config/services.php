@@ -8,9 +8,12 @@ return [
         'timeout' => 10,
     ],
 
-    // Catalog's /api/internal/* routes, called with the service token (config/internal.php from packages/common).
-    'catalog' => [
-        'url' => env('CATALOG_URL', 'http://127.0.0.1:8002'),
+    'weather' => [
+        'open_meteo_url' => env('OPEN_METEO_URL', 'https://api.open-meteo.com/v1'),
+        'nominatim_url' => env('NOMINATIM_URL', 'https://nominatim.openstreetmap.org'),
+        'user_agent' => 'KAIA-MoviePlatform/1.0 (Antonine University student project)',
         'timeout' => 5,
+        'weather_minutes' => 30,
+        'city_days' => 7,
     ],
 ];

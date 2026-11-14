@@ -31,6 +31,11 @@ class MovieController extends Controller
         return (new MovieDetailResource($this->movies->find($id)))->response();
     }
 
+    public function similar(string $id): JsonResponse
+    {
+        return MovieCardResource::collection($this->movies->similar($id))->response();
+    }
+
     public function popular(Request $request): JsonResponse
     {
         $data = $this->validate($request, MoviePageRequest::rules());

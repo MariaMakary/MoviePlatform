@@ -104,3 +104,48 @@ Azure texts.
 **Errors:** `401` no or invalid token · `403` not an admin · `422` invalid `text` · `503`
 `"Azure AI Language is unavailable."` (timeout, bad key, free limit used up, refused text) or a message saying the key
 or endpoint is not set up
+
+## Suggestions
+
+### GET /api/suggestions/weather
+
+Movies that fit the weather at a place, for the homepage's weather row. Intelligence gets the current weather
+(Open-Meteo, the city from OpenStreetMap Nominatim, cached in Redis for 30 minutes per ~1 km), sorts it into one of five
+conditions, and asks Catalog's internal discover for the 10 most popular local movies in that condition's genres.
+
+| Condition | Weather (WMO codes) | Genres |
+|---|---|---|
+| `clear` | clear, mainly clear, partly cloudy (0–2) | Comedy, Adventure |
+| `clouds` | overcast, fog (3, 45, 48) and any unknown code | Mystery, Thriller |
+| `rain` | drizzle, rain, freezing rain, showers (51–67, 80–82) | Drama, Romance |
+| `storm` | thunderstorm (95, 96, 99) | Horror |
+| `snow` | snow, snow grains, snow showers (71–77, 85, 86) | Family, Animation |
+
+**Who:** guest
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `lat` | number | query, required, -90 to 90 |
+| `lon` | number | query, required, -180 to 180 |
+
+**Response** `200`
+
+```json
+{
+  "data": {
+    "weather": {"condition": "clear", "phrase": "Mainly clear", "temp": 22.1, "city": "Beirut"},
+    "genres": ["Comedy", "Adventure"],
+    "movies": [
+      {"id": "0193a7c1-3333-7aaa-8bbb-000000000100", "title": "Project Hail Mary", "poster_url": "https://image.tmdb.org/t/p/w342/abc.jpg", "year": 2026, "release_date": "2026-03-20", "vote_average": 7.9, "genres": ["Adventure", "Science Fiction"]}
+    ]
+  }
+}
+```
+
+`temp` is in °C. `city` is `null` when the place has no city, town or village (at sea, for example). `movies` are
+Catalog movie cards (`docs/api/catalog.md`), at most 10, and can be empty.
+
+**Errors:** `422` invalid `lat` or `lon` · `503` `"Weather is unavailable."` (the weather or city API failed) or
+`"Catalog is unavailable."`
