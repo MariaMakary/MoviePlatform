@@ -52,6 +52,12 @@ class TmdbClient
         ], fn ($value) => $value !== null));
     }
 
+    /** TMDB's first page of movies similar to $tmdbId; no results when TMDB doesn't know the movie. */
+    public function similar(int $tmdbId): array
+    {
+        return $this->cachedList("similar:{$tmdbId}", "/movie/{$tmdbId}/similar", ['page' => 1], nullOn404: true);
+    }
+
     public function movie(int $tmdbId): ?array
     {
         $data = $this->get("/movie/{$tmdbId}", ['append_to_response' => 'credits,videos'], nullOn404: true);
@@ -134,18 +140,18 @@ class TmdbClient
         Cache::tags(self::CACHE_TAG)->flush();
     }
 
-    private function cachedList(string $key, string $path, array $query): array
+    private function cachedList(string $key, string $path, array $query, bool $nullOn404 = false): array
     {
         return Cache::tags(self::CACHE_TAG)->remember(
             self::CACHE_TAG.':'.$key,
             Carbon::now()->addHours(self::LIST_CACHE_HOURS),
-            fn () => $this->movieList($path, $query),
+            fn () => $this->movieList($path, $query, $nullOn404),
         );
     }
 
-    private function movieList(string $path, array $query): array
+    private function movieList(string $path, array $query, bool $nullOn404 = false): array
     {
-        $data = $this->get($path, $query);
+        $data = $this->get($path, $query, $nullOn404) ?? [];
 
         return [
             'results' => array_map(fn (array $movie) => [
