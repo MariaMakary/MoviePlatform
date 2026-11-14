@@ -8,6 +8,7 @@ $router->get('/movies/{id}/rating-summary', 'Api\RatingController@summary');
 $router->get('/movies/{id}/reviews', 'Api\ReviewController@forMovie');
 $router->get('/users/{id}/reviews', 'Api\ReviewController@forUser');
 
+$router->get('/lists/public', 'Api\ListController@publicLists');
 $router->get("/lists/{id:$uuid}", 'Api\ListController@show');
 $router->get("/users/{id:$uuid}/lists", 'Api\ListController@ofUser');
 

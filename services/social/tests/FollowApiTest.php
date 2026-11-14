@@ -234,4 +234,41 @@ class FollowApiTest extends TestCase
             ->seeStatusCode(200)
             ->seeJson(['is_following' => null]);
     }
+
+    public function test_follow_status_answers_for_each_id_in_order(): void
+    {
+        $this->follows(self::ME, self::TONIO);
+        $this->follows(self::MARIA, self::ME);
+
+        $this->json('GET', '/api/follow/status?ids='.self::TONIO.','.self::MARIA.','.self::TONIO, [], $this->auth())
+            ->seeStatusCode(200)
+            ->seeJsonEquals(['data' => [
+                ['user_id' => self::TONIO, 'is_following' => true],
+                ['user_id' => self::MARIA, 'is_following' => false],
+                ['user_id' => self::TONIO, 'is_following' => true],
+            ]]);
+    }
+
+    public function test_follow_status_uses_one_query(): void
+    {
+        DB::enableQueryLog();
+
+        $this->json('GET', '/api/follow/status?ids='.self::MARIA.','.self::TONIO, [], $this->auth())->seeStatusCode(200);
+
+        $this->assertCount(1, DB::getQueryLog());
+    }
+
+    public function test_follow_status_needs_a_token(): void
+    {
+        $this->json('GET', '/api/follow/status?ids='.self::MARIA)->seeStatusCode(401);
+    }
+
+    public function test_follow_status_validates_the_ids(): void
+    {
+        $this->json('GET', '/api/follow/status', [], $this->auth())->seeStatusCode(422);
+        $this->json('GET', '/api/follow/status?ids='.self::MARIA.',nope', [], $this->auth())->seeStatusCode(422);
+
+        $tooMany = implode(',', array_fill(0, 101, self::MARIA));
+        $this->json('GET', '/api/follow/status?ids='.$tooMany, [], $this->auth())->seeStatusCode(422);
+    }
 }

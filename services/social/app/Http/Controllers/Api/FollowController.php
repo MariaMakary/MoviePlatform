@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\FollowRequest;
+use App\Http\Requests\FollowStatusRequest;
 use App\Http\Resources\FollowResource;
 use App\Http\Resources\FollowStatsResource;
+use App\Http\Resources\FollowStatusResource;
 use App\Http\Resources\FollowUserResource;
 use App\Services\FollowService;
 use Illuminate\Http\JsonResponse;
@@ -48,6 +50,14 @@ class FollowController extends Controller
         $stats = $this->follows->stats($this->validUserId($id), Auth::guard('jwt')->user()?->id);
 
         return (new FollowStatsResource($stats))->response();
+    }
+
+    public function status(Request $request): JsonResponse
+    {
+        $ids = array_values(array_filter(array_map('trim', explode(',', (string) $request->query('ids', '')))));
+        $ids = Validator::make(['ids' => $ids], FollowStatusRequest::rules())->validate()['ids'];
+
+        return FollowStatusResource::collection($this->follows->statuses($request->user()->id, $ids))->response();
     }
 
     private function validUserId(string $userId): string

@@ -12,6 +12,7 @@ $router->get('/users/{id}/privacy', 'Api\PrivacyController@showFor');
 $router->group(['middleware' => 'jwt'], function ($router) use ($uuid) {
     $router->post('/follow/{userId}', 'Api\FollowController@store');
     $router->delete('/follow/{userId}', 'Api\FollowController@destroy');
+    $router->get('/follow/status', 'Api\FollowController@status');
 
     $router->get('/privacy', 'Api\PrivacyController@show');
     $router->put('/privacy', 'Api\PrivacyController@update');

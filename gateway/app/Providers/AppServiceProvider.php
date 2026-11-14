@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Http\Middleware\RequireAdmin;
 use App\Http\Middleware\RequireLogin;
 use App\Services\AuthSession;
+use App\Services\Clients\ServiceOutages;
 use Illuminate\Auth\GenericUser;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
@@ -14,6 +15,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->scoped(ServiceOutages::class);
     }
 
     public function boot(): void

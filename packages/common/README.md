@@ -35,7 +35,9 @@ are picked up by every project without copying files.
 | `src/MovieNights/MovieNightStatus.php` | `enum MovieNightStatus: string` with `Open` (`'open'`), `Finalized` (`'finalized'`) and `Cancelled` (`'cancelled'`), the only values of Social's `movie_nights.status`. Social casts the column with it; the Gateway reads a night's `status` with `MovieNightStatus::from()`. |
 | `src/MovieNights/ParticipantStatus.php` | `enum ParticipantStatus: string` with `Pending` (`'pending'`), `Accepted` (`'accepted'`) and `Declined` (`'declined'`), the only values of Social's `participants.status` and of a night's `my_status`. Used by Social and the Gateway. |
 | `config/jwt.php` | `public_key_path` (`JWT_PUBLIC_KEY_PATH`) and `leeway` defaults, merged with the project's own `config/jwt.php`. |
-| `config/internal.php` | `service_token`, read with `secret('service_token')` (file `secrets/service_token`, the same value in every service). |
+| `config/internal.php` | `service_token`, read with `secret('service_token')` (file `secrets/service_token`, the same value in every service); `services`, each service's base URL (`IDENTITY_URL` … `NOTIFICATION_URL`, default `http://127.0.0.1:8001` … `8006`); `timeout` (3 s) for `InternalClient`. |
+| `src/Integration/InternalClient.php` | Service-to-service calls (below). `InternalClient::to('catalog')->get($path, $query)` or `->post($path, $data)`: sends `X-Service-Token`, 3 s timeout, retries a `GET` twice on connection errors only, returns the decoded JSON (`null` for 204). A connection error or any non-2xx answer throws `ServiceUnavailable`. |
+| `src/Exceptions/ServiceUnavailable.php` | `HttpException` 503 `"<Service> is unavailable."`, with the service's name in `$service`. Thrown by `InternalClient`; `JsonExceptionRenderer` answers it as `503 {"message": …}`, so an endpoint that calls another service needs no try/catch to give a 503. |
 | `src/Integration/EventPublisher.php` | `publish($routingKey, $data)`: wraps `$data` in the envelope of `docs/events.md` (`event` built from the routing key, new `id`, `occurred_at` in UTC) and sends it, persistent, to the `movieplatform.events` exchange. Returns the envelope. |
 | `src/Integration/RabbitMqConnection.php` | One connection per process, opened on first use; declares the exchange (topic, durable). Shared by the publisher and the consumer. |
 | `src/Integration/EventHandler.php` | Interface every event handler implements: `handle(array $data, array $envelope): void`. |
@@ -67,6 +69,35 @@ $this->events->publish('user.registered', [
 
 `$this->events` is an `EventPublisher` injected in the constructor. PHP's `sockets` extension must be enabled
 (`README.md`, Requirements).
+
+## Calling another service
+
+Only through `/api/internal/*` routes guarded by the `service` middleware (`docs/api/conventions.md`), and only with
+`InternalClient`, never with `Http::` directly. Wrap the calls in a client of your service, in
+`app/Integration/Clients`:
+
+```php
+<?php
+
+namespace App\Integration\Clients;
+
+use MoviePlatform\Common\Integration\InternalClient;
+
+class CatalogClient
+{
+    public function discover(array $genres, int $limit): array
+    {
+        return InternalClient::to('catalog')->get('/api/internal/discover', [
+            'genres' => implode(',', $genres),
+            'limit' => $limit,
+        ])['data'];
+    }
+}
+```
+
+If Catalog is down or answers with an error, `ServiceUnavailable` reaches the exception handler and the endpoint
+answers `503 {"message": "Catalog is unavailable."}`. Catch it only to fall back to something else. The target URL
+comes from `CATALOG_URL` in `.env` (default `http://127.0.0.1:8002`). In tests, fake the calls with `Http::fake()`.
 
 ## Consuming an event
 

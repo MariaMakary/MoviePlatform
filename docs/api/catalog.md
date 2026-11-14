@@ -104,6 +104,19 @@ open. A movie added by an admin (no `tmdb_id`) is never synced, and an admin's e
 
 **Errors:** `404` `"Movie not found."` (unknown id, or not a UUID)
 
+### GET /api/movies/{id}/similar
+
+Up to **12** movies TMDB finds similar to this one, as movie cards with their Catalog ids, in TMDB's order (the movie
+itself is never in the list). New movies are created from the list data as in popular. TMDB's answer is cached for
+**2 hours**. A movie added by an admin (no `tmdb_id`), or one TMDB no longer knows, gives an empty list. Not paginated.
+
+**Who:** guest
+
+**Response** `200`: `{"data": [movie card, …]}`
+
+**Errors:** `404` `"Movie not found."` (unknown id, or not a UUID) · `503` `"TMDB is unavailable."` (TMDB down and the
+list not cached)
+
 ### GET /api/movies/popular
 
 TMDB's popular movies, 20 per page, as movie cards with their **Catalog** ids. Every movie on the page is made sure to
@@ -187,6 +200,42 @@ TMDB's.
 **Response** `200`: same shape as popular
 
 **Errors:** `422` invalid `page` · `503` `"TMDB is unavailable."` (TMDB down and the page not cached)
+
+## Internal
+
+For other services only: the `service` middleware refuses every call without the right `X-Service-Token`
+(`docs/api/conventions.md`). Call them with `MoviePlatform\Common\Integration\InternalClient`.
+
+### GET /api/internal/discover
+
+The most popular **local** movies in some genres, as movie cards. TMDB is not called. Used by Intelligence's weather
+suggestions.
+
+**Who:** service (`X-Service-Token`)
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `genres` | string | query, required, comma-separated genre names as in `GET /api/genres` (e.g. `Drama,Romance`), at most 10; a movie in any of them matches |
+| `exclude_ids` | string | query, optional, comma-separated Catalog movie ids to leave out, at most 100 |
+| `limit` | integer | query, optional, default 10, 1–50 |
+
+`GET /api/internal/discover?genres=Comedy,Adventure&limit=10`
+
+**Response** `200`, sorted by popularity, highest first; a movie in several of the genres appears once. Unknown genre
+names match nothing.
+
+```json
+{
+  "data": [
+    {"id": "0193a7c1-3333-7aaa-8bbb-000000000100", "title": "Project Hail Mary", "poster_url": "https://image.tmdb.org/t/p/w342/abc.jpg", "year": 2026, "release_date": "2026-03-20", "vote_average": 7.9, "genres": ["Adventure", "Science Fiction"]}
+  ]
+}
+```
+
+**Errors:** `401` no or wrong service token · `422` `genres` missing, too many, an `exclude_ids` entry that is not a
+UUID, or `limit` out of range
 
 ## Genres
 
