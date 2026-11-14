@@ -83,6 +83,12 @@ class EngagementClient extends BaseClient
         return array_column($this->contains('/api/history/contains', $movieIds), 'watched_at', 'movie_id');
     }
 
+    /** Everyone's public lists (1202), each with movie_count and up to 4 first_movie_ids. */
+    public function publicLists(?string $search, int $page = 1, int $perPage = 20): array
+    {
+        return $this->get('/api/lists/public', array_filter(['q' => $search, 'page' => $page, 'per_page' => $perPage]));
+    }
+
     public function lists(int $page = 1, int $perPage = 20, ?string $movieId = null): array
     {
         return $this->get('/api/lists', array_filter(['page' => $page, 'per_page' => $perPage, 'movie_id' => $movieId]));
