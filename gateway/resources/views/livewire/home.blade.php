@@ -11,7 +11,9 @@
         </p>
     </section>
 
-    <x-reserved id="recommendations-row" title="Recommended for you" subtitle="Picks based on what you rate and watch." />
+    @if ($loggedIn)
+        <livewire:intelligence.recommended-row lazy />
+    @endif
 
     {{-- One notice instead of one per card: the watchlist buttons wait until Engagement answers --}}
     @if ($loggedIn && $this->isUnavailable('watchlist'))
