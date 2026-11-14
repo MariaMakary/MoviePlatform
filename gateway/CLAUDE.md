@@ -10,7 +10,7 @@ services. Sessions and cache are in Redis (`predis`).
 app/Livewire/<Module>/         Auth, Catalog, Engagement, Social, Intelligence, Notifications, Admin
 app/Services/Clients/          BaseClient + one client per service (IdentityClient, CatalogClient, …)
 app/Services/Aggregators/      combine several services for one page (e.g. MoviePageAggregator)
-resources/views/components/    shared: x-logo, x-nav-link, x-date, x-flash, x-movie-card, x-movie-row (+ .item), x-rating-stars, x-avatar, x-button, x-input, x-modal, x-empty-state, x-service-unavailable, x-icons.star / bookmark / plus
+resources/views/components/    shared: x-logo, x-nav-link, x-date, x-flash, x-movie-card, x-movie-row (+ .item), x-rating-stars, x-avatar, x-button, x-input, x-modal, x-empty-state, x-service-unavailable, x-icons.star / bookmark / plus / weather
 resources/views/layouts/       app.blade.php (navbar, flash area, footer) + partials/ (navigation, search, user-menu, notification-bell, footer)
 resources/views/livewire/<module>/
 resources/js/                  Echo (Reverb), Leaflet
