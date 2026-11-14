@@ -42,6 +42,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // Private broadcast channels (routes/channels.php): the session user from AuthSession.
+        'broadcast' => [
+            'driver' => 'session-user',
+        ],
     ],
 
     /*
