@@ -2,68 +2,34 @@
 
 namespace App\Enums;
 
-enum WeatherCondition: int
+enum WeatherCondition: string
 {
-    case Clear = 0;
-    case MainlyClear = 1;
-    case PartlyCloudy = 2;
-    case Overcast = 3;
-    case Fog = 45;
-    case RimeFog = 48;
-    case LightDrizzle = 51;
-    case Drizzle = 53;
-    case DenseDrizzle = 55;
-    case LightFreezingDrizzle = 56;
-    case FreezingDrizzle = 57;
-    case LightRain = 61;
-    case Rain = 63;
-    case HeavyRain = 65;
-    case LightFreezingRain = 66;
-    case FreezingRain = 67;
-    case LightSnow = 71;
-    case Snow = 73;
-    case HeavySnow = 75;
-    case SnowGrains = 77;
-    case LightShowers = 80;
-    case Showers = 81;
-    case HeavyShowers = 82;
-    case LightSnowShowers = 85;
-    case SnowShowers = 86;
-    case Thunderstorm = 95;
-    case ThunderstormWithHail = 96;
-    case ThunderstormWithHeavyHail = 99;
+    case Clear = 'clear';
+    case Clouds = 'clouds';
+    case Rain = 'rain';
+    case Storm = 'storm';
+    case Snow = 'snow';
 
-    public function phrase(): string
+    public static function fromCode(int $code): self
+    {
+        return match ($code) {
+            0, 1, 2 => self::Clear,
+            3, 45, 48 => self::Clouds,
+            51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82 => self::Rain,
+            95, 96, 99 => self::Storm,
+            71, 73, 75, 77, 85, 86 => self::Snow,
+            default => self::Clouds,
+        };
+    }
+
+    public function genres(): array
     {
         return match ($this) {
-            self::Clear => 'Clear sky',
-            self::MainlyClear => 'Mainly clear',
-            self::PartlyCloudy => 'Partly cloudy',
-            self::Overcast => 'Overcast',
-            self::Fog => 'Fog',
-            self::RimeFog => 'Freezing fog',
-            self::LightDrizzle => 'Light drizzle',
-            self::Drizzle => 'Drizzle',
-            self::DenseDrizzle => 'Dense drizzle',
-            self::LightFreezingDrizzle => 'Light freezing drizzle',
-            self::FreezingDrizzle => 'Freezing drizzle',
-            self::LightRain => 'Light rain',
-            self::Rain => 'Rain',
-            self::HeavyRain => 'Heavy rain',
-            self::LightFreezingRain => 'Light freezing rain',
-            self::FreezingRain => 'Freezing rain',
-            self::LightSnow => 'Light snow',
-            self::Snow => 'Snow',
-            self::HeavySnow => 'Heavy snow',
-            self::SnowGrains => 'Snow grains',
-            self::LightShowers => 'Light showers',
-            self::Showers => 'Showers',
-            self::HeavyShowers => 'Heavy showers',
-            self::LightSnowShowers => 'Light snow showers',
-            self::SnowShowers => 'Snow showers',
-            self::Thunderstorm => 'Thunderstorm',
-            self::ThunderstormWithHail => 'Thunderstorm with hail',
-            self::ThunderstormWithHeavyHail => 'Thunderstorm with heavy hail',
+            self::Rain => ['Drama', 'Romance'],
+            self::Clear => ['Comedy', 'Adventure'],
+            self::Snow => ['Family', 'Animation'],
+            self::Clouds => ['Mystery', 'Thriller'],
+            self::Storm => ['Horror'],
         };
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Integration\Clients;
 
-use App\Enums\WeatherCondition;
+use App\Enums\WeatherCode;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Carbon;
@@ -33,7 +33,7 @@ class WeatherClient
             'current' => 'temperature_2m,weather_code',
         ])->json('current');
 
-        $condition = is_numeric($current['weather_code'] ?? null) ? WeatherCondition::tryFrom((int) $current['weather_code']) : null;
+        $condition = is_numeric($current['weather_code'] ?? null) ? WeatherCode::tryFrom((int) $current['weather_code']) : null;
 
         if ($condition === null || ! is_numeric($current['temperature_2m'] ?? null)) {
             throw $this->unavailable('Open-Meteo', null, 'unexpected answer');
