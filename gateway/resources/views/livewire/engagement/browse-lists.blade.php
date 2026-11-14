@@ -53,10 +53,10 @@
                             </div>
                         </a>
 
-                        {{-- Outside the card link: a link cannot hold another link. The profile page comes with task 1210. --}}
+                        {{-- Outside the card link: a link cannot hold another link. --}}
                         <div class="flex items-center gap-2 border-t border-white/10 px-4 py-3">
                             <x-avatar :name="$ownerName" :src="$owner['avatar'] ?? null" size="xs" />
-                            @if ($owner && Route::has('users.show'))
+                            @if ($owner)
                                 <a href="{{ route('users.show', $list['user_id']) }}" class="truncate text-sm text-gray-300 hover:text-white hover:underline">{{ $ownerName }}</a>
                             @else
                                 <span class="truncate text-sm text-gray-400">{{ $ownerName }}</span>

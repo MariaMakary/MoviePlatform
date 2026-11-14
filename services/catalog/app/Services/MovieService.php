@@ -23,6 +23,8 @@ class MovieService
 
     public const RESYNC_AFTER_DAYS = 7;
 
+    public const SIMILAR_LIMIT = 12;
+
     /** Search sorts, always descending; the first one is the default. */
     public const SEARCH_SORTS = ['popularity', 'vote_average', 'release_date'];
 
@@ -58,6 +60,23 @@ class MovieService
             ->map(fn (string $id) => $movies->get($id))
             ->filter()
             ->values();
+    }
+
+    /**
+     * Up to SIMILAR_LIMIT movies TMDB finds similar to $id, as local movies (created from the list data when new).
+     * A movie without a tmdb_id (added by an admin) has none. Used by the public and the internal similar endpoints.
+     */
+    public function similar(string $id): Collection
+    {
+        $movie = Movie::findOrFail($id);
+
+        if ($movie->tmdb_id === null) {
+            return new Collection();
+        }
+
+        $results = array_filter($this->tmdb->similar($movie->tmdb_id)['results'], fn (array $result) => $result['movie']['tmdb_id'] !== $movie->tmdb_id);
+
+        return $this->ensureLocal(array_slice(array_values($results), 0, self::SIMILAR_LIMIT));
     }
 
     public function popular(int $page): array
@@ -101,6 +120,17 @@ class MovieService
             ->orderByRaw($this->sortColumn($sort).' DESC NULLS LAST')
             ->orderBy('id')
             ->paginate(self::PER_PAGE, ['*'], 'page', $page);
+    }
+
+    public function discover(array $genreNames, array $excludeIds, int $limit): Collection
+    {
+        return Movie::with('genres')
+            ->whereHas('genres', fn (Builder $genres) => $genres->whereIn('genres.name', $genreNames))
+            ->when($excludeIds !== [], fn (Builder $query) => $query->whereNotIn('id', $excludeIds))
+            ->orderByDesc('popularity')
+            ->orderBy('id')
+            ->limit($limit)
+            ->get();
     }
 
     private function matching(array $filters): Builder
