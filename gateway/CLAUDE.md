@@ -36,6 +36,13 @@ resources/js/                  Echo (Reverb), Leaflet
 
   Exception: `health()` returns the body of a `503` too (`status: degraded` and the part that failed), so the admin
   dashboard can show what is wrong; only a connection error throws.
+
+  **A service that is down is skipped for the rest of the request.** Once a call ends in `ServiceUnavailable`
+  (no connection, timeout or 5xx), `ServiceOutages` (bound with `app()->scoped()`) remembers that service, and every
+  later call to it in the same request throws `ServiceUnavailable` at once without sending anything. So a page with
+  20 components that all call a hanging service waits for one timeout, not 20. A 4xx or 422 means the service is up
+  and is not remembered. The warning is logged once per service per request. The next request (every Livewire update
+  too) tries the service again. `health()` always calls the service, so the admin status page is never skipped.
 - **Logged-in user:** `App\Services\AuthSession` owns the session keys. Login and register (`App\Livewire\Auth`, through
   the `SignsIn` trait) call `start()`: a new session id, then the token (`jwt`), its `jwt_expires_at` and the user
   (`id`, `name`, `role`, `avatar`). Read the user with `app(AuthSession::class)->user()` (null for guests and once the
