@@ -7,4 +7,10 @@ return [
         'api_version' => '2023-04-01',
         'timeout' => 10,
     ],
+
+    // Catalog's /api/internal/* routes, called with the service token (config/internal.php from packages/common).
+    'catalog' => [
+        'url' => env('CATALOG_URL', 'http://127.0.0.1:8002'),
+        'timeout' => 5,
+    ],
 ];
