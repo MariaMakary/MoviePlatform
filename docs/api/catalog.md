@@ -209,7 +209,7 @@ For other services only: the `service` middleware refuses every call without the
 ### GET /api/internal/discover
 
 The most popular **local** movies in some genres, as movie cards. TMDB is not called. Used by Intelligence's weather
-suggestions.
+suggestions (genre names) and taste profiles (genre ids).
 
 **Who:** service (`X-Service-Token`)
 
@@ -217,14 +217,18 @@ suggestions.
 
 | Field | Type | Rules |
 |---|---|---|
-| `genres` | string | query, required, comma-separated genre names as in `GET /api/genres` (e.g. `Drama,Romance`), at most 10; a movie in any of them matches |
+| `genres` | string | query, required without `genre_ids`, comma-separated genre names as in `GET /api/genres` (e.g. `Drama,Romance`), at most 10 |
+| `genre_ids` | string | query, required without `genres`, comma-separated Catalog genre ids (UUID), at most 10 |
 | `exclude_ids` | string | query, optional, comma-separated Catalog movie ids to leave out, at most 100 |
 | `limit` | integer | query, optional, default 10, 1–50 |
 
+A movie in any of the given genres matches, whether given by name or by id (both can be sent together).
+
 `GET /api/internal/discover?genres=Comedy,Adventure&limit=10`
+`GET /api/internal/discover?genre_ids=0193a7c1-1111-7aaa-8bbb-000000000001,0193a7c1-1111-7aaa-8bbb-000000000002`
 
 **Response** `200`, sorted by popularity, highest first; a movie in several of the genres appears once. Unknown genre
-names match nothing.
+names and ids match nothing.
 
 ```json
 {
@@ -234,8 +238,68 @@ names match nothing.
 }
 ```
 
-**Errors:** `401` no or wrong service token · `422` `genres` missing, too many, an `exclude_ids` entry that is not a
-UUID, or `limit` out of range
+**Errors:** `401` no or wrong service token · `422` neither `genres` nor `genre_ids`, more than 10 of either, a
+`genre_ids` or `exclude_ids` entry that is not a UUID, or `limit` out of range
+
+### GET /api/internal/movies
+
+The same movie cards as `GET /api/movies?ids=`, for services that show movie titles (Social: watch rooms, chat).
+
+**Who:** service (`X-Service-Token`)
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `ids` | string | query, required, comma-separated Catalog movie ids (UUID), at most 100 |
+
+`GET /api/internal/movies?ids=0193a7c1-3333-7aaa-8bbb-000000000101`
+
+**Response** `200`, in the order of `ids`; unknown ids are skipped.
+
+```json
+{
+  "data": [
+    {"id": "0193a7c1-3333-7aaa-8bbb-000000000101", "title": "Interstellar", "poster_url": "https://image.tmdb.org/t/p/w342/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg", "year": 2014, "release_date": "2014-11-05", "vote_average": 8.5, "genres": ["Adventure", "Drama", "Science Fiction"]}
+  ]
+}
+```
+
+**Errors:** `401` no or wrong service token · `422` `ids` missing, more than 100, or an entry that is not a UUID
+
+### GET /api/internal/movies/{id}/features
+
+What a taste profile is built from: the movie's Catalog genre, cast and director ids. Cast ids follow the billing order.
+
+**Who:** service (`X-Service-Token`)
+
+**Response** `200`
+
+```json
+{
+  "data": {
+    "genre_ids": ["0193a7c1-1111-7aaa-8bbb-000000000001", "0193a7c1-1111-7aaa-8bbb-000000000002"],
+    "cast_ids": ["0193a7c1-2222-7aaa-8bbb-000000000010", "0193a7c1-2222-7aaa-8bbb-000000000011"],
+    "director_ids": ["0193a7c1-2222-7aaa-8bbb-000000000020"]
+  }
+}
+```
+
+**Errors:** `401` no or wrong service token · `404` unknown movie
+
+### GET /api/internal/movies/{id}/similar
+
+The same list as the public `GET /api/movies/{id}/similar`: up to **12** movie cards TMDB finds similar, in TMDB's
+order, never the movie itself. A similar movie that is not in the local database yet is created from the list data,
+like `GET /api/movies/popular`. TMDB's answer is cached in Redis for 2 hours (`tmdb:similar:<tmdb_id>`). A movie
+without a `tmdb_id` (added by an admin), or one TMDB no longer knows, gives `{"data": []}`.
+
+**Who:** service (`X-Service-Token`)
+
+**Response** `200`: `{"data": [ …movie cards… ]}`
+
+**Errors:** `401` no or wrong service token · `404` unknown movie · `503` `"TMDB is unavailable."` (TMDB down and the
+list not cached)
 
 ## Genres
 
