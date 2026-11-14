@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ListIndexRequest;
+use App\Http\Requests\PublicListsRequest;
 use App\Http\Requests\StoreListRequest;
 use App\Http\Requests\UpdateListRequest;
 use App\Http\Resources\ListResource;
+use App\Http\Resources\PublicListResource;
 use App\Services\ListService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -27,6 +29,13 @@ class ListController extends Controller
             ListResource::class,
             $request,
         );
+    }
+
+    public function publicLists(Request $request): PaginatedCollection
+    {
+        $data = $this->validate($request, PublicListsRequest::rules());
+
+        return PaginatedCollection::fromQuery($this->lists->publicLists($data['q'] ?? null), PublicListResource::class, $request);
     }
 
     public function ofUser(Request $request, string $id): PaginatedCollection
