@@ -94,14 +94,18 @@ resources/js/                  Echo (Reverb), Leaflet
 
 ## Real time
 
-- The **Reverb** server runs from this project: `php artisan reverb:start` (port 8080).
-- Laravel Echo in `resources/js` listens to `room.{id}` (MessageSent), `movie-night.{id}` (VotesUpdated) and
-  `user.{id}` (NotificationCreated). Private channels are authorized by this app's `/broadcasting/auth`.
+- The **Reverb** server runs from this project: `php artisan reverb:start` (port 8080), started by `composer run dev`.
+  Gateway, Social and Notification share `REVERB_APP_ID` / `REVERB_APP_KEY` (`.env`) and the secret in
+  `secrets/reverb_app_secret`, read with `secret('reverb_app_secret')`. Social and Notification (Lumen 10) broadcast
+  with the `pusher` driver pointed at Reverb (their `config/broadcasting.php`).
+- Laravel Echo (`resources/js/echo.js`, `window.Echo`) listens to `room.{id}` (MessageSent), `movie-night.{id}`
+  (VotesUpdated) and `user.{id}` (NotificationCreated). Private channels are authorized by this app's
+  `/broadcasting/auth` in `routes/channels.php`, with the `broadcast` guard: the session user from `AuthSession` as a
+  `GenericUser` (`$user->id`, `name`, `role`). Add `['guards' => ['broadcast']]` to every channel.
 
 ## Running
 
 `composer run dev` runs `composer install` and `npm install --no-save` (exactly the versions in the lock files; nobody runs them by
-hand after a pull), then starts `php artisan serve --port=8000` and `npm run dev`; `php artisan reverb:start` is added
-when Reverb is installed. Never add `php artisan pail`: it needs `pcntl`, which does not exist on Windows.
+hand after a pull), then starts `php artisan serve --port=8000`, `npm run dev` and `php artisan reverb:start`. Never add `php artisan pail`: it needs `pcntl`, which does not exist on Windows.
 
 No automated tests in the Gateway: each task's "Done when" in Azure Boards is checked by hand in the browser.
