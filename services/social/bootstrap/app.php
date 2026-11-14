@@ -28,7 +28,9 @@ $app->singleton(
 
 $app->configure('app');
 $app->configure('events');
+$app->configure('broadcasting');
 
+$app->register(Illuminate\Broadcasting\BroadcastServiceProvider::class);
 $app->register(MoviePlatform\Common\CommonServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 
