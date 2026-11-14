@@ -4,7 +4,7 @@
     ['label' => 'Movies', 'href' => '#', 'active' => false],
     $loggedIn ? ['label' => 'Watchlist', 'href' => route('watchlist'), 'active' => request()->routeIs('watchlist')] : null,
     $loggedIn ? ['label' => 'History', 'href' => route('history'), 'active' => request()->routeIs('history')] : null,
-    $loggedIn ? ['label' => 'Lists', 'href' => route('lists.index'), 'active' => request()->routeIs('lists.*')] : null,
+    ['label' => 'Lists', 'href' => $loggedIn ? route('lists.index') : route('lists.browse'), 'active' => request()->routeIs('lists.*')],
     ['label' => 'Movie nights', 'href' => route('movie-nights.index'), 'active' => request()->routeIs('movie-nights.*')],
     ['label' => 'Cinemas', 'href' => route('cinemas'), 'active' => request()->routeIs('cinemas')],
     app(\App\Services\AuthSession::class)->isAdmin() ? ['label' => 'Admin', 'href' => route('admin.dashboard'), 'active' => request()->routeIs('admin.*')] : null,

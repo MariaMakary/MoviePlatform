@@ -12,6 +12,7 @@ use App\Livewire\Catalog\MoviePage;
 use App\Livewire\Catalog\PersonPage;
 use App\Livewire\Catalog\Search;
 use App\Livewire\Dev\ServiceStatus;
+use App\Livewire\Engagement\BrowseLists;
 use App\Livewire\Engagement\History;
 use App\Livewire\Engagement\ListForm;
 use App\Livewire\Engagement\ListPage;
@@ -48,6 +49,7 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('/lists/create', ListForm::class)->name('lists.create');
     Route::get('/lists/{id}/edit', ListForm::class)->whereUuid('id')->name('lists.edit');
 });
+Route::get('/lists/browse', BrowseLists::class)->name('lists.browse');
 Route::get('/lists/{id}', ListPage::class)->whereUuid('id')->name('lists.show');
 
 Route::middleware(['auth.jwt', 'admin.page'])->prefix('admin')->name('admin.')->group(function () {
