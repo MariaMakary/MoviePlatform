@@ -72,6 +72,37 @@ Google has no separate field for it.
 
 **Errors:** `422` invalid fields
 
+## Recommendations
+
+Built from the user's taste profile, which Intelligence keeps up to date from `RatingAdded`, `MovieWatched` and
+`UserGenresUpdated` (`docs/events.md`). Candidates are Catalog's most popular movies in the user's top 3 genres (favorite
+genres count +3) and movies similar to their 5 best-rated movies (rated 4 or 5); a movie the user has watched or rated is
+never recommended. Score = (genre match × 3 + people match × 2 + similar 2 + `vote_average` × 0.5) ÷ 12, so 0–1. The best
+20 are stored and recomputed when they are older than an hour.
+
+### GET /api/recommendations/{userId}
+
+A user's recommendations, best first. Recomputed first when the stored ones are older than an hour; if Catalog is
+down while recomputing, the stored ones are returned as they are.
+
+**Who:** user (their own `userId`), or admin (any)
+
+**Response** `200`: an empty `data` for a user without a taste profile yet (no ratings, watches or favorite genres)
+
+```json
+{
+  "data": [
+    {"movie_id": "0193a7c1-3333-7aaa-8bbb-000000000101", "score": 0.8542, "reason": "Because you liked Inception"},
+    {"movie_id": "0193a7c1-3333-7aaa-8bbb-000000000102", "score": 0.6125, "reason": "You like Science Fiction"}
+  ]
+}
+```
+
+`reason` is `Because you liked <title>` (similar to a movie they rated 4 or 5), `You like <genre>`, or
+`Popular in your genres`. Get the movie cards with Catalog `GET /api/movies?ids=`.
+
+**Errors:** `401` no or invalid token · `403` another user's recommendations · `404` `userId` is not a UUID
+
 ## Sentiment
 
 Every review is analyzed in the background: Intelligence consumes `ReviewCreated` and `ReviewUpdated`, asks Azure AI
