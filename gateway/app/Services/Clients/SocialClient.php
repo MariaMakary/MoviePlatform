@@ -8,6 +8,18 @@ class SocialClient extends BaseClient
 {
     protected string $service = 'social';
 
+    /** The current user's `{user_id, show_reviews, show_ratings, show_lists, show_history}`. */
+    public function privacy(): array
+    {
+        return $this->get('/api/privacy')['data'];
+    }
+
+    /** Replaces the current user's settings: all four booleans, required. */
+    public function updatePrivacy(array $settings): array
+    {
+        return $this->put('/api/privacy', $settings)['data'];
+    }
+
     public function createMovieNight(array $data): array
     {
         return $this->post('/api/movie-nights', $data)['data'];
