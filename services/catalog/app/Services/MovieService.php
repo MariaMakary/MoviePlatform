@@ -60,6 +60,35 @@ class MovieService
             ->values();
     }
 
+    /** The ids a taste profile is built from: genres, top-billed cast and directors. */
+    public function features(string $id): array
+    {
+        $movie = Movie::with(['genres', 'cast', 'directors'])->findOrFail($id);
+
+        return [
+            'genre_ids' => $movie->genres->pluck('id')->values()->all(),
+            'cast_ids' => $movie->cast->pluck('id')->values()->all(),
+            'director_ids' => $movie->directors->pluck('id')->values()->all(),
+        ];
+    }
+
+    /**
+     * TMDB's similar movies (first page) as local movies, created from the list data when missing. A movie that is
+     * not from TMDB has none.
+     */
+    public function similar(string $id): Collection
+    {
+        $movie = Movie::findOrFail($id);
+
+        if ($movie->tmdb_id === null) {
+            return collect();
+        }
+
+        return $this->ensureLocal($this->tmdb->similar($movie->tmdb_id)['results'])
+            ->reject(fn (Movie $similar) => $similar->id === $movie->id)
+            ->values();
+    }
+
     public function popular(int $page): array
     {
         return $this->fromTmdbList($this->tmdb->popular($page), $page);
@@ -101,6 +130,20 @@ class MovieService
             ->orderByRaw($this->sortColumn($sort).' DESC NULLS LAST')
             ->orderBy('id')
             ->paginate(self::PER_PAGE, ['*'], 'page', $page);
+    }
+
+    /** The most popular local movies in any of the genres, given by name and/or Catalog id. */
+    public function discover(array $genreNames, array $excludeIds, int $limit, array $genreIds = []): Collection
+    {
+        return Movie::with('genres')
+            ->whereHas('genres', fn (Builder $genres) => $genres->where(fn (Builder $match) => $match
+                ->whereIn('genres.name', $genreNames)
+                ->orWhereIn('genres.id', $genreIds)))
+            ->when($excludeIds !== [], fn (Builder $query) => $query->whereNotIn('id', $excludeIds))
+            ->orderByDesc('popularity')
+            ->orderBy('id')
+            ->limit($limit)
+            ->get();
     }
 
     private function matching(array $filters): Builder

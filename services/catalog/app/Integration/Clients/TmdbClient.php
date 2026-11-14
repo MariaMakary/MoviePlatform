@@ -52,6 +52,11 @@ class TmdbClient
         ], fn ($value) => $value !== null));
     }
 
+    public function similar(int $tmdbId, int $page = 1): array
+    {
+        return $this->cachedList("similar:{$tmdbId}:page:{$page}", "/movie/{$tmdbId}/similar", ['page' => $page]);
+    }
+
     public function movie(int $tmdbId): ?array
     {
         $data = $this->get("/movie/{$tmdbId}", ['append_to_response' => 'credits,videos'], nullOn404: true);

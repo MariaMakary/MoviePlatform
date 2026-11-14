@@ -39,6 +39,7 @@ Token" (starts with `eyJ`, sent as `Authorization: Bearer`).
 | `popular($page)`, `upcoming($page)`, `search($query, $page)`, `discover($genreTmdbId, $year, $page)` | `['results' => [['movie' => […], 'genre_tmdb_ids' => […]]], 'page', 'total_pages', 'total_results']`. `upcoming` asks for `TMDB_REGION` (default `US`): without a region TMDB's `release_date` is the first release anywhere, usually already past. |
 | `movie($tmdbId)` | `['movie' => […incl. runtime, trailer_key], 'genres' => [['tmdb_id', 'name']], 'cast' => [['person' => […], 'character', 'cast_order']] (top 20), 'directors' => [['person' => […]]]]`, or `null` if TMDB has no such movie |
 | `person($tmdbId)` | `['person' => […incl. biography, birthday], 'movies' => [['movie' => […], 'genre_tmdb_ids', 'role' (CreditRole), 'character']]]` (movies only, cast and director), or `null` |
+| `similar($tmdbId, $page)` | same shape as the lists: TMDB's similar movies |
 | `genres()` | `[['tmdb_id', 'name']]` |
 
 Any other TMDB error or timeout throws `TmdbUnavailable`, which the API returns as `503 {"message": "TMDB is
@@ -46,10 +47,10 @@ unavailable."}`. The key never reaches a log or a response: errors are logged wi
 
 ### List cache
 
-The four list methods (`popular`, `upcoming`, `search`, `discover`) cache their result in Redis for 2 hours
+The list methods (`popular`, `upcoming`, `search`, `discover`, `similar`) cache their result in Redis for 2 hours
 (`TmdbClient::LIST_CACHE_HOURS`), so every caller gets it and repeated page views stay under TMDB's rate limit. Keys
 look like `tmdb:popular:page:1`, `tmdb:upcoming:US:page:1`, `tmdb:search:<sha1 of the lowercased query>:page:1` and
-`tmdb:discover:genre:878:year:any:page:1`, all under the cache tag `tmdb`. A failed call is not cached. `movie()`,
+`tmdb:discover:genre:878:year:any:page:1`, `tmdb:similar:27205:page:1`, all under the cache tag `tmdb`. A failed call is not cached. `movie()`,
 `person()` and `genres()` are not cached: details live in the database (7-day re-sync in `MovieService`).
 
 `php artisan catalog:clear-cache` forgets only the `tmdb` tagged lists (it never flushes the whole Redis database, which
