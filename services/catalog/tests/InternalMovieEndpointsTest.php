@@ -5,6 +5,7 @@ namespace Tests;
 use App\Models\Genre;
 use App\Models\Movie;
 use App\Models\Person;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Laravel\Lumen\Testing\DatabaseTransactions;
@@ -73,7 +74,8 @@ class InternalMovieEndpointsTest extends TestCase
 
     public function test_features_list_the_genre_cast_and_director_ids(): void
     {
-        $movie = Movie::factory()->create();
+        Http::fake();
+        $movie = Movie::factory()->create(['synced_at' => Carbon::now()]);
         $genres = Genre::factory()->count(2)->create();
         [$actor1, $actor2, $director] = Person::factory()->count(3)->create();
         $movie->genres()->attach($genres->pluck('id'));
@@ -88,6 +90,33 @@ class InternalMovieEndpointsTest extends TestCase
         $this->assertEqualsCanonicalizing($genres->pluck('id')->all(), $data['genre_ids']);
         $this->assertSame([$actor1->id, $actor2->id], $data['cast_ids']);
         $this->assertSame([$director->id], $data['director_ids']);
+        Http::assertNothingSent();
+    }
+
+    public function test_features_of_a_movie_created_from_a_list_get_its_credits_from_tmdb_first(): void
+    {
+        $movie = Movie::factory()->create(['tmdb_id' => 1900000101, 'synced_at' => null]);
+
+        Http::fake(['api.themoviedb.org/3/movie/1900000101*' => Http::response([
+            'id' => 1900000101,
+            'title' => 'Synced for features',
+            'release_date' => '2020-01-01',
+            'genres' => [['id' => 990101, 'name' => 'Features Genre Test']],
+            'credits' => [
+                'cast' => [['id' => 1900000201, 'name' => 'Features Actor', 'character' => 'Lead', 'order' => 0, 'profile_path' => null, 'known_for_department' => 'Acting']],
+                'crew' => [['id' => 1900000301, 'name' => 'Features Director', 'job' => 'Director', 'profile_path' => null, 'known_for_department' => 'Directing']],
+            ],
+            'videos' => ['results' => []],
+        ])]);
+
+        $this->get("/api/internal/movies/{$movie->id}/features", $this->token());
+
+        $this->seeStatusCode(200);
+        $data = $this->data();
+        $this->assertSame([Genre::where('tmdb_id', 990101)->value('id')], $data['genre_ids']);
+        $this->assertSame([Person::where('tmdb_id', 1900000201)->value('id')], $data['cast_ids']);
+        $this->assertSame([Person::where('tmdb_id', 1900000301)->value('id')], $data['director_ids']);
+        $this->assertNotNull($movie->fresh()->synced_at);
     }
 
     public function test_features_of_an_unknown_movie_is_404(): void

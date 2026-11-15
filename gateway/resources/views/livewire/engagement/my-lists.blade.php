@@ -6,10 +6,13 @@
                 <p class="text-sm text-gray-400">{{ $total }} {{ Str::plural('list', $total) }}</p>
             @endif
         </div>
-        <x-button :href="route('lists.create')">
-            <x-icons.plus class="h-4 w-4" />
-            New list
-        </x-button>
+        <div class="flex flex-wrap gap-2">
+            <x-button variant="ghost" :href="route('lists.browse')">Browse public lists</x-button>
+            <x-button :href="route('lists.create')">
+                <x-icons.plus class="h-4 w-4" />
+                New list
+            </x-button>
+        </div>
     </div>
 
     @if ($this->isUnavailable('lists'))

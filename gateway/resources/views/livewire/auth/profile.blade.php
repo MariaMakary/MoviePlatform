@@ -59,6 +59,14 @@
 
         <livewire:auth.favorite-genres embedded />
 
+        <a href="{{ route('settings.privacy') }}" class="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition hover:border-cerulean/60 hover:bg-white/5">
+            <span class="space-y-1">
+                <span class="block text-lg font-semibold text-white">Privacy</span>
+                <span class="block text-sm text-gray-400">Choose what others see on your public profile.</span>
+            </span>
+            <span aria-hidden="true" class="text-gray-400">&rarr;</span>
+        </a>
+
         <form wire:submit="changePassword" class="space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
             <h2 class="text-lg font-semibold text-white">Password</h2>
 

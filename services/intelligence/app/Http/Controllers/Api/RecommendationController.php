@@ -15,6 +15,6 @@ class RecommendationController extends Controller
     {
         $this->authorize('view-recommendations', $userId);
 
-        return RecommendationResource::collection($this->recommendations->forUser($userId))->response();
+        return RecommendationResource::collection($this->recommendations->stored($userId))->response();
     }
 }
