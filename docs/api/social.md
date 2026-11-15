@@ -372,6 +372,47 @@ night not found."` (unknown id, or the caller is not a participant) · `422` `"T
 
 **Real time:** broadcasts `VotesUpdated` when the vote changed
 
+### POST /api/movie-nights/{id}/finalize
+
+Closes the vote. The winner is the candidate with the most votes. On a tie (a shortlist without votes is a tie too),
+the host sends the `candidate_id` of one of the tied candidates. Sets `status` to `finalized` and `winner_movie_id`.
+Social has no movie titles, so it asks Catalog (`GET /api/internal/movies`) for the winner's title before saving: if
+Catalog is down, nothing changes.
+
+**Who:** user, host of the night
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `candidate_id` | uuid \| null | required on a tie; when sent, must be one of the candidates with the most votes |
+
+**Response** `200`, the night as in `GET /api/movie-nights/{id}`, with `status: "finalized"` and `winner_movie_id`
+
+**Errors:** `401` no or invalid token · `403` `"Only the host can finalize the movie night."` · `404` `"Movie night not
+found."` (unknown id, or the caller is not a participant) · `422` `"This movie night is no longer open."` (already
+finalized, or cancelled) · `422` `"Add a movie to the shortlist first."` (no candidates) · `422` `candidate_id` not a
+UUID, `"It is a tie: choose one of the movies with the most votes."` or `"Choose one of the movies with the most
+votes."` (`errors.candidate_id`) · `422` `"The winning movie is no longer in the catalog."` · `503` `"Catalog is
+unavailable."`
+
+**Events:** publishes `MovieNightFinalized` after the night is saved (`participant_ids`: participants who accepted,
+without the host)
+
+### POST /api/movie-nights/{id}/cancel
+
+Cancels an open night: `status` becomes `cancelled`. Invites, RSVP, candidates, votes, finalize and cancel are then
+refused with `422` `"This movie night is no longer open."`. No event: participants see the cancelled status on the
+page and in their list.
+
+**Who:** user, host of the night
+
+**Response** `200`, the night as in `GET /api/movie-nights/{id}`, with `status: "cancelled"`
+
+**Errors:** `401` no or invalid token · `403` `"Only the host can cancel the movie night."` · `404` `"Movie night not
+found."` (unknown id, or the caller is not a participant) · `422` `"This movie night is no longer open."` (already
+finalized or cancelled)
+
 ## Real time
 
 Social broadcasts through Reverb, which runs from the Gateway (`gateway/CLAUDE.md`, "Real time"). Channels are
