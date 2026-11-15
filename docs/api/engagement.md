@@ -508,3 +508,39 @@ call. Movies that were not watched are left out.
 ```
 
 **Errors:** `401` no or invalid token · `422` missing or invalid `ids`, or more than 100
+
+## Admin
+
+### GET /api/stats
+
+Numbers for the admin dashboard (1269). Counts every row, hidden reviews and reviews of blocked authors included.
+
+**Who:** admin
+
+**Response** `200`
+
+| Field | Type | Content |
+|---|---|---|
+| `reviews` | integer | total reviews |
+| `ratings` | integer | total ratings |
+| `sentiment` | object | reviews per sentiment: `positive`, `neutral`, `negative`, and `not_analyzed` (Intelligence has not sent `review.analyzed` yet); every key is always present |
+| `most_watched` | object[] | top 10 `{movie_id, watches}` by watch history entries, most first |
+| `highest_rated` | object[] | top 10 `{movie_id, average, ratings}` by average score (two decimals), only movies with **at least 3 ratings**; ties: more ratings first |
+| `movie_counts` | object | `{movie_id: count}` for the 200 most active movies, where count = watch history entries + ratings. Sent to Catalog's `POST /api/admin/genre-counts` (1268) for the popular genres chart. `{}` when empty |
+
+Movie ids are Catalog ids: the Gateway loads titles and posters with Catalog's bulk lookup.
+
+```json
+{
+  "data": {
+    "reviews": 42,
+    "ratings": 180,
+    "sentiment": {"positive": 25, "neutral": 9, "negative": 6, "not_analyzed": 2},
+    "most_watched": [{"movie_id": "0193a7c1-3333-7aaa-8bbb-000000000100", "watches": 31}],
+    "highest_rated": [{"movie_id": "0193a7c1-3333-7aaa-8bbb-000000000101", "average": 4.67, "ratings": 12}],
+    "movie_counts": {"0193a7c1-3333-7aaa-8bbb-000000000100": 54, "0193a7c1-3333-7aaa-8bbb-000000000101": 20}
+  }
+}
+```
+
+**Errors:** `401` no or invalid token · `403` `"This action is unauthorized."` (not an admin)
