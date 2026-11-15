@@ -45,6 +45,12 @@ Payloads and rules: `docs/events.md`.
   `review_id`, Engagement's `reviews.id`, no foreign key), so an edit replaces the result. The handler runs inside the
   consumer's transaction, so `ReviewAnalyzed` is published with `DB::afterCommit`. In tests the test's own transaction
   never commits, so `SentimentTest` swaps in a transaction manager that treats getting back to level 1 as the commit.
+- Recommendations (`RecommendationService`) are recomputed only in the background: the `RatingAdded`, `MovieWatched`
+  and `UserGenresUpdated` handlers update the taste profile, then call `refreshAfterCommit($userId)`, which runs
+  `recompute()` with `DB::afterCommit` and only logs a warning if it fails (one recompute is about 38 Catalog calls,
+  some reaching TMDB). `GET /api/recommendations/{userId}` only reads the stored rows (`stored()`); never recompute in
+  a request, the Gateway gives up after 3 seconds. Tests that need the recompute swap in the transaction manager of
+  `RecommendationRefreshTest`, like `SentimentTest`.
 - Movie details come from Catalog's `/api/internal/*` routes with `X-Service-Token`, never from Catalog's database.
   Every Catalog call is a method of the one `CatalogClient`, built on `InternalClient`: `discover()` by genre names
   (weather suggestions), `discoverByGenreIds()`, `similar()`, `movies()` and `genreIdsByName()` (recommendation

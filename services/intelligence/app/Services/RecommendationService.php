@@ -8,6 +8,8 @@ use App\Models\UserTasteProfile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
  * Scores movies for a user from their taste profile (1244) and keeps their best 20 in `recommendations`.
@@ -19,8 +21,6 @@ use Illuminate\Support\Facades\DB;
 class RecommendationService
 {
     public const KEEP = 20;
-
-    public const MAX_AGE_MINUTES = 60;
 
     private const GENRE_FACTOR = 3;
 
@@ -55,12 +55,15 @@ class RecommendationService
         return Recommendation::forUser($userId)->orderByDesc('score')->orderBy('movie_id')->get();
     }
 
-    /** True when there are none yet or the newest is older than an hour (1246 then recomputes). */
-    public function isStale(string $userId): bool
+    public function refreshAfterCommit(string $userId): void
     {
-        $newest = Recommendation::forUser($userId)->max('updated_at');
-
-        return $newest === null || Carbon::parse($newest)->lt(Carbon::now()->subMinutes(self::MAX_AGE_MINUTES));
+        DB::afterCommit(function () use ($userId) {
+            try {
+                $this->recompute($userId);
+            } catch (Throwable $e) {
+                Log::warning('Recommendations were not recomputed', ['user_id' => $userId, 'error' => $e->getMessage()]);
+            }
+        });
     }
 
     /**

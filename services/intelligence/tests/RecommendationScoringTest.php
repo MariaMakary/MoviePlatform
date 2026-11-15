@@ -6,7 +6,6 @@ use App\Models\Recommendation;
 use App\Models\UserTasteProfile;
 use App\Services\RecommendationService;
 use Illuminate\Http\Client\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Laravel\Lumen\Testing\DatabaseTransactions;
@@ -239,21 +238,5 @@ class RecommendationScoringTest extends TestCase
         } catch (ServiceUnavailable) {
             $this->assertSame(1, Recommendation::forUser(self::USER)->count());
         }
-    }
-
-    public function test_results_are_stale_after_one_hour(): void
-    {
-        $this->assertTrue($this->service()->isStale(self::USER), 'No results yet.');
-
-        Carbon::setTestNow('2026-11-14T10:00:00Z');
-        Recommendation::forceCreate(['user_id' => self::USER, 'movie_id' => $this->id(1), 'score' => 0.5, 'reason' => 'x']);
-
-        Carbon::setTestNow('2026-11-14T10:59:00Z');
-        $this->assertFalse($this->service()->isStale(self::USER));
-
-        Carbon::setTestNow('2026-11-14T11:01:00Z');
-        $this->assertTrue($this->service()->isStale(self::USER));
-
-        Carbon::setTestNow();
     }
 }

@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use MoviePlatform\Common\Auth\JwtUser;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -14,6 +15,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Gate::policy(Review::class, ReviewPolicy::class);
+        // Recommendations are not a model: a user reads their own, an admin anyone's.
+        Gate::define('view-recommendations', fn (JwtUser $user, string $userId) => $user->id === $userId || $user->isAdmin());
     }
 }
