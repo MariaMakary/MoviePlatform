@@ -27,4 +27,9 @@ $router->group(['middleware' => 'jwt'], function ($router) use ($uuid) {
     $router->post("/movie-nights/{id:$uuid}/votes", 'Api\VotingController@vote');
     $router->post("/movie-nights/{id:$uuid}/finalize", 'Api\MovieNightController@finalize');
     $router->post("/movie-nights/{id:$uuid}/cancel", 'Api\MovieNightController@cancel');
+
+    $router->get('/rooms', 'Api\RoomController@index');
+    $router->get("/rooms/by-movie/{movieId:$uuid}", 'Api\RoomController@byMovie');
+    $router->get("/rooms/{id:$uuid}/messages", 'Api\RoomController@messages');
+    $router->post("/rooms/{id:$uuid}/messages", 'Api\RoomController@store');
 });
