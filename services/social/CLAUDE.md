@@ -46,6 +46,18 @@ Payloads and rules: `docs/events.md`.
   call Reverb.
 - The `{id}` route parameter is checked with the `$uuid` pattern in `routes/api.php`: a non-UUID is a `404`.
 
+## Chat rooms
+
+- `App\Services\RoomService`: one public room per movie. `forMovie` returns the room, or asks Catalog for the title
+  (`CatalogClient::movieTitle`) and creates it with `createOrFirst`, so two first visits at the same time still give
+  one room (`movie_id` UNIQUE). Catalog is not called for a room that exists.
+- Messages use a cursor, not pages: `messages($roomId, $before)` takes the 50 messages before `(created_at, id)` of
+  the `before` message (row comparison in Postgres, so messages in the same second are not skipped), newest first,
+  then reverses them so the answer is oldest first. It fetches 51 to know `has_more`.
+- `send` saves the message in a transaction, then broadcasts `App\Events\MessageSent` (`ShouldBroadcastNow`) with the
+  `name` claim as `user_name`. A broadcast error is caught and logged, like `VotesUpdated`. Tests fake it with
+  `Event::fake([MessageSent::class])`.
+
 ## Models
 
 - `MovieNight` (UUID, `HasUuids`, `MovieNightFactory`): `status` is the `MoviePlatform\Common\MovieNights\MovieNightStatus` enum (`Open`,
@@ -60,6 +72,9 @@ Payloads and rules: `docs/events.md`.
 - `Vote`: primary key (`movie_night_id`, `user_id`), so one vote per user per night; changing a vote updates
   `candidate_id` with a query. The database does not check that the candidate belongs to the same night:
   `VotingService::vote` checks it (`422`).
+- `Room` (UUID): `movie_id` UNIQUE, `name` max 150 (the Catalog title, cut to 150); only `created_at`.
+  `last_message_at` is added with a subquery in `RoomService`. `Message` (UUID): `room_id`, `user_id`, `body` max
+  1000; only `created_at`; index (`room_id`, `created_at`). Deleting a room deletes its messages.
 - Deleting a night deletes its participants, candidates and votes; deleting a candidate deletes its votes (cascade
   foreign keys, all inside Social).
 
