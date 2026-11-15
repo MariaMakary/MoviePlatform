@@ -30,7 +30,7 @@
         <section aria-labelledby="upcoming-title" class="space-y-3">
             <h2 id="upcoming-title" class="text-lg font-semibold text-white">Upcoming</h2>
             @forelse ($upcoming as $night)
-                @include('livewire.social.partials.night-row', ['night' => $night, 'muted' => false])
+                @include('livewire.social.partials.night-row', ['night' => $night, 'muted' => $night['status'] === \MoviePlatform\Common\MovieNights\MovieNightStatus::Cancelled->value])
             @empty
                 <p class="rounded-2xl border border-dashed border-white/15 px-6 py-6 text-center text-sm text-gray-400">Nothing planned yet.</p>
             @endforelse

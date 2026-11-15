@@ -96,6 +96,13 @@ resources/js/                  Echo (Reverb), Leaflet
   view. It calls Social's RSVP, puts Social's message in `$answerError` when it refuses (night no longer open…) or is
   down, and on success flashes a toast and redirects to `afterAnswerUrl()`, which the component defines. Used by "My
   movie nights" (pending invitations) and the night page (change of mind while the night is open).
+- **Add to calendar:** `<livewire:intelligence.add-to-calendar>` takes the event's fields: `title`, `start` (a
+  service's UTC date-time, or a `Y-m-d` date with `:all-day="true"`), and optional `description`, `location` and `url`
+  (`docs/api/intelligence.md`, "Calendar"). It offers an `.ics` download and a Google Calendar link through
+  Intelligence; Google opens with a redirect, not `window.open`, because a popup opened after the request is blocked.
+  Used for a movie's release (movie page) and a finalized movie night.
+- **Changing a movie night** (finalize, cancel): the page flashes the result and redirects to itself, also on an
+  error, so the next request tries Social again even when it just answered `503` (Catalog down during finalize).
 - **TMDB images:** build poster, backdrop and profile URLs with `App\Services\TmdbImage::url($path, 'w342')` (size
   from TMDB: `w185`, `w342`, `w780`, `original`…). Never build `image.tmdb.org` URLs by hand.
 

@@ -9,24 +9,25 @@ use Illuminate\Support\Str;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 
-/**
- * "Add to calendar" for an upcoming movie: its release date as an all-day event, as an .ics download or a
- * Google Calendar link. Both go through Intelligence; the browser never calls it directly.
- */
 class AddToCalendar extends Component
 {
     #[Locked]
-    public string $movieId;
-
-    #[Locked]
     public string $title;
 
-    /** Y-m-d */
     #[Locked]
-    public string $releaseDate;
+    public string $start;
 
     #[Locked]
-    public ?string $overview = null;
+    public bool $allDay = false;
+
+    #[Locked]
+    public ?string $description = null;
+
+    #[Locked]
+    public ?string $location = null;
+
+    #[Locked]
+    public ?string $url = null;
 
     public ?string $error = null;
 
@@ -64,18 +65,18 @@ class AddToCalendar extends Component
             return null;
         }
 
-        // A redirect, not window.open: a popup opened after the request would be blocked.
         return $this->redirect($url);
     }
 
     private function event(): array
     {
         return array_filter([
-            'title' => Str::limit('Release: '.$this->title, 255, ''),
-            'description' => $this->overview ? Str::limit($this->overview, 4900) : null,
-            'start' => $this->releaseDate,
-            'all_day' => 1,
-            'url' => route('movies.show', $this->movieId),
+            'title' => Str::limit($this->title, 255, ''),
+            'description' => $this->description ? Str::limit($this->description, 4900) : null,
+            'start' => $this->start,
+            'all_day' => $this->allDay ? 1 : 0,
+            'location' => $this->location ? Str::limit($this->location, 255, '') : null,
+            'url' => $this->url,
         ], fn ($value) => $value !== null);
     }
 }
