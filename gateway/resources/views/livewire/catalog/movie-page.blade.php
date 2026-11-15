@@ -66,8 +66,8 @@
                         <livewire:engagement.mark-watched-button :movie-id="$movie['id']" :key="'watched-'.$movie['id']" />
                         <livewire:engagement.add-to-list-button :movie-id="$movie['id']" :key="'lists-'.$movie['id']" />
                         @if ($upcoming)
-                            <livewire:intelligence.add-to-calendar :movie-id="$movie['id']" :title="$movie['title']"
-                                :release-date="$movie['release_date']" :overview="$movie['overview']" :key="'calendar-'.$movie['id']" />
+                            <livewire:intelligence.add-to-calendar :title="'Release: '.$movie['title']" :start="$movie['release_date']" :all-day="true"
+                                :description="$movie['overview']" :url="route('movies.show', $movie['id'])" :key="'calendar-'.$movie['id']" />
                         @endif
                         <x-reserved compact id="discussion-slot" title="Discussion" />           {{-- Sprint 4 discussion button --}}
                     </div>
