@@ -35,3 +35,7 @@ $router->group(['middleware' => 'jwt'], function ($router) use ($uuid) {
     $router->get('/history/contains', 'Api\HistoryController@contains');
     $router->post('/history', 'Api\HistoryController@store');
 });
+
+$router->group(['middleware' => ['jwt', 'admin']], function ($router) {
+    $router->get('/stats', 'Api\StatsController@show');
+});
