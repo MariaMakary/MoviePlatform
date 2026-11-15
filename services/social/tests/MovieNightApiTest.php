@@ -98,6 +98,7 @@ class MovieNightApiTest extends TestCase
             ],
             'candidates' => [],
             'votes_cast' => 0,
+            'my_vote' => null,
         ], $data);
     }
 

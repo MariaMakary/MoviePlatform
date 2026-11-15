@@ -22,4 +22,7 @@ $router->group(['middleware' => 'jwt'], function ($router) use ($uuid) {
     $router->get("/movie-nights/{id:$uuid}", 'Api\MovieNightController@show');
     $router->post("/movie-nights/{id:$uuid}/invites", 'Api\ParticipantController@invite');
     $router->patch("/movie-nights/{id:$uuid}/rsvp", 'Api\ParticipantController@rsvp');
+    $router->post("/movie-nights/{id:$uuid}/candidates", 'Api\VotingController@addCandidate');
+    $router->delete("/movie-nights/{id:$uuid}/candidates/{candidateId:$uuid}", 'Api\VotingController@removeCandidate');
+    $router->post("/movie-nights/{id:$uuid}/votes", 'Api\VotingController@vote');
 });

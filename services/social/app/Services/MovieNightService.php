@@ -4,10 +4,12 @@ namespace App\Services;
 
 use App\Models\MovieNight;
 use App\Models\Participant;
+use App\Models\Vote;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use MoviePlatform\Common\Auth\JwtUser;
+use MoviePlatform\Common\MovieNights\MovieNightStatus;
 use MoviePlatform\Common\MovieNights\ParticipantStatus;
 
 class MovieNightService
@@ -47,7 +49,10 @@ class MovieNightService
     public function find(string $id, string $userId): MovieNight
     {
         $night = MovieNight::withParticipant($userId)
-            ->addSelect(['my_status' => $this->statusOf($userId)])
+            ->addSelect([
+                'my_status' => $this->statusOf($userId),
+                'my_vote' => Vote::select('candidate_id')->whereColumn('movie_night_id', 'movie_nights.id')->where('user_id', $userId),
+            ])
             ->with([
                 'participants' => fn ($query) => $query->orderBy('created_at')->orderBy('user_id'),
                 'candidates' => fn ($query) => $query->withCount('votes')->orderBy('created_at')->orderBy('id'),
@@ -60,6 +65,24 @@ class MovieNightService
         }
 
         return $night;
+    }
+
+    public function lock(string $id, string $userId): MovieNight
+    {
+        $night = MovieNight::withParticipant($userId)->lockForUpdate()->find($id);
+
+        if ($night === null) {
+            abort(404, 'Movie night not found.');
+        }
+
+        return $night;
+    }
+
+    public function ensureOpen(MovieNight $night): void
+    {
+        if ($night->status !== MovieNightStatus::Open) {
+            abort(422, 'This movie night is no longer open.');
+        }
     }
 
     private function statusOf(string $userId): Builder
