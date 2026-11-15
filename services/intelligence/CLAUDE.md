@@ -46,9 +46,10 @@ Payloads and rules: `docs/events.md`.
   consumer's transaction, so `ReviewAnalyzed` is published with `DB::afterCommit`. In tests the test's own transaction
   never commits, so `SentimentTest` swaps in a transaction manager that treats getting back to level 1 as the commit.
 - Movie details come from Catalog's `/api/internal/*` routes with `X-Service-Token`, never from Catalog's database.
-  Every Catalog call is a method of the one `CatalogClient`, built on `InternalClient`: `discover()` (weather
-  suggestions) and `movieFeatures()` (taste profiles), which returns `null` when Catalog answers 404 (the movie was
-  deleted). Catalog down throws `ServiceUnavailable`, so an event retries and then goes to the DLQ.
+  Every Catalog call is a method of the one `CatalogClient`, built on `InternalClient`: `discover()` by genre names
+  (weather suggestions), `discoverByGenreIds()`, `similar()`, `movies()` and `genreIdsByName()` (recommendation
+  scoring), and `movieFeatures()` (taste profiles), which returns `null` when Catalog answers 404 (the movie was
+  deleted; `similar()` then gives `[]`). Catalog down throws `ServiceUnavailable`, so an event retries and then goes to the DLQ.
 
 ## Before coding
 
