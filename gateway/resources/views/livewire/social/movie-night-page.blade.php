@@ -187,7 +187,7 @@
         @endunless
 
         @if ($open)
-            <x-reserved id="shortlist-section" title="Shortlist and votes" subtitle="Pick the movie together." />          {{-- 1227 --}}
+            <livewire:social.shortlist :night-id="$night['id']" :key="'shortlist-'.$night['id']" />
         @endif
 
         @if ($canManage)

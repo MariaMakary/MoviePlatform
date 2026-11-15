@@ -45,6 +45,21 @@ class SocialClient extends BaseClient
         return $this->patch("/api/movie-nights/{$id}/rsvp", ['status' => $status->value])['data'];
     }
 
+    public function addCandidate(string $nightId, string $movieId): array
+    {
+        return $this->post("/api/movie-nights/{$nightId}/candidates", ['movie_id' => $movieId])['data'];
+    }
+
+    public function removeCandidate(string $nightId, string $candidateId): array
+    {
+        return $this->delete("/api/movie-nights/{$nightId}/candidates/".rawurlencode($candidateId))['data'];
+    }
+
+    public function vote(string $nightId, string $candidateId): array
+    {
+        return $this->post("/api/movie-nights/{$nightId}/votes", ['candidate_id' => $candidateId])['data'];
+    }
+
     public function finalizeMovieNight(string $id, ?string $candidateId = null): array
     {
         return $this->post("/api/movie-nights/{$id}/finalize", array_filter(['candidate_id' => $candidateId]))['data'];
