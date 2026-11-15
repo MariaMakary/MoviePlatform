@@ -43,8 +43,9 @@ Payloads and rules: `docs/events.md`.
 - `MovieDeleted` (`App\Integration\Handlers\MovieDeletedHandler`) calls `VotingService::removeMovie`: it locks the
   open nights that have the movie on their shortlist, deletes those candidates (their votes by cascade) and, after the
   commit, broadcasts `VotesUpdated` for each of them. Finalized and cancelled nights are history: their candidates and
-  `winner_movie_id` stay. Chat rooms and feed activities do not exist yet; the tasks that add them must also delete
-  the movie's room, messages and activities in this handler.
+  `winner_movie_id` stay. The same handler deletes the movie's chat room with `RoomService::removeMovie` (its
+  messages by cascade). Feed activities do not exist yet: the feed task (1213) must also delete the movie's
+  activities in this handler.
 - `my_status` (the caller's participant status) and, in the detail, `my_vote` (the caller's candidate id) are added
   with subqueries, so the list needs no extra query per night.
 - Tests run with `BROADCAST_DRIVER=null` (`phpunit.xml`) and `Event::fake([VotesUpdated::class])`, so they never

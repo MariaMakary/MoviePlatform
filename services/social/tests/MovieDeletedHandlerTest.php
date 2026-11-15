@@ -5,7 +5,9 @@ namespace Tests;
 use App\Events\VotesUpdated;
 use App\Integration\Handlers\MovieDeletedHandler;
 use App\Models\Candidate;
+use App\Models\Message;
 use App\Models\MovieNight;
+use App\Models\Room;
 use App\Models\Vote;
 use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Support\Carbon;
@@ -137,6 +139,22 @@ class MovieDeletedHandlerTest extends TestCase
         $this->assertNotNull($finalizedCandidate->fresh());
         $this->assertNotNull($cancelledCandidate->fresh());
         Event::assertNotDispatched(VotesUpdated::class);
+    }
+
+    public function test_the_movie_chat_room_is_deleted_with_its_messages(): void
+    {
+        $room = Room::create(['movie_id' => self::INCEPTION, 'name' => 'Inception']);
+        $room->messages()->create(['user_id' => self::JOE, 'body' => 'What an ending!']);
+        $otherRoom = Room::create(['movie_id' => self::ARRIVAL, 'name' => 'Arrival']);
+        $otherRoom->messages()->create(['user_id' => self::JOE, 'body' => 'So good.']);
+
+        $this->deliver(self::INCEPTION);
+
+        $this->assertSame(['ack'], $this->answers);
+        $this->assertNull($room->fresh());
+        $this->assertSame(0, Message::where('room_id', $room->id)->count());
+        $this->assertNotNull($otherRoom->fresh());
+        $this->assertSame(1, Message::where('room_id', $otherRoom->id)->count());
     }
 
     public function test_the_same_event_twice_or_an_unknown_movie_is_acknowledged(): void
