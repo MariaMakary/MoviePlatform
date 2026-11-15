@@ -6,6 +6,12 @@ class IntelligenceClient extends BaseClient
 {
     protected string $service = 'intelligence';
 
+    /** [{movie_id, score, reason}], best first; [] for a user without a taste profile yet. */
+    public function recommendations(string $userId): array
+    {
+        return $this->get('/api/recommendations/'.rawurlencode($userId))['data'];
+    }
+
     public function weatherSuggestions(float $lat, float $lon): array
     {
         return $this->get('/api/suggestions/weather', ['lat' => $lat, 'lon' => $lon])['data'];
