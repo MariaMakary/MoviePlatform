@@ -396,6 +396,36 @@ for everyone, including that user. An unknown user gives an empty page: users li
 
 **Errors:** `404` the id is not a UUID
 
+### GET /api/lists/public
+
+Everyone's public lists for the browse page: `is_public = true` and not hidden because the author is blocked, newest
+first. Private lists never appear, not even the caller's own.
+
+**Who:** guest
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `q` | string | query, optional, max 150; titles containing it, ignoring case (`ILIKE`; `%` and `_` are searched as themselves) |
+| `page`, `per_page` | integer | query, as above (default 20, max 100) |
+
+**Response** `200`
+
+```json
+{
+  "data": [
+    {"id": "0193a7d2-7777-7aaa-8bbb-000000000500", "user_id": "0193a7c0-1111-7aaa-8bbb-000000000001", "title": "Best of Nolan", "description": "My picks.", "movie_count": 6, "first_movie_ids": ["0193a7c1-3333-7aaa-8bbb-000000000100", "0193a7c1-3333-7aaa-8bbb-000000000101", "0193a7c1-3333-7aaa-8bbb-000000000102", "0193a7c1-3333-7aaa-8bbb-000000000103"], "created_at": "2026-11-14T18:00:00Z", "updated_at": "2026-11-14T18:00:00Z"}
+  ],
+  "meta": {"current_page": 1, "last_page": 1, "total": 1}
+}
+```
+
+`movie_count` is the number of movies in the list; `first_movie_ids` holds at most **4** of them, in the list's order
+(the first added first), for the poster collage. Get their cards with Catalog `GET /api/movies?ids=`.
+
+**Errors:** `422` `q` longer than 150 characters
+
 ## History
 
 Every route works on the token's user only: nobody can see or change another user's history. A movie can be watched

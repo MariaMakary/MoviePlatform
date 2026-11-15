@@ -10,7 +10,7 @@ services. Sessions and cache are in Redis (`predis`).
 app/Livewire/<Module>/         Auth, Catalog, Engagement, Social, Intelligence, Notifications, Admin
 app/Services/Clients/          BaseClient + one client per service (IdentityClient, CatalogClient, …)
 app/Services/Aggregators/      combine several services for one page (e.g. MoviePageAggregator)
-resources/views/components/    shared: x-logo, x-nav-link, x-date, x-flash, x-movie-card, x-movie-row (+ .item), x-rating-stars, x-avatar, x-button, x-input, x-modal, x-empty-state, x-service-unavailable, x-icons.star / bookmark / plus
+resources/views/components/    shared: x-logo, x-nav-link, x-date, x-flash, x-movie-card, x-movie-row (+ .item), x-rating-stars, x-avatar, x-button, x-input, x-modal, x-empty-state, x-service-unavailable, x-icons.star / bookmark / plus / weather
 resources/views/layouts/       app.blade.php (navbar, flash area, footer) + partials/ (navigation, search, user-menu, notification-bell, footer)
 resources/views/livewire/<module>/
 resources/js/                  Echo (Reverb), Leaflet
@@ -36,6 +36,13 @@ resources/js/                  Echo (Reverb), Leaflet
 
   Exception: `health()` returns the body of a `503` too (`status: degraded` and the part that failed), so the admin
   dashboard can show what is wrong; only a connection error throws.
+
+  **A service that is down is skipped for the rest of the request.** Once a call ends in `ServiceUnavailable`
+  (no connection, timeout or 5xx), `ServiceOutages` (bound with `app()->scoped()`) remembers that service, and every
+  later call to it in the same request throws `ServiceUnavailable` at once without sending anything. So a page with
+  20 components that all call a hanging service waits for one timeout, not 20. A 4xx or 422 means the service is up
+  and is not remembered. The warning is logged once per service per request. The next request (every Livewire update
+  too) tries the service again. `health()` always calls the service, so the admin status page is never skipped.
 - **Logged-in user:** `App\Services\AuthSession` owns the session keys. Login and register (`App\Livewire\Auth`, through
   the `SignsIn` trait) call `start()`: a new session id, then the token (`jwt`), its `jwt_expires_at` and the user
   (`id`, `name`, `role`, `avatar`). Read the user with `app(AuthSession::class)->user()` (null for guests and once the
@@ -94,14 +101,18 @@ resources/js/                  Echo (Reverb), Leaflet
 
 ## Real time
 
-- The **Reverb** server runs from this project: `php artisan reverb:start` (port 8080).
-- Laravel Echo in `resources/js` listens to `room.{id}` (MessageSent), `movie-night.{id}` (VotesUpdated) and
-  `user.{id}` (NotificationCreated). Private channels are authorized by this app's `/broadcasting/auth`.
+- The **Reverb** server runs from this project: `php artisan reverb:start` (port 8080), started by `composer run dev`.
+  Gateway, Social and Notification share `REVERB_APP_ID` / `REVERB_APP_KEY` (`.env`) and the secret in
+  `secrets/reverb_app_secret`, read with `secret('reverb_app_secret')`. Social and Notification (Lumen 10) broadcast
+  with the `pusher` driver pointed at Reverb (their `config/broadcasting.php`).
+- Laravel Echo (`resources/js/echo.js`, `window.Echo`) listens to `room.{id}` (MessageSent), `movie-night.{id}`
+  (VotesUpdated) and `user.{id}` (NotificationCreated). Private channels are authorized by this app's
+  `/broadcasting/auth` in `routes/channels.php`, with the `broadcast` guard: the session user from `AuthSession` as a
+  `GenericUser` (`$user->id`, `name`, `role`). Add `['guards' => ['broadcast']]` to every channel.
 
 ## Running
 
 `composer run dev` runs `composer install` and `npm install --no-save` (exactly the versions in the lock files; nobody runs them by
-hand after a pull), then starts `php artisan serve --port=8000` and `npm run dev`; `php artisan reverb:start` is added
-when Reverb is installed. Never add `php artisan pail`: it needs `pcntl`, which does not exist on Windows.
+hand after a pull), then starts `php artisan serve --port=8000`, `npm run dev` and `php artisan reverb:start`. Never add `php artisan pail`: it needs `pcntl`, which does not exist on Windows.
 
 No automated tests in the Gateway: each task's "Done when" in Azure Boards is checked by hand in the browser.

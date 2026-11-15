@@ -104,6 +104,19 @@ open. A movie added by an admin (no `tmdb_id`) is never synced, and an admin's e
 
 **Errors:** `404` `"Movie not found."` (unknown id, or not a UUID)
 
+### GET /api/movies/{id}/similar
+
+Up to **12** movies TMDB finds similar to this one, as movie cards with their Catalog ids, in TMDB's order (the movie
+itself is never in the list). New movies are created from the list data as in popular. TMDB's answer is cached for
+**2 hours**. A movie added by an admin (no `tmdb_id`), or one TMDB no longer knows, gives an empty list. Not paginated.
+
+**Who:** guest
+
+**Response** `200`: `{"data": [movie card, …]}`
+
+**Errors:** `404` `"Movie not found."` (unknown id, or not a UUID) · `503` `"TMDB is unavailable."` (TMDB down and the
+list not cached)
+
 ### GET /api/movies/popular
 
 TMDB's popular movies, 20 per page, as movie cards with their **Catalog** ids. Every movie on the page is made sure to
@@ -276,9 +289,10 @@ What a taste profile is built from: the movie's Catalog genre, cast and director
 
 ### GET /api/internal/movies/{id}/similar
 
-TMDB's similar movies (its first page, up to 20) as movie cards, in TMDB's order. A similar movie that is not in the
-local database yet is created from the list data, like `GET /api/movies/popular`. The list is cached in Redis for
-2 hours (`tmdb:similar:<tmdb_id>:page:1`). A movie without a `tmdb_id` (added by an admin) has none: `{"data": []}`.
+The same list as the public `GET /api/movies/{id}/similar`: up to **12** movie cards TMDB finds similar, in TMDB's
+order, never the movie itself. A similar movie that is not in the local database yet is created from the list data,
+like `GET /api/movies/popular`. TMDB's answer is cached in Redis for 2 hours (`tmdb:similar:<tmdb_id>`). A movie
+without a `tmdb_id` (added by an admin), or one TMDB no longer knows, gives `{"data": []}`.
 
 **Who:** service (`X-Service-Token`)
 

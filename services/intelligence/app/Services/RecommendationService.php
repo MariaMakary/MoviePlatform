@@ -66,7 +66,7 @@ class RecommendationService
     /**
      * Scores, saves and returns the user's best 20. A user without a taste profile gets none.
      *
-     * @throws \App\Integration\Clients\CatalogUnavailable (the stored results are then left as they were)
+     * @throws \MoviePlatform\Common\Exceptions\ServiceUnavailable (the stored results are then left as they were)
      */
     public function recompute(string $userId): Collection
     {
@@ -179,7 +179,7 @@ class RecommendationService
         }
 
         if ($topGenres !== []) {
-            foreach ($this->catalog->discover($topGenres, $seen, self::DISCOVER_LIMIT) as $card) {
+            foreach ($this->catalog->discoverByGenreIds($topGenres, $seen, self::DISCOVER_LIMIT) as $card) {
                 if (! isset($seenSet[$card['id']]) && ! isset($candidates[$card['id']])) {
                     $candidates[$card['id']] = ['card' => $card, 'similar_to' => null];
                 }
