@@ -413,6 +413,104 @@ page and in their list.
 found."` (unknown id, or the caller is not a participant) · `422` `"This movie night is no longer open."` (already
 finalized or cancelled)
 
+## Chat rooms
+
+One public room per movie: every logged-in user can read it and write in it. A room is created the first time someone
+opens it, named after the movie's title, which Social asks Catalog for (`GET /api/internal/movies`). Messages store
+only the author's `user_id`: the Gateway loads names and avatars with Identity's bulk lookup.
+
+A `{id}` or `{movieId}` that is not a UUID answers `404`.
+
+### GET /api/rooms
+
+Every room, the one with the latest message first. Rooms without messages come last, newest first.
+
+**Who:** user
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `page` | integer | query, default 1 |
+| `per_page` | integer | query, default 20, max 100 |
+
+**Response** `200`
+
+```json
+{
+  "data": [
+    {"id": "0193a7e0-1111-7aaa-8bbb-000000000800", "movie_id": "0193a7c1-3333-7aaa-8bbb-000000000100", "name": "Inception", "last_message_at": "2026-11-15T12:00:00Z", "created_at": "2026-11-14T09:00:00Z"}
+  ],
+  "meta": {"current_page": 1, "last_page": 1, "total": 1}
+}
+```
+
+`last_message_at` is `null` in a room without messages.
+
+**Errors:** `401` no or invalid token
+
+### GET /api/rooms/by-movie/{movieId}
+
+The room of a movie, created if it does not exist yet. Opening it again (by anyone) gives the same room: `movie_id`
+is unique. Catalog is only called when the room is created.
+
+**Who:** user
+
+**Response** `200`, one room as in `GET /api/rooms`
+
+**Errors:** `401` no or invalid token · `404` `"Movie not found."` (Catalog does not have this movie) · `503`
+`"Catalog is unavailable."` (only when the room did not exist yet)
+
+### GET /api/rooms/{id}/messages?before={messageId}
+
+The messages of a room, 50 at a time, **oldest first** inside the answer, so the page can append them as they come.
+
+This endpoint uses a **cursor instead of page numbers**: new messages arrive all the time, so page 2 would shift
+while the user scrolls. Without `before` you get the latest 50. To load older ones, send the `before` from the last
+answer's `meta`: you get the 50 messages written just before that message. `meta.has_more` is `false` (and `before`
+`null`) when there is nothing older.
+
+**Who:** user
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `before` | uuid | query, optional, the id of a message of this room |
+
+**Response** `200`
+
+```json
+{
+  "data": [
+    {"id": "0193a7e1-1111-7aaa-8bbb-000000000900", "room_id": "0193a7e0-1111-7aaa-8bbb-000000000800", "user_id": "0193a7c0-2222-7aaa-8bbb-000000000002", "body": "What an ending!", "created_at": "2026-11-15T12:00:00Z"}
+  ],
+  "meta": {"has_more": true, "before": "0193a7e1-1111-7aaa-8bbb-000000000900"}
+}
+```
+
+**Errors:** `401` no or invalid token · `404` `"Room not found."` · `422` `before` not a UUID, or `"This message is
+not in this room."` (`errors.before`)
+
+### POST /api/rooms/{id}/messages
+
+Sends a message to the room. The body is trimmed before it is saved.
+
+**Who:** user
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `body` | string | required, not only spaces, max 1000 |
+
+**Response** `201`, one message as in `GET /api/rooms/{id}/messages`
+
+**Errors:** `401` no or invalid token · `404` `"Room not found."` · `422` `body` missing, empty or longer than 1000
+characters (`errors.body`)
+
+**Real time:** broadcasts `MessageSent` on `private-room.{id}` once the message is saved (see below)
+
 ## Real time
 
 Social broadcasts through Reverb, which runs from the Gateway (`gateway/CLAUDE.md`, "Real time"). Channels are
@@ -421,9 +519,14 @@ private: the Gateway's `/broadcasting/auth` decides who may listen.
 | Event (`broadcastAs`) | Channel | Sent | Payload |
 |---|---|---|---|
 | `VotesUpdated` | `private-movie-night.{id}` | after a candidate is added or removed, or a vote changes, once saved | `movie_night_id`, `totals`: `[{candidate_id, votes}]` for every candidate, in shortlist order |
+| `MessageSent` | `private-room.{id}` | after a message is saved | `id`, `user_id`, `user_name` (the `name` claim of the sender's token), `body`, `created_at` |
 
 ```json
 {"movie_night_id": "0193a7d3-8888-7aaa-8bbb-000000000600", "totals": [{"candidate_id": "0193a7d4-1111-7aaa-8bbb-000000000700", "votes": 2}, {"candidate_id": "0193a7d4-2222-7aaa-8bbb-000000000701", "votes": 0}]}
+```
+
+```json
+{"id": "0193a7e1-1111-7aaa-8bbb-000000000900", "user_id": "0193a7c0-2222-7aaa-8bbb-000000000002", "user_name": "Joe", "body": "What an ending!", "created_at": "2026-11-15T12:00:00Z"}
 ```
 
 A `candidate_id` the page does not know yet is a movie just added: reload the night to get its `movie_id`. If Reverb
