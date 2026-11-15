@@ -109,6 +109,10 @@ resources/js/                  Echo (Reverb), Leaflet
   (VotesUpdated) and `user.{id}` (NotificationCreated). Private channels are authorized by this app's
   `/broadcasting/auth` in `routes/channels.php`, with the `broadcast` guard: the session user from `AuthSession` as a
   `GenericUser` (`$user->id`, `name`, `role`). Add `['guards' => ['broadcast']]` to every channel.
+- Who may listen: guests never (no session user → `403` on every channel). `room.{id}`: any logged-in user (rooms
+  are public). `movie-night.{id}`: only participants, checked with Social's `GET /api/movie-nights/{id}` and the
+  user's token (`SocialClient::movieNight`); Social's `404` (not a participant) or Social down refuses. `user.{id}`:
+  only that user.
 
 ## Running
 
