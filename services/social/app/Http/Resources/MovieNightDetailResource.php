@@ -24,6 +24,7 @@ class MovieNightDetailResource extends MovieNightResource
                 'votes' => $candidate->votes_count,
             ])->all(),
             'votes_cast' => $this->votes_count,
+            'my_vote' => $this->my_vote,
         ];
     }
 }

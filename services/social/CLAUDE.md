@@ -27,8 +27,18 @@ Payloads and rules: `docs/events.md`.
   publishes its events after the commit. Order of checks: not a participant → `404`, then the role check (invite: not
   the host → `403`; RSVP: the host → `422`), then night not `open` → `422` (`abort(422, '…')`, no field). An RSVP with
   the same answer as before changes nothing and publishes nothing.
-- `my_status` (the caller's participant status) is added to each night with a subquery, so the list needs no extra
-  query per night.
+- `MovieNightService::lock($id, $userId)` (the night locked for the transaction, `404` for non-participants) and
+  `ensureOpen($night)` (`422` unless `open`) are shared by `ParticipantService` and `VotingService`; reuse them for
+  finalize and cancel.
+- `App\Services\VotingService` adds and removes candidates and votes, under the same night lock. Adding and voting
+  need an `accepted` participant (`403` otherwise); removing needs who added the movie or the host. After the
+  transaction it broadcasts `App\Events\VotesUpdated` (`ShouldBroadcastNow`: Social has no queue worker) with the
+  totals of every candidate. A broadcast error is caught and logged as a warning, so Reverb being down never fails
+  the request.
+- `my_status` (the caller's participant status) and, in the detail, `my_vote` (the caller's candidate id) are added
+  with subqueries, so the list needs no extra query per night.
+- Tests run with `BROADCAST_DRIVER=null` (`phpunit.xml`) and `Event::fake([VotesUpdated::class])`, so they never
+  call Reverb.
 - The `{id}` route parameter is checked with the `$uuid` pattern in `routes/api.php`: a non-UUID is a `404`.
 
 ## Models
@@ -43,8 +53,8 @@ Payloads and rules: `docs/events.md`.
 - `Candidate` (UUID): UNIQUE (`movie_night_id`, `movie_id`), so a movie is proposed once per night; `added_by` is the
   user who proposed it; only `created_at`. Relation: `votes`.
 - `Vote`: primary key (`movie_night_id`, `user_id`), so one vote per user per night; changing a vote updates
-  `candidate_id` with a query. The database does not check that the candidate belongs to the same night: the voting
-  service (1226) must check it.
+  `candidate_id` with a query. The database does not check that the candidate belongs to the same night:
+  `VotingService::vote` checks it (`422`).
 - Deleting a night deletes its participants, candidates and votes; deleting a candidate deletes its votes (cascade
   foreign keys, all inside Social).
 

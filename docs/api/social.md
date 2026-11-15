@@ -191,8 +191,9 @@ A movie night, as returned by the list:
 | Field | Type | Content |
 |---|---|---|
 | `participants` | object[] | `user_id`, `status`, `is_host`, `responded_at` (null until they answer), in the order they were invited (the host first) |
-| `candidates` | object[] | `id`, `movie_id`, `added_by`, `votes` (count), in the order they were proposed; empty until voting (1226) |
+| `candidates` | object[] | the shortlist: `id`, `movie_id`, `added_by`, `votes` (count), in the order they were proposed |
 | `votes_cast` | integer | number of votes on the night |
+| `my_vote` | uuid \| null | the candidate `id` the caller voted for, `null` before voting |
 
 ### POST /api/movie-nights
 
@@ -214,7 +215,7 @@ Creates a movie night hosted by the caller, who is added as an `accepted` partic
 **Response** `201`
 
 ```json
-{"data": {"id": "0193a7d3-8888-7aaa-8bbb-000000000600", "host_id": "0193a7c0-1111-7aaa-8bbb-000000000001", "title": "Friday sci-fi", "description": null, "scheduled_at": "2026-11-07T19:00:00Z", "location": null, "meeting_link": "https://meet.example.com/abc", "status": "open", "winner_movie_id": null, "my_status": "accepted", "created_at": "2026-11-03T18:00:00Z", "participants": [{"user_id": "0193a7c0-1111-7aaa-8bbb-000000000001", "status": "accepted", "is_host": true, "responded_at": "2026-11-03T18:00:00Z"}], "candidates": [], "votes_cast": 0}}
+{"data": {"id": "0193a7d3-8888-7aaa-8bbb-000000000600", "host_id": "0193a7c0-1111-7aaa-8bbb-000000000001", "title": "Friday sci-fi", "description": null, "scheduled_at": "2026-11-07T19:00:00Z", "location": null, "meeting_link": "https://meet.example.com/abc", "status": "open", "winner_movie_id": null, "my_status": "accepted", "created_at": "2026-11-03T18:00:00Z", "participants": [{"user_id": "0193a7c0-1111-7aaa-8bbb-000000000001", "status": "accepted", "is_host": true, "responded_at": "2026-11-03T18:00:00Z"}], "candidates": [], "votes_cast": 0, "my_vote": null}}
 ```
 
 **Errors:** `401` no or invalid token · `422` invalid fields, `scheduled_at` not in the future (`"The movie night must
@@ -303,3 +304,87 @@ cancelled) · `422` `status` missing or not `accepted` / `declined` (`errors.sta
 
 **Events:** publishes `MovieNightInviteAnswered` after the answer is saved, only when it changed (`user_name` is the
 `name` claim of the caller's token)
+
+### Shortlist and voting
+
+Participants who accepted propose movies (candidates) and vote while the night is `open`. Each participant has one
+vote per night and can move it to another candidate. Social does not check that a movie exists: the Gateway picks it
+with Catalog's search. Every change is broadcast live as `VotesUpdated` (see "Real time" below).
+
+Order of checks for the three endpoints: the caller is not a participant → `404`, then the role check → `403`, then
+the night is not `open` → `422`, then the fields.
+
+### POST /api/movie-nights/{id}/candidates
+
+Adds a movie to the shortlist.
+
+**Who:** user, participant of the night who accepted (the host included)
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `movie_id` | uuid | required, Catalog movie id, not already on this night's shortlist |
+
+**Response** `201`, the night as in `GET /api/movie-nights/{id}`, with the new candidate (`votes: 0`)
+
+**Errors:** `401` no or invalid token · `403` `"Accept the invitation first."` (pending or declined) · `404` `"Movie
+night not found."` (unknown id, or the caller is not a participant) · `422` `"This movie night is no longer open."`
+(finalized or cancelled) · `422` `movie_id` missing or not a UUID, or `"This movie is already on the shortlist."`
+(`errors.movie_id`)
+
+**Real time:** broadcasts `VotesUpdated`
+
+### DELETE /api/movie-nights/{id}/candidates/{candidateId}
+
+Removes a movie from the shortlist, with its votes: those voters can vote again.
+
+**Who:** user, the participant who added the movie, or the host
+
+**Response** `200`, the night as in `GET /api/movie-nights/{id}`, without the candidate
+
+**Errors:** `401` no or invalid token · `403` `"Only the host or the person who added this movie can remove it."` ·
+`404` `"Movie night not found."` (unknown id, or the caller is not a participant) · `404` `"Candidate not found."`
+(unknown id or a candidate of another night) · `404` `"Not found."` (an id that is not a UUID) · `422` `"This movie
+night is no longer open."`
+
+**Real time:** broadcasts `VotesUpdated`
+
+### POST /api/movie-nights/{id}/votes
+
+Casts the caller's vote, or moves it to another candidate. Voting for the candidate already chosen changes nothing and
+broadcasts nothing.
+
+**Who:** user, participant of the night who accepted (the host included)
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `candidate_id` | uuid | required, a candidate of this night |
+
+**Response** `200`, the night as in `GET /api/movie-nights/{id}`, with the new `my_vote` and counts
+
+**Errors:** `401` no or invalid token · `403` `"Accept the invitation first."` (pending or declined) · `404` `"Movie
+night not found."` (unknown id, or the caller is not a participant) · `422` `"This movie night is no longer open."` ·
+`422` `candidate_id` missing or not a UUID, or `"This movie is not on the shortlist of this movie night."`
+(`errors.candidate_id`)
+
+**Real time:** broadcasts `VotesUpdated` when the vote changed
+
+## Real time
+
+Social broadcasts through Reverb, which runs from the Gateway (`gateway/CLAUDE.md`, "Real time"). Channels are
+private: the Gateway's `/broadcasting/auth` decides who may listen.
+
+| Event (`broadcastAs`) | Channel | Sent | Payload |
+|---|---|---|---|
+| `VotesUpdated` | `private-movie-night.{id}` | after a candidate is added or removed, or a vote changes, once saved | `movie_night_id`, `totals`: `[{candidate_id, votes}]` for every candidate, in shortlist order |
+
+```json
+{"movie_night_id": "0193a7d3-8888-7aaa-8bbb-000000000600", "totals": [{"candidate_id": "0193a7d4-1111-7aaa-8bbb-000000000700", "votes": 2}, {"candidate_id": "0193a7d4-2222-7aaa-8bbb-000000000701", "votes": 0}]}
+```
+
+A `candidate_id` the page does not know yet is a movie just added: reload the night to get its `movie_id`. If Reverb
+is down the change is still saved and the endpoint answers normally; only the live update is lost (logged as a
+warning).
