@@ -33,6 +33,16 @@ class MovieNightPage extends Component
 
     public ?string $winnerChoice = null;
 
+    #[Locked]
+    public bool $watchingVotes = false;
+
+    public function getListeners(): array
+    {
+        return $this->watchingVotes
+            ? ["echo-private:movie-night.{$this->id},.VotesUpdated" => '$refresh', 'shortlist-changed' => '$refresh']
+            : [];
+    }
+
     public function invite(SocialClient $social)
     {
         $this->resetErrorBag();
@@ -89,6 +99,7 @@ class MovieNightPage extends Component
         $hosting = $night !== null && $night['host_id'] === $userId;
         $candidates = collect($night['candidates'] ?? []);
         $winnerMovieId = $night['winner_movie_id'] ?? null;
+        $this->watchingVotes = $open && $hosting;
 
         return view('livewire.social.movie-night-page', [
             'night' => $night,

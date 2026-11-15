@@ -121,6 +121,12 @@ resources/js/                  Echo (Reverb), Leaflet
   user's token (`SocialClient::movieNight`); Social's `404` (not a participant) or Social down refuses. `user.{id}`:
   only that user.
 
+- A Livewire component listens with Livewire's Echo listeners in `getListeners()`, e.g.
+  `"echo-private:movie-night.{$this->nightId},.VotesUpdated" => '$refresh'` (the dot: the services send the name of
+  `broadcastAs()` as it is). `$refresh` re-renders the component, which loads its data again in `render()`, so the
+  page stays right even if an event is missed. `App\Livewire\Social\Shortlist` (the voting section of the movie night
+  page) does this; the page itself also listens, for the host only, so the Finalize box shows the current leader.
+
 ## Running
 
 `composer run dev` runs `composer install` and `npm install --no-save` (exactly the versions in the lock files; nobody runs them by
