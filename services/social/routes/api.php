@@ -25,4 +25,6 @@ $router->group(['middleware' => 'jwt'], function ($router) use ($uuid) {
     $router->post("/movie-nights/{id:$uuid}/candidates", 'Api\VotingController@addCandidate');
     $router->delete("/movie-nights/{id:$uuid}/candidates/{candidateId:$uuid}", 'Api\VotingController@removeCandidate');
     $router->post("/movie-nights/{id:$uuid}/votes", 'Api\VotingController@vote');
+    $router->post("/movie-nights/{id:$uuid}/finalize", 'Api\MovieNightController@finalize');
+    $router->post("/movie-nights/{id:$uuid}/cancel", 'Api\MovieNightController@cancel');
 });

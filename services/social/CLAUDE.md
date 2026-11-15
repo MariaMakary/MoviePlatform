@@ -28,8 +28,13 @@ Payloads and rules: `docs/events.md`.
   the host → `403`; RSVP: the host → `422`), then night not `open` → `422` (`abort(422, '…')`, no field). An RSVP with
   the same answer as before changes nothing and publishes nothing.
 - `MovieNightService::lock($id, $userId)` (the night locked for the transaction, `404` for non-participants) and
-  `ensureOpen($night)` (`422` unless `open`) are shared by `ParticipantService` and `VotingService`; reuse them for
-  finalize and cancel.
+  `ensureOpen($night)` (`422` unless `open`) are shared by `ParticipantService`, `VotingService` and the night's own
+  `finalize` and `cancel`. Every change on a night uses them, so a finalized or cancelled night refuses them all.
+- `MovieNightService::finalize` (host only) picks the candidate with the most votes; on a tie the host's
+  `candidate_id` must be one of the tied ones. It gets the winner's title from Catalog through
+  `App\Integration\Clients\CatalogClient` (`InternalClient`, `GET /api/internal/movies`) inside the transaction, so
+  Catalog down (`503`) or a movie Catalog no longer has (`422`) rolls everything back. `MovieNightFinalized` is
+  published after the commit. `cancel` (host only) only sets `cancelled`, with no event.
 - `App\Services\VotingService` adds and removes candidates and votes, under the same night lock. Adding and voting
   need an `accepted` participant (`403` otherwise); removing needs who added the movie or the host. After the
   transaction it broadcasts `App\Events\VotesUpdated` (`ShouldBroadcastNow`: Social has no queue worker) with the
