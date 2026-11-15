@@ -12,6 +12,11 @@ class IntelligenceClient extends BaseClient
         return $this->get('/api/recommendations/'.rawurlencode($userId))['data'];
     }
 
+    public function weatherSuggestions(float $lat, float $lon): array
+    {
+        return $this->get('/api/suggestions/weather', ['lat' => $lat, 'lon' => $lon])['data'];
+    }
+
     /** The event as an .ics file (raw text). Fields: docs/api/intelligence.md, "Calendar". */
     public function calendarIcs(array $event): string
     {

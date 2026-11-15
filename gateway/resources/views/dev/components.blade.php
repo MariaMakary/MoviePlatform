@@ -32,8 +32,11 @@
         </section>
 
         <section class="space-y-4">
-            <h2 class="text-lg font-semibold text-white"><code>&lt;x-icons.star class="h-4 w-4 text-neon-rose" /&gt;</code>, <code>&lt;x-icons.bookmark :filled="true" /&gt;</code> and <code>&lt;x-icons.plus /&gt;</code></h2>
+            <h2 class="text-lg font-semibold text-white"><code>&lt;x-icons.star class="h-4 w-4 text-neon-rose" /&gt;</code>, <code>&lt;x-icons.bookmark :filled="true" /&gt;</code>, <code>&lt;x-icons.plus /&gt;</code> and <code>&lt;x-icons.weather condition="clear|clouds|rain|storm|snow" /&gt;</code></h2>
             <div class="flex items-center gap-3">
+                @foreach (['clear', 'clouds', 'rain', 'storm', 'snow'] as $condition)
+                    <x-icons.weather :condition="$condition" class="h-6 w-6 text-gray-300" title="{{ $condition }}" />
+                @endforeach
                 <x-icons.star class="h-6 w-6 text-neon-rose" />
                 <x-icons.bookmark class="h-6 w-6 text-gray-300" />
                 <x-icons.bookmark class="h-6 w-6 text-neon-rose" :filled="true" />

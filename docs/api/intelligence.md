@@ -77,13 +77,15 @@ Google has no separate field for it.
 Built from the user's taste profile, which Intelligence keeps up to date from `RatingAdded`, `MovieWatched` and
 `UserGenresUpdated` (`docs/events.md`). Candidates are Catalog's most popular movies in the user's top 3 genres (favorite
 genres count +3) and movies similar to their 5 best-rated movies (rated 4 or 5); a movie the user has watched or rated is
-never recommended. Score = (genre match × 3 + people match × 2 + similar 2 + `vote_average` × 0.5) ÷ 12, so 0–1. The best
-20 are stored and recomputed when they are older than an hour.
+never recommended. Score = (genre match × 3 + people match × 2 + similar 2 + `vote_average` × 0.5) ÷ 12, so 0–1 (a
+perfect 10 average is rare, so real scores seldom pass 0.8). The best 20 are stored. They are recomputed in the
+background, by the event consumer, after each of those three events (after its transaction commits, so a slow or
+failing Catalog never fails the event or the taste profile; the old picks then stay).
 
 ### GET /api/recommendations/{userId}
 
-A user's recommendations, best first. Recomputed first when the stored ones are older than an hour; if Catalog is
-down while recomputing, the stored ones are returned as they are.
+A user's stored recommendations, best first. It only reads the database and never calls Catalog, so it answers fast
+even when Catalog is down. A new user's list fills in a few seconds after their first rating, watch or favorite genre.
 
 **Who:** user (their own `userId`), or admin (any)
 
@@ -135,3 +137,48 @@ Azure texts.
 **Errors:** `401` no or invalid token · `403` not an admin · `422` invalid `text` · `503`
 `"Azure AI Language is unavailable."` (timeout, bad key, free limit used up, refused text) or a message saying the key
 or endpoint is not set up
+
+## Suggestions
+
+### GET /api/suggestions/weather
+
+Movies that fit the weather at a place, for the homepage's weather row. Intelligence gets the current weather
+(Open-Meteo, the city from OpenStreetMap Nominatim, cached in Redis for 30 minutes per ~1 km), sorts it into one of five
+conditions, and asks Catalog's internal discover for the 10 most popular local movies in that condition's genres.
+
+| Condition | Weather (WMO codes) | Genres |
+|---|---|---|
+| `clear` | clear, mainly clear, partly cloudy (0–2) | Comedy, Adventure |
+| `clouds` | overcast, fog (3, 45, 48) and any unknown code | Mystery, Thriller |
+| `rain` | drizzle, rain, freezing rain, showers (51–67, 80–82) | Drama, Romance |
+| `storm` | thunderstorm (95, 96, 99) | Horror |
+| `snow` | snow, snow grains, snow showers (71–77, 85, 86) | Family, Animation |
+
+**Who:** guest
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `lat` | number | query, required, -90 to 90 |
+| `lon` | number | query, required, -180 to 180 |
+
+**Response** `200`
+
+```json
+{
+  "data": {
+    "weather": {"condition": "clear", "phrase": "Mainly clear", "temp": 22.1, "city": "Beirut"},
+    "genres": ["Comedy", "Adventure"],
+    "movies": [
+      {"id": "0193a7c1-3333-7aaa-8bbb-000000000100", "title": "Project Hail Mary", "poster_url": "https://image.tmdb.org/t/p/w342/abc.jpg", "year": 2026, "release_date": "2026-03-20", "vote_average": 7.9, "genres": ["Adventure", "Science Fiction"]}
+    ]
+  }
+}
+```
+
+`temp` is in °C. `city` is `null` when the place has no city, town or village (at sea, for example). `movies` are
+Catalog movie cards (`docs/api/catalog.md`), at most 10, and can be empty.
+
+**Errors:** `422` invalid `lat` or `lon` · `503` `"Weather is unavailable."` (the weather or city API failed) or
+`"Catalog is unavailable."`

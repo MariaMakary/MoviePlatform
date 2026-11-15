@@ -50,7 +50,7 @@ class TasteProfileTest extends TestCase
         parent::setUp();
 
         config([
-            'services.catalog.url' => 'http://catalog.test',
+            'internal.services.catalog' => 'http://catalog.test',
             'internal.service_token' => 'test-service-token',
         ]);
 

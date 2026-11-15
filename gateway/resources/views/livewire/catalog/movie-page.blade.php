@@ -135,6 +135,6 @@
         {{-- Sections from later sprints: replace each x-reserved with its Livewire component --}}
         <livewire:engagement.movie-reviews :movie-id="$movie['id']" :key="'reviews-'.$movie['id']" />
         <x-reserved id="lists-section" title="In lists" subtitle="Lists that include this movie." />         {{-- Sprint 3 --}}
-        <x-reserved id="similar-section" title="Similar movies" subtitle="If you liked this one." />        {{-- 1311, Sprint 4 --}}
+        <livewire:catalog.similar-movies :movie-id="$movie['id']" :key="'similar-'.$movie['id']" lazy />
     @endif
 </div>

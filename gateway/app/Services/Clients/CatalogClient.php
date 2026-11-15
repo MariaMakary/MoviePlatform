@@ -25,6 +25,12 @@ class CatalogClient extends BaseClient
         return $this->get('/api/movies/'.rawurlencode($id))['data'];
     }
 
+    /** Up to 12 movie cards similar to $id; an empty list when there are none. */
+    public function similar(string $id): array
+    {
+        return $this->get('/api/movies/'.rawurlencode($id).'/similar')['data'];
+    }
+
     public function popular(int $page = 1): array
     {
         return $this->get('/api/movies/popular', ['page' => $page]);

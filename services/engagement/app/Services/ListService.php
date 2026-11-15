@@ -12,6 +12,9 @@ use MoviePlatform\Common\Integration\EventPublisher;
 
 class ListService
 {
+    /** How many movies of a public list are sent for its poster collage. */
+    public const COLLAGE_SIZE = 4;
+
     public function __construct(private EventPublisher $events) {}
 
     public function listFor(string $userId, ?string $movieId = null): Builder
@@ -20,6 +23,20 @@ class ListService
             ->when($movieId !== null, fn (Builder $query) => $query->withExists([
                 'items as contains_movie' => fn (Builder $items) => $items->where('movie_id', $movieId),
             ]))
+            ->latest()
+            ->orderByDesc('id');
+    }
+
+    /** Every public list of non-blocked authors, newest first, optionally matching a title. */
+    public function publicLists(?string $search): Builder
+    {
+        $search = trim((string) $search);
+
+        return MovieList::publiclyVisible()
+            ->when($search !== '', fn (Builder $query) => $query->where('title', 'ILIKE', '%'.$this->escapeLike($search).'%'))
+            ->withCount('items as movie_count')
+            // In the order of the list page (oldest first), so the collage shows the list's first movies.
+            ->selectRaw("(select coalesce(json_agg(first.movie_id), '[]') from (select movie_id from list_movie where list_id = lists.id order by created_at, movie_id limit ?) as first) as first_movie_ids", [self::COLLAGE_SIZE])
             ->latest()
             ->orderByDesc('id');
     }
@@ -79,6 +96,12 @@ class ListService
 
             return $item;
         });
+    }
+
+    // A typed % or _ is searched as itself, not as a LIKE wildcard.
+    private function escapeLike(string $text): string
+    {
+        return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $text);
     }
 
     public function removeMovie(MovieList $list, string $movieId): void
