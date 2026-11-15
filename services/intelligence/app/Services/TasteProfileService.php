@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Integration\Clients\CatalogClient;
 use App\Models\UserTasteProfile;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Keeps user_taste_profiles up to date from RatingAdded, MovieWatched and UserGenresUpdated.
@@ -61,6 +62,19 @@ class TasteProfileService
         $profile = $this->lockedProfile($userId);
         $profile->favorite_genre_ids = array_values(array_unique($genreIds));
         $profile->save();
+    }
+
+    public function forgetMovie(string $movieId): void
+    {
+        DB::update(
+            'update user_taste_profiles set seen_movie_ids = seen_movie_ids - ?::text where jsonb_exists(seen_movie_ids, ?)',
+            [$movieId, $movieId],
+        );
+    }
+
+    public function forgetUser(string $userId): void
+    {
+        UserTasteProfile::where('user_id', $userId)->delete();
     }
 
     private function lockedProfile(string $userId): UserTasteProfile
