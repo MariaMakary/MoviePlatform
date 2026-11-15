@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use MoviePlatform\Common\Auth\JwtUser;
+use MoviePlatform\Common\MovieNights\MovieNightStatus;
 use MoviePlatform\Common\MovieNights\ParticipantStatus;
 use Throwable;
 
@@ -99,6 +100,28 @@ class VotingService
         if ($changed) {
             $this->broadcastTotals($nightId);
         }
+    }
+
+    public function removeMovie(string $movieId): void
+    {
+        $nightIds = MovieNight::where('status', MovieNightStatus::Open->value)
+            ->whereIn('id', Candidate::select('movie_night_id')->where('movie_id', $movieId))
+            ->orderBy('id')
+            ->lockForUpdate()
+            ->pluck('id')
+            ->all();
+
+        if ($nightIds === []) {
+            return;
+        }
+
+        Candidate::where('movie_id', $movieId)->whereIn('movie_night_id', $nightIds)->delete();
+
+        DB::afterCommit(function () use ($nightIds) {
+            foreach ($nightIds as $nightId) {
+                $this->broadcastTotals($nightId);
+            }
+        });
     }
 
     public function totals(string $nightId): array

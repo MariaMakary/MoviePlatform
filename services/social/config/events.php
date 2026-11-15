@@ -16,5 +16,6 @@ return [
     ],
 
     'handlers' => [
+        'MovieDeleted' => App\Integration\Handlers\MovieDeletedHandler::class,
     ],
 ];

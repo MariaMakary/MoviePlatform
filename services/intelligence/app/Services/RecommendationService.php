@@ -55,6 +55,16 @@ class RecommendationService
         return Recommendation::forUser($userId)->orderByDesc('score')->orderBy('movie_id')->get();
     }
 
+    public function forgetMovie(string $movieId): void
+    {
+        Recommendation::where('movie_id', $movieId)->delete();
+    }
+
+    public function forgetUser(string $userId): void
+    {
+        Recommendation::forUser($userId)->delete();
+    }
+
     public function refreshAfterCommit(string $userId): void
     {
         DB::afterCommit(function () use ($userId) {

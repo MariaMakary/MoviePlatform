@@ -96,6 +96,11 @@ class RoomService
         return $message;
     }
 
+    public function removeMovie(string $movieId): void
+    {
+        Room::where('movie_id', $movieId)->delete();
+    }
+
     private function withLastMessage(): Builder
     {
         return Room::query()

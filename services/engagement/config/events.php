@@ -16,5 +16,6 @@ return [
         'UserBlocked' => App\Integration\Handlers\UserBlockedHandler::class,
         'UserUnblocked' => App\Integration\Handlers\UserUnblockedHandler::class,
         'UserDeleted' => App\Integration\Handlers\UserDeletedHandler::class,
+        'MovieDeleted' => App\Integration\Handlers\MovieDeletedHandler::class,
     ],
 ];

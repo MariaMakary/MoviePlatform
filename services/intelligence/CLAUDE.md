@@ -51,6 +51,10 @@ Payloads and rules: `docs/events.md`.
   some reaching TMDB). `GET /api/recommendations/{userId}` only reads the stored rows (`stored()`); never recompute in
   a request, the Gateway gives up after 3 seconds. Tests that need the recompute swap in the transaction manager of
   `RecommendationRefreshTest`, like `SentimentTest`.
+- `MovieDeleted` removes the movie from every user's `seen_movie_ids` (one SQL update with the jsonb `-` operator,
+  `jsonb_exists` instead of `?` because PDO reads `?` as a placeholder) and deletes its recommendations. Genre and
+  people weights stay: they describe the user's taste, not the movie. `UserDeleted` deletes the user's taste profile
+  and recommendations. Neither calls Catalog.
 - Movie details come from Catalog's `/api/internal/*` routes with `X-Service-Token`, never from Catalog's database.
   Every Catalog call is a method of the one `CatalogClient`, built on `InternalClient`: `discover()` by genre names
   (weather suggestions), `discoverByGenreIds()`, `similar()`, `movies()` and `genreIdsByName()` (recommendation

@@ -20,6 +20,8 @@ Payloads and rules: `docs/events.md`.
   not an edit by the author); `UserDeleted` deletes the user's ratings, reviews, watchlist, history and lists (their
   items go with them by cascade). The consumer runs each handler in one transaction and skips an event id it has
   already processed.
+- `MovieDeleted` goes through `App\Services\MovieDataService`: it deletes the movie's ratings, reviews, watchlist and
+  history entries and list items; the lists themselves stay.
 - Review sentiment is not computed here: Intelligence sends it back with `review.analyzed`, stored as `sentiment_label` / `sentiment_score`.
 - Admin stats (`GET /api/stats`, `App\Services\StatsService`) are computed with grouped queries on every call, no
   cache. Limits are the constants `TOP` (10), `MIN_RATINGS` (3) and `MOVIE_COUNTS` (200). Tests empty the tables
