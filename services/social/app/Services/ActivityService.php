@@ -36,6 +36,7 @@ class ActivityService
     public function feedFor(string $userId): Builder
     {
         return Activity::allowedByPrivacy()
+            ->authorNotBlocked()
             ->whereIn('activities.user_id', Follow::followedBy($userId)->select('following_id'))
             ->newestFirst();
     }
@@ -45,7 +46,7 @@ class ActivityService
     {
         $query = $viewerId === $userId ? Activity::query() : Activity::allowedByPrivacy();
 
-        return $query->where('activities.user_id', $userId)->newestFirst();
+        return $query->authorNotBlocked()->where('activities.user_id', $userId)->newestFirst();
     }
 
     /** Feed entries about a movie that left Catalog go with it (MovieDeleted). */

@@ -82,7 +82,7 @@ class ActivityHandlerTest extends TestCase
 
         $this->assertSame([
             'id' => 'uuid', 'event_id' => 'uuid', 'user_id' => 'uuid', 'type' => 'character varying (30)',
-            'subject_id' => 'uuid', 'movie_id' => 'uuid NULL', 'data' => 'jsonb', 'created_at' => 'timestamp without time zone',
+            'subject_id' => 'uuid', 'movie_id' => 'uuid NULL', 'data' => 'jsonb', 'created_at' => 'timestamp without time zone', 'author_blocked' => 'boolean',
         ], $columns);
 
         $indexes = collect(DB::select("select indexname from pg_indexes where tablename = 'activities'"))->pluck('indexname');

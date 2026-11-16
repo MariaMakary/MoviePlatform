@@ -170,6 +170,12 @@ Built from Engagement's events (`docs/events.md`), never from Engagement's datab
 public list becomes an entry. A changed rating updates its entry (new score, moved up) and an edited review updates its
 excerpt; every watch is a new entry; private lists never appear. A movie deleted from Catalog removes its entries.
 
+A user blocked in Identity (`UserBlocked`) disappears from every feed and their own activity page, even for
+themselves, until `UserUnblocked`; their entries are kept, only hidden. A deleted user (`UserDeleted`) loses everything
+Social keeps about them: follows both ways, privacy settings, activity, chat messages, votes, invitations and the movie
+nights they hosted (with those nights' candidates, votes and participants). Movies they proposed on other people's
+nights stay, since others may have voted for them.
+
 An entry is shown to other users only when the author's privacy setting for its type is on (`GET /api/privacy`):
 
 | `type` | `subject_id` | `data` | Shown when |

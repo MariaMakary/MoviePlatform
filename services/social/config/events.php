@@ -17,6 +17,9 @@ return [
 
     'handlers' => [
         'MovieDeleted' => App\Integration\Handlers\MovieDeletedHandler::class,
+        'UserBlocked' => App\Integration\Handlers\UserBlockedHandler::class,
+        'UserUnblocked' => App\Integration\Handlers\UserUnblockedHandler::class,
+        'UserDeleted' => App\Integration\Handlers\UserDeletedHandler::class,
         'RatingAdded' => App\Integration\Handlers\ActivityHandler::class,
         'ReviewCreated' => App\Integration\Handlers\ActivityHandler::class,
         'ReviewUpdated' => App\Integration\Handlers\ActivityHandler::class,
