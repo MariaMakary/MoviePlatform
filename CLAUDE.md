@@ -57,6 +57,11 @@ or `migrate` by hand after a pull; adding or upgrading a package (`composer requ
 manual and the lock file is committed with it. Background processes (`events:consume`, `reverb:start`) start from the
 same `composer run dev` script, never as Docker containers. Details: `README.md`.
 
+Demo data (task 1289): `seeds/demo.json` is the only source, with fixed ids; each service's `Database\Seeders\DemoSeeder`
+seeds its own database from it (`.\docker\seed-demo.ps1` runs all six in order). Rows another service makes from events
+(feed, notifications, taste profiles) are built by replaying the events through that service's own code, never copied.
+A new table that a page shows gets its demo rows in the same PR.
+
 ## Git workflow
 
 - Branches are created from the Azure DevOps task, **based on `develop`**: `feature/<taskId>-short-name`, `fix/…`, `docs/…`, `chore/…`.
