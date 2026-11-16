@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ActivityType;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
@@ -23,4 +24,23 @@ class Activity extends Model
         'data' => 'array',
         'created_at' => 'datetime',
     ];
+
+    /** Only what the author shows to others: each type needs its privacy setting on (no saved settings = all on). */
+    public function scopeAllowedByPrivacy(Builder $query): Builder
+    {
+        return $query->select('activities.*')
+            ->leftJoin('privacy_settings', 'privacy_settings.user_id', '=', 'activities.user_id')
+            ->where(function (Builder $allowed) {
+                foreach (ActivityType::cases() as $type) {
+                    $allowed->orWhere(fn (Builder $query) => $query
+                        ->where('activities.type', $type->value)
+                        ->whereRaw('coalesce(privacy_settings.'.$type->privacyField().', true)'));
+                }
+            });
+    }
+
+    public function scopeNewestFirst(Builder $query): Builder
+    {
+        return $query->orderByDesc('activities.created_at')->orderByDesc('activities.id');
+    }
 }

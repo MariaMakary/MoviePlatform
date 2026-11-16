@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Enums\ActivityType;
 use App\Models\Activity;
+use App\Models\Follow;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
@@ -28,6 +30,22 @@ class ActivityService
             'ListCreated' => $this->listCreated($data, $envelope['id'], $at),
             default => null,
         };
+    }
+
+    /** GET /api/feed: what the people $userId follows did, newest first, as their privacy allows. */
+    public function feedFor(string $userId): Builder
+    {
+        return Activity::allowedByPrivacy()
+            ->whereIn('activities.user_id', Follow::followedBy($userId)->select('following_id'))
+            ->newestFirst();
+    }
+
+    /** GET /api/users/{id}/activity: the user sees all of their own; anyone else what their privacy allows. */
+    public function ofUser(string $userId, ?string $viewerId): Builder
+    {
+        $query = $viewerId === $userId ? Activity::query() : Activity::allowedByPrivacy();
+
+        return $query->where('activities.user_id', $userId)->newestFirst();
     }
 
     /** Feed entries about a movie that left Catalog go with it (MovieDeleted). */

@@ -3,13 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\FollowRequest;
 use App\Http\Requests\UpdatePrivacyRequest;
 use App\Http\Resources\PrivacyResource;
 use App\Services\PrivacyService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class PrivacyController extends Controller
 {
@@ -30,7 +28,7 @@ class PrivacyController extends Controller
 
     public function showFor(string $id): JsonResponse
     {
-        $userId = Validator::make(['user_id' => $id], FollowRequest::rules())->validate()['user_id'];
+        $userId = $this->validUserId($id);
 
         return (new PrivacyResource($this->privacy->for($userId)))->response();
     }
