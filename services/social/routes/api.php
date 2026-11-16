@@ -8,11 +8,14 @@ $router->get('/users/{id}/followers', 'Api\FollowController@followers');
 $router->get('/users/{id}/following', 'Api\FollowController@following');
 $router->get('/users/{id}/follow-stats', 'Api\FollowController@stats');
 $router->get('/users/{id}/privacy', 'Api\PrivacyController@showFor');
+$router->get('/users/{id}/activity', 'Api\ActivityController@ofUser');
 
 $router->group(['middleware' => 'jwt'], function ($router) use ($uuid) {
     $router->post('/follow/{userId}', 'Api\FollowController@store');
     $router->delete('/follow/{userId}', 'Api\FollowController@destroy');
     $router->get('/follow/status', 'Api\FollowController@status');
+
+    $router->get('/feed', 'Api\ActivityController@feed');
 
     $router->get('/privacy', 'Api\PrivacyController@show');
     $router->put('/privacy', 'Api\PrivacyController@update');

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\FollowRequest;
 use App\Http\Requests\FollowStatusRequest;
 use App\Http\Resources\FollowResource;
 use App\Http\Resources\FollowStatsResource;
@@ -58,10 +57,5 @@ class FollowController extends Controller
         $ids = Validator::make(['ids' => $ids], FollowStatusRequest::rules())->validate()['ids'];
 
         return FollowStatusResource::collection($this->follows->statuses($request->user()->id, $ids))->response();
-    }
-
-    private function validUserId(string $userId): string
-    {
-        return Validator::make(['user_id' => $userId], FollowRequest::rules())->validate()['user_id'];
     }
 }

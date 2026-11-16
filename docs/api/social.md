@@ -164,6 +164,75 @@ user exists).
 
 **Errors:** `422` `id` is not a UUID (`errors.user_id`)
 
+## Activity feed
+
+Built from Engagement's events (`docs/events.md`), never from Engagement's database: every rating, review, watch and
+public list becomes an entry. A changed rating updates its entry (new score, moved up) and an edited review updates its
+excerpt; every watch is a new entry; private lists never appear. A movie deleted from Catalog removes its entries.
+
+An entry is shown to other users only when the author's privacy setting for its type is on (`GET /api/privacy`):
+
+| `type` | `subject_id` | `data` | Shown when |
+|---|---|---|---|
+| `rating` | Engagement `ratings.id` | `{"score": 4}` | `show_ratings` |
+| `review` | Engagement `reviews.id` | `{"excerpt": "first 280 characters…"}` | `show_reviews` |
+| `watched` | the movie id (a watch has no id of its own) | `{"watched_at": "2026-11-15T21:00:00Z"}` | `show_history` |
+| `list` | Engagement `lists.id` | `{"title": "Best of Nolan"}` | `show_lists` |
+
+An entry:
+
+| Field | Type | Content |
+|---|---|---|
+| `id` | uuid | |
+| `user_id` | uuid | who did it (Identity `users.id`) |
+| `type` | string | `rating`, `review`, `watched` or `list` |
+| `subject_id` | uuid | see the table above |
+| `movie_id` | uuid \| null | Catalog `movies.id`; `null` for a list |
+| `data` | object | see the table above |
+| `created_at` | date | when it happened (the event's `occurred_at`; for a changed rating, the last change) |
+
+### GET /api/feed
+
+What the users the current user follows did, newest first, as each author's privacy allows. The user's own activity
+is not in it.
+
+**Who:** user
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `page` | integer | query, default 1 |
+| `per_page` | integer | query, default 20, max 100 |
+
+**Response** `200`
+
+```json
+{
+  "data": [
+    {"id": "0193a7d3-8888-7aaa-8bbb-000000000600", "user_id": "0193a7c0-2222-7aaa-8bbb-000000000002", "type": "review", "subject_id": "0193a7d1-6666-7aaa-8bbb-000000000400", "movie_id": "0193a7c1-3333-7aaa-8bbb-000000000100", "data": {"excerpt": "Loved the ending, the soundtrack is amazing."}, "created_at": "2026-11-16T11:00:00Z"}
+  ],
+  "meta": {"current_page": 1, "last_page": 1, "total": 1}
+}
+```
+
+Get the movie cards with Catalog `GET /api/movies?ids=` and the authors with Identity `GET /api/users?ids=`.
+
+**Errors:** `401` no or invalid token
+
+### GET /api/users/{id}/activity
+
+One user's activity for their profile, newest first. Others see what the user's privacy allows; the user sees all of
+their own (with a token).
+
+**Who:** guest
+
+**Request:** `page`, `per_page` as above
+
+**Response** `200`, as in `GET /api/feed`
+
+**Errors:** `422` `id` is not a UUID (`errors.user_id`)
+
 ## Movie nights
 
 A user hosts a movie night and invites others (1220). Only participants (the host and invited users, whatever their
