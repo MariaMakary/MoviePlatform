@@ -1,6 +1,7 @@
 @php($loggedIn = app(\App\Services\AuthSession::class)->check())
 @php($links = array_values(array_filter([
     ['label' => 'Home', 'href' => route('home'), 'active' => request()->routeIs('home')],
+    $loggedIn ? ['label' => 'Feed', 'href' => route('feed'), 'active' => request()->routeIs('feed')] : null,
     ['label' => 'Movies', 'href' => '#', 'active' => false],
     $loggedIn ? ['label' => 'Watchlist', 'href' => route('watchlist'), 'active' => request()->routeIs('watchlist')] : null,
     $loggedIn ? ['label' => 'History', 'href' => route('history'), 'active' => request()->routeIs('history')] : null,

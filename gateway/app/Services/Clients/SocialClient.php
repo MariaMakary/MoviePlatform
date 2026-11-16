@@ -81,6 +81,12 @@ class SocialClient extends BaseClient
     }
 
     /** `{data: [{user_id, followed_at}], meta}`, newest first. */
+    /** What the people the current user follows did, newest first: {id, user_id, type, subject_id, movie_id, data, created_at}. */
+    public function feed(int $page = 1, int $perPage = 20): array
+    {
+        return $this->get('/api/feed', ['page' => $page, 'per_page' => $perPage]);
+    }
+
     public function followers(string $userId, int $page = 1, int $perPage = 20): array
     {
         return $this->get('/api/users/'.rawurlencode($userId).'/followers', ['page' => $page, 'per_page' => $perPage]);
