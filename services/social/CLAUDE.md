@@ -71,6 +71,11 @@ Payloads and rules: `docs/events.md`.
   moved up), and `ReviewUpdated` updates the review's excerpt (first 280 characters) in place. Every watch adds an
   entry (rewatches too); only public lists are added. `subject_id` is the Engagement rating, review or list id, and
   the movie id for a watch. `type` is the `App\Enums\ActivityType` enum.
+- Blocked and deleted users (task 1307): `UserBlockedHandler` / `UserUnblockedHandler` set `activities.author_blocked`
+  through `App\Services\UserDataService::setActivityHidden()`; every activity query goes through the
+  `authorNotBlocked()` scope. `UserDeletedHandler` calls `UserDataService::deleteAll()`: hosted nights (cascade),
+  votes, participations, messages, follows both ways, privacy settings and activities. Candidates the user added to
+  someone else's night are kept (other people's votes point at them).
 
 ## Models
 

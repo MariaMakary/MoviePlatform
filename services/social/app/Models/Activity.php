@@ -23,7 +23,14 @@ class Activity extends Model
         'type' => ActivityType::class,
         'data' => 'array',
         'created_at' => 'datetime',
+        'author_blocked' => 'boolean',
     ];
+
+    /** Hides the activity of a user an admin blocked (user.blocked); user.unblocked shows it again. */
+    public function scopeAuthorNotBlocked(Builder $query): Builder
+    {
+        return $query->where('activities.author_blocked', false);
+    }
 
     /** Only what the author shows to others: each type needs its privacy setting on (no saved settings = all on). */
     public function scopeAllowedByPrivacy(Builder $query): Builder
