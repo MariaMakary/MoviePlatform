@@ -83,6 +83,7 @@ Every error uses the same shape. `errors` is present only for validation errors.
 | `403` | Authenticated but not allowed (not the owner, not an admin, blocked user) | `"This action is unauthorized."` |
 | `404` | Resource does not exist (or must stay hidden from this user) | `"Movie not found."` |
 | `422` | Validation failed, or a business rule is broken (e.g. already following this user) | `"The given data was invalid."` |
+| `429` | Too many attempts (rate limit); the `Retry-After` header gives the seconds to wait | `"Too many attempts. Try again in 42 seconds."` |
 | `503` | A service or external API this request depends on is unavailable | `"Catalog service is unavailable."` |
 | `500` | Unexpected error | `"Server error."` (never a stack trace or exception message) |
 

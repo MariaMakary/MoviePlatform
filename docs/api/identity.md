@@ -8,6 +8,19 @@ Tokens are RS256 JWTs valid for **30 minutes** (`config('jwt.ttl')`, `JWT_TTL`, 
 of `docs/api/conventions.md` section 7. Identity keeps no session: logging out only tells the Gateway to forget the
 token, which then expires on its own.
 
+**Rate limits.** Register, login, forgot and reset are limited **per email address** (lowercase), in
+`config/throttle.php`. Over the limit they answer `429` `"Too many attempts. Try again in N seconds."` with a
+`Retry-After` header, before checking anything else (even a correct password is refused until then).
+
+| Endpoint | Attempts | Window | Counter cleared on success |
+|---|---|---|---|
+| `POST /api/login` | 5 | 1 minute | yes, so only failed logins add up |
+| `POST /api/register` | 5 | 10 minutes | no |
+| `POST /api/password/forgot` | 3 | 10 minutes | no |
+| `POST /api/password/reset` | 5 | 10 minutes | yes |
+
+Identity only sees the Gateway's IP, so the per-IP limit is in the Gateway (`gateway/config/throttle.php`).
+
 A user, as returned by every endpoint below:
 
 | Field | Type | Content |
@@ -41,7 +54,7 @@ Creates an account with email and password and logs it in. The email is saved in
 {"data": {"token": "eyJhbGciOiJSUzI1NiIs…", "expires_at": "2026-11-03T18:50:00Z", "user": {"id": "0193a7c0-1111-7aaa-8bbb-000000000001", "name": "Maria Makary", "email": "maria@example.com", "avatar": null, "bio": null, "role": "user"}}}
 ```
 
-**Errors:** `422` invalid fields, or `email` already taken (`"The email has already been taken."`)
+**Errors:** `422` invalid fields, or `email` already taken (`"The email has already been taken."`) · `429` too many attempts
 
 **Events:** publishes `UserRegistered` after the user is saved
 
@@ -66,7 +79,7 @@ Logs in with email and password. The email is compared in lowercase.
 
 **Errors:** `401` `"Invalid credentials."` (wrong password, unknown email, or an account created through social login
 that has no password: the same answer, so nobody can tell which emails exist) · `403` `"Account blocked."` (only after
-a correct password) · `422` invalid `email` or `password`
+a correct password) · `422` invalid `email` or `password` · `429` too many attempts
 
 ### POST /api/logout
 
@@ -227,7 +240,7 @@ exist. The link goes to the Gateway page `<GATEWAY_URL>/reset-password?token=…
 {"data": {"message": "If this email exists, we sent you a link."}}
 ```
 
-**Errors:** `422` invalid `email`
+**Errors:** `422` invalid `email` · `429` too many attempts
 
 ### POST /api/password/reset
 
@@ -248,7 +261,7 @@ their first password. Tokens already issued stay valid until they expire.
 **Response** `204`, no body
 
 **Errors:** `422` on `token`: `"This password reset link is invalid or has expired."` (wrong, used or expired token, or
-an unknown email) · `422` other invalid fields
+an unknown email) · `422` other invalid fields · `429` too many attempts
 
 ## Users
 

@@ -161,13 +161,20 @@ own check, so one failing project does not hide the others:
 |---|---|
 | `common` | `composer update` and `vendor/bin/phpunit` in `packages/common` |
 | `identity` … `notification` | `composer install`, `php artisan migrate --force` and `vendor/bin/phpunit`, against a fresh PostgreSQL 16 container (the same engine as Docker) |
-| `gateway (install only)` | `composer install`, to check it still installs (no automated tests) |
+| `gateway` | `composer install`, a `.env` from `.env.example` with a new `APP_KEY`, and `vendor/bin/phpunit` |
+| `secrets` | `bash docker/check-secrets.sh` (below) |
 
 No real secret is used. Each job writes throwaway values into a temporary secrets folder and points `SECRETS_DIR` at
 it: random values for every name in `secrets.example/`, a fresh RSA key pair (`jwt_private_key`, and the runner's copy
 of `keys/jwt_public.pem`), and a random database password that is set on the job's PostgreSQL user and masked in the
 logs. The tests sign their own tokens with the keys in `tests/Fixtures/jwt`. RabbitMQ and Redis are not needed: tests
 mock RabbitMQ and use the `array` cache.
+
+`docker/check-secrets.sh` fails the `secrets` check when a secret could leak: a file under `secrets/` is committed, a
+file in `secrets.example/` is not empty, the code reads a `secret('name')` that `secrets.example/` does not list, a
+`.env.example` has a value for `APP_KEY` or a `…PASSWORD`, `…SECRET`, `…TOKEN`, `…API_KEY` or `…PRIVATE_KEY` key, or
+a private key is committed outside `tests/Fixtures`. It prints names only, never a value. Run it before a PR with
+`bash docker/check-secrets.sh`.
 
 A PR can only be merged when every check is green (branch protection on `develop`). If a check fails, open it on the PR
 and read the `Test` step: it is the same output as `vendor/bin/phpunit` on your laptop.
