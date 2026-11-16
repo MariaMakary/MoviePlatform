@@ -44,8 +44,7 @@ Payloads and rules: `docs/events.md`.
   open nights that have the movie on their shortlist, deletes those candidates (their votes by cascade) and, after the
   commit, broadcasts `VotesUpdated` for each of them. Finalized and cancelled nights are history: their candidates and
   `winner_movie_id` stay. The same handler deletes the movie's chat room with `RoomService::removeMovie` (its
-  messages by cascade). Feed activities do not exist yet: the feed task (1213) must also delete the movie's
-  activities in this handler.
+  messages by cascade). It also deletes the movie's feed activities (`ActivityService::removeMovie`).
 - `my_status` (the caller's participant status) and, in the detail, `my_vote` (the caller's candidate id) are added
   with subqueries, so the list needs no extra query per night.
 - Tests run with `BROADCAST_DRIVER=null` (`phpunit.xml`) and `Event::fake([VotesUpdated::class])`, so they never
@@ -63,6 +62,15 @@ Payloads and rules: `docs/events.md`.
 - `send` saves the message in a transaction, then broadcasts `App\Events\MessageSent` (`ShouldBroadcastNow`) with the
   `name` claim as `user_name`. A broadcast error is caught and logged, like `VotesUpdated`. Tests fake it with
   `Event::fake([MessageSent::class])`.
+
+## Activity feed
+
+- `App\Integration\Handlers\ActivityHandler` turns `RatingAdded`, `ReviewCreated`, `ReviewUpdated`, `MovieWatched`
+  and `ListCreated` into `activities` through `App\Services\ActivityService` (task 1213). `created_at` is the event's
+  `occurred_at`. One entry per event (`event_id` UNIQUE), except: a changed rating updates its entry (new score,
+  moved up), and `ReviewUpdated` updates the review's excerpt (first 280 characters) in place. Every watch adds an
+  entry (rewatches too); only public lists are added. `subject_id` is the Engagement rating, review or list id, and
+  the movie id for a watch. `type` is the `App\Enums\ActivityType` enum.
 
 ## Models
 

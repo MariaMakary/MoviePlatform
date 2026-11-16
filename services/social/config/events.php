@@ -17,5 +17,10 @@ return [
 
     'handlers' => [
         'MovieDeleted' => App\Integration\Handlers\MovieDeletedHandler::class,
+        'RatingAdded' => App\Integration\Handlers\ActivityHandler::class,
+        'ReviewCreated' => App\Integration\Handlers\ActivityHandler::class,
+        'ReviewUpdated' => App\Integration\Handlers\ActivityHandler::class,
+        'MovieWatched' => App\Integration\Handlers\ActivityHandler::class,
+        'ListCreated' => App\Integration\Handlers\ActivityHandler::class,
     ],
 ];
