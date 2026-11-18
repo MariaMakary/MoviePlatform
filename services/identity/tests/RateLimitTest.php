@@ -54,6 +54,13 @@ class RateLimitTest extends TestCase
         $this->seeStatusCode(429);
     }
 
+    public function test_an_email_that_is_not_a_string_gets_422_not_500(): void
+    {
+        $this->json('POST', '/api/login', ['email' => ['maria@example.com'], 'password' => 'wrong-password']);
+
+        $this->seeStatusCode(422);
+    }
+
     public function test_the_limit_is_per_email_and_ignores_case(): void
     {
         for ($i = 0; $i < 5; $i++) {

@@ -47,7 +47,8 @@ class ThrottleRequests
     private function identify(Request $request, string $by): ?string
     {
         if ($by === 'email') {
-            $email = Str::lower(trim((string) $request->input('email')));
+            $email = $request->input('email');
+            $email = is_string($email) ? Str::lower(trim($email)) : '';
 
             return $email !== '' ? "email:$email" : 'ip:'.$request->ip();
         }

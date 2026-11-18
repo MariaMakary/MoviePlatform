@@ -75,4 +75,11 @@ class ThrottleRequestsTest extends TestCase
 
         $this->postJson('/api/login', ['email' => 'joy@example.com', 'password' => 'wrong'])->assertStatus(401);
     }
+
+    public function test_an_email_that_is_not_a_string_is_counted_per_ip_instead_of_failing(): void
+    {
+        $this->postJson('/api/login', ['email' => ['maria@example.com'], 'password' => 'wrong'])->assertStatus(401);
+        $this->postJson('/api/login', ['email' => ['joy@example.com'], 'password' => 'wrong'])->assertStatus(401);
+        $this->postJson('/api/login', ['email' => ['ana@example.com'], 'password' => 'wrong'])->assertStatus(429);
+    }
 }
