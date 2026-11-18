@@ -53,7 +53,10 @@ resources/js/                  Echo (Reverb), Leaflet
 - **Admin pages:** add the route to the `/admin` group in `routes/web.php` (`auth.jwt` sends guests to `/login`,
   `admin.page` gives others a 403), wrap the view in `<x-admin.layout title="…">` and add the link to that component's
   side menu. The alias is `admin.page` because `admin` is taken by `packages/common` (JWT bearer token). This only
-  guards the page: the service still checks the token on every admin endpoint.
+  guards the page: the service still checks the token on every admin endpoint. The side menu finds the current page
+  with `Livewire::originalPath()`, so the link stays active after a Livewire update (`routeIs()` is false there).
+  `/admin/reviews` (`App\Livewire\Admin\Reviews`) moderates reviews with Engagement's admin endpoints; its actions go
+  through one `x-modal` confirmation (`confirm($action, $id)`, then `apply`).
 - **Token renewal:** `RefreshJwt` runs on every web request. When a logged-in user's token expires in less than 10
   minutes, it calls Identity's `POST /api/token/refresh` and stores the new token, so an active user stays logged in.
   Identity refusing (401/403: expired, deleted or blocked) logs the user out to `/login` with a message; Identity down
