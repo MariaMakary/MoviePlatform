@@ -15,6 +15,11 @@ Payloads and rules: `docs/events.md`.
 
 - Turns consumed events into notifications for users. Event payloads carry the names it needs (e.g. `follower_name`), so it never calls other services to build the text.
 - Real time: broadcasts `NotificationCreated` on `user.{id}` through Reverb, using the `pusher` broadcast driver.
+  `NotificationService::notify()` sends it with `DB::afterCommit` (handlers run inside the consumer's transaction), so
+  a failed handler broadcasts nothing. `ShouldBroadcastNow` (no queue worker); a broadcast error is caught and logged
+  as a warning, so Reverb down never fails an event. Tests run with `BROADCAST_DRIVER=null` and
+  `Event::fake([NotificationCreated::class])`; `NotificationBroadcastTest` shows how to make after-commit callbacks
+  run inside `DatabaseTransactions`.
 - A notification's type is the enum `MoviePlatform\Common\Notifications\NotificationType`, cast on the `Notification` model: handlers create
   notifications with its cases (`NotificationType::Welcome`), never with strings. A new kind of notification needs a
   new case **and** a new migration that replaces the `notifications_type_check` CHECK (`docs/database.md`).
