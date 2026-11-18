@@ -78,7 +78,8 @@ class ProfileService
         return rtrim(config('app.url'), '/').'/'.self::AVATAR_FOLDER;
     }
 
-    private function deleteAvatarFile(?string $url): void
+    /** Deletes an uploaded avatar; a URL outside public/avatars (Google, GitHub) is left alone. Also used by AdminUserService. */
+    public function deleteAvatarFile(?string $url): void
     {
         if ($url !== null && str_starts_with($url, $this->avatarUrl().'/')) {
             File::delete(self::avatarDirectory().'/'.basename($url));
