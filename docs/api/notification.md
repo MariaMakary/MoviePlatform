@@ -82,3 +82,21 @@ Marks all of the current user's unread notifications as read. Already read ones 
 **Response** `204`, no body
 
 **Errors:** `401` no or invalid token
+
+## Real time
+
+Notification broadcasts through Reverb, which runs from the Gateway (`gateway/CLAUDE.md`, "Real time"). The channel is
+private: the Gateway's `/broadcasting/auth` lets only that user listen.
+
+| Event (`broadcastAs`) | Channel | Sent | Payload |
+|---|---|---|---|
+| `NotificationCreated` | `private-user.{user_id}` | after a notification is saved (once the event handler's transaction commits) | `id`, `type`, `title`, `created_at` |
+
+```json
+{"id": "0193a7d0-5555-7aaa-8bbb-000000000600", "type": "new_follower", "title": "Maria Makary started following you", "created_at": "2026-11-03T18:20:00Z"}
+```
+
+The payload is only a signal: the Gateway reloads the unread count and the list through the endpoints above. A
+handler that fails broadcasts nothing, and an event delivered twice broadcasts once. If Reverb is down the
+notification is still saved and the event acked; only the live update is lost (logged as a warning), and the
+Gateway's 30-second polling picks it up.

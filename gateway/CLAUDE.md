@@ -126,6 +126,8 @@ resources/js/                  Echo (Reverb), Leaflet
   `broadcastAs()` as it is). `$refresh` re-renders the component, which loads its data again in `render()`, so the
   page stays right even if an event is missed. `App\Livewire\Social\Shortlist` (the voting section of the movie night
   page) does this; the page itself also listens, for the host only, so the Finalize box shows the current leader.
+- The notification bell (`App\Livewire\Notifications\Bell`) listens to `user.{id}` `.NotificationCreated` the same
+  way. Its view polls every 30 seconds only while `window.Echo` is not connected (Reverb down), as a fallback.
 
 ## Running
 
