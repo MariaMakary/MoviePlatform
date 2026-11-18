@@ -28,12 +28,16 @@ use App\Livewire\Social\FollowList;
 use App\Livewire\Social\MovieNightPage;
 use App\Livewire\Social\MovieNights;
 use App\Livewire\Social\PrivacySettings;
+use App\Livewire\Social\RoomPage;
+use App\Livewire\Social\Rooms;
 use App\Livewire\Social\UserProfile;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', Home::class)->name('home');
 
 Route::get('/movies/{id}', MoviePage::class)->whereUuid('id')->name('movies.show');
+Route::get('/movies/{id}/discussion', RoomPage::class)->whereUuid('id')->middleware('auth.jwt')->name('movies.discussion');
+Route::get('/discussions', Rooms::class)->middleware('auth.jwt')->name('rooms.index');
 
 Route::get('/people/{id}', PersonPage::class)->whereUuid('id')->name('people.show');
 

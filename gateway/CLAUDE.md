@@ -126,6 +126,13 @@ resources/js/                  Echo (Reverb), Leaflet
   `broadcastAs()` as it is). `$refresh` re-renders the component, which loads its data again in `render()`, so the
   page stays right even if an event is missed. `App\Livewire\Social\Shortlist` (the voting section of the movie night
   page) does this; the page itself also listens, for the host only, so the Finalize box shows the current leader.
+- Livewire sends a component's listeners only when the page loads, so a channel whose id comes from a service must be
+  known in `mount()`. **Discussion room** (`/movies/{id}/discussion`, `App\Livewire\Social\RoomPage`; list of rooms at
+  `/discussions`): it loads the room and its latest messages in `mount()`; if Social was down and "Try again" works,
+  it redirects to itself so the listener is registered. Messages pile up (older ones from "Load older", new ones from
+  `.MessageSent` through `receive()`, which appends without duplicates), so it keeps them in properties instead of
+  reloading them in `render()`; only the authors' names and avatars are loaded there (Identity bulk lookup, missing
+  ones only). It dispatches `room-message-added` and `room-older-loaded` for the Alpine auto-scroll.
 
 ## Running
 
