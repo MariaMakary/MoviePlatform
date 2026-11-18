@@ -15,7 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->web(append: [RefreshJwt::class]);
+        $middleware->web(append: [RefreshJwt::class, 'throttle:web']);
         // Not 'admin': packages/common already registers that alias for a JWT bearer token.
         $middleware->alias(['auth.jwt' => RequireLogin::class, 'admin.page' => RequireAdmin::class]);
     })

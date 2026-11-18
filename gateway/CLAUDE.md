@@ -31,6 +31,7 @@ resources/js/                  Echo (Reverb), Leaflet
   |---|---|
   | 2xx | the JSON as an array |
   | 422 | `ValidationException`: errors show under the form fields (`@error('score')`) |
+  | 429 | `ValidationException` on `form` with the service's message (`@error('form')`) |
   | other 4xx | `ServiceRequestException` (status + the service's message; renders the 403/404 page) |
   | no connection or 5xx | `ServiceUnavailable` (logged as a warning) |
 
@@ -105,6 +106,17 @@ resources/js/                  Echo (Reverb), Leaflet
   error, so the next request tries Social again even when it just answered `503` (Catalog down during finalize).
 - **TMDB images:** build poster, backdrop and profile URLs with `App\Services\TmdbImage::url($path, 'w342')` (size
   from TMDB: `w185`, `w342`, `w780`, `original`…). Never build `image.tmdb.org` URLs by hand.
+
+## Rate limits
+
+- Every web request (pages and Livewire updates) goes through `throttle:web`: `config('throttle.web')` per logged-in
+  user, else per IP (`AppServiceProvider`). Over it: Laravel's 429 page.
+- Public forms that call Identity (login, register, forgot and reset password) also use the
+  `App\Livewire\Concerns\ThrottlesByIp` trait: `if ($this->tooManyAttempts('login')) return;` first thing in the
+  action, with the limits in `config/throttle.php`. Over it, the form shows "Too many attempts. Try again in N
+  seconds." and Identity is not called. A successful login calls `clearAttempts('login')`, so only failed logins
+  count (a class shares one Wi-Fi IP). Identity limits the same forms per email (`docs/api/identity.md`), and every
+  service limits each user to 60 requests per minute; all limits are listed in `docs/security.md`.
 
 ## Real time
 

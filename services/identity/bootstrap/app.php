@@ -31,6 +31,7 @@ $app->configure('mail');
 $app->configure('admin');
 $app->configure('queue');
 
+$app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->register(MoviePlatform\Common\CommonServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(Illuminate\Mail\MailServiceProvider::class);
