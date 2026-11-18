@@ -544,3 +544,76 @@ Movie ids are Catalog ids: the Gateway loads titles and posters with Catalog's b
 ```
 
 **Errors:** `401` no or invalid token · `403` `"This action is unauthorized."` (not an admin)
+
+### Review moderation
+
+Used by the Gateway's `/admin/reviews` page (1189). An admin review is the review above plus:
+
+| Field | Type | Content |
+|---|---|---|
+| `is_hidden` | boolean | hidden by an admin (hide / unhide below) |
+| `author_blocked` | boolean | the author is blocked; set and cleared only by `user.blocked` / `user.unblocked`, never by these endpoints |
+
+A review is in the public lists only when both are `false`.
+
+### GET /api/admin/reviews
+
+Every review, hidden and author-blocked ones included, newest first.
+
+**Who:** admin
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `sentiment` | string | query, optional: `positive`, `neutral` or `negative` |
+| `movie_id` | uuid | query, optional |
+| `hidden` | boolean | query, optional: `true` / `1` only reviews with `is_hidden = true`, `false` / `0` only the others (`author_blocked` is not part of this filter) |
+| `page` | integer | query, default 1 |
+| `per_page` | integer | query, default 20, max 100 |
+
+An empty filter (`?sentiment=`) is ignored.
+
+**Response** `200`
+
+```json
+{
+  "data": [
+    {"id": "0193a7d1-6666-7aaa-8bbb-000000000400", "user_id": "0193a7c0-1111-7aaa-8bbb-000000000001", "movie_id": "0193a7c1-3333-7aaa-8bbb-000000000100", "body": "Worst ending ever, I want my two hours back.", "author_score": 1, "sentiment_label": "negative", "sentiment_score": 0.9412, "created_at": "2026-11-03T18:20:00Z", "updated_at": "2026-11-03T18:20:00Z", "is_hidden": false, "author_blocked": false}
+  ],
+  "meta": {"current_page": 1, "last_page": 1, "total": 1}
+}
+```
+
+**Errors:** `401` no or invalid token · `403` not an admin · `422` invalid `sentiment`, `movie_id` or `hidden`
+
+### PATCH /api/admin/reviews/{id}/hide
+
+Sets `is_hidden` to `true`: the review leaves the public lists. Nothing else changes (not `author_blocked`, not
+`updated_at`: it is not an edit by the author). Hiding a hidden review changes nothing. No event.
+
+**Who:** admin
+
+**Response** `200`, the admin review
+
+**Errors:** `401` no or invalid token · `403` not an admin · `404` `"Review not found."`
+
+### PATCH /api/admin/reviews/{id}/unhide
+
+Sets `is_hidden` back to `false`. The review is public again unless `author_blocked` is `true`. Same rules as hide.
+
+**Who:** admin
+
+**Response** `200`, the admin review
+
+**Errors:** `401` no or invalid token · `403` not an admin · `404` `"Review not found."`
+
+### DELETE /api/admin/reviews/{id}
+
+Deletes any review. No event (like the author's delete).
+
+**Who:** admin
+
+**Response** `204`
+
+**Errors:** `401` no or invalid token · `403` not an admin · `404` `"Review not found."`
