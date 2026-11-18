@@ -2,39 +2,35 @@
 
 namespace Database\Seeders;
 
+use App\Models\Activity;
 use App\Services\ActivityService;
-use App\Services\UserDataService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use RuntimeException;
+use MoviePlatform\Common\MovieNights\MovieNightStatus;
+use MoviePlatform\Common\MovieNights\ParticipantStatus;
+use MoviePlatform\Common\Seeding\DemoData;
 
 /**
  * The demo users' follows, privacy settings, movie night, chat and activity feed of seeds/demo.json (task 1289).
  * The feed is built by replaying Engagement's events through ActivityService, exactly as the consumer does.
- * Running it again replaces the demo users' data (UserDataService::deleteAll) and leaves everyone else alone.
- * Never in production.
+ * Running it again replaces only the demo rows: a real user's follows, votes, participations and messages around the
+ * demo users stay. Never in production.
  */
 class DemoSeeder extends Seeder
 {
-    public function __construct(private UserDataService $users, private ActivityService $activities) {}
+    public function __construct(private ActivityService $activities) {}
 
     public function run(): void
     {
-        if (app()->environment('production')) {
-            throw new RuntimeException('The demo data is never seeded in production.');
-        }
-
-        $demo = json_decode(file_get_contents(base_path('../../seeds/demo.json')), true, flags: JSON_THROW_ON_ERROR);
-        $user = fn (int $n) => $demo['users'][$n - 1]['id'];
-        $movie = fn (string $key) => $demo['movies'][$key]['id'];
-        $at = fn (string $time) => Carbon::parse($time)->utc();
+        $demo = DemoData::load();
+        $user = $demo->userId(...);
+        $movie = $demo->movieId(...);
+        $at = DemoData::at(...);
 
         DB::transaction(function () use ($demo, $user, $movie, $at) {
-            foreach ($demo['users'] as $row) {
-                $this->users->deleteAll($row['id']);
-            }
+            $this->forgetDemoRows($demo);
 
             foreach ($demo['follows'] as $row) {
                 DB::table('follows')->insert(['follower_id' => $user($row['follower']), 'following_id' => $user($row['following']), 'created_at' => $at($row['at'])]);
@@ -74,22 +70,45 @@ class DemoSeeder extends Seeder
             .count($demo['rooms']).' chat room and the activity feed.');
     }
 
+    private function save(string $table, string $id, array $fields): void
+    {
+        if (DB::table($table)->where('id', $id)->update($fields) === 0) {
+            DB::table($table)->insert(['id' => $id, ...$fields]);
+        }
+    }
+
+    private function forgetDemoRows(DemoData $demo): void
+    {
+        $userIds = $demo->userIds();
+
+        DB::table('follows')->whereIn('follower_id', $userIds)->whereIn('following_id', $userIds)->delete();
+        DB::table('privacy_settings')->whereIn('user_id', $userIds)->delete();
+        Activity::whereIn('user_id', $userIds)->delete();
+        DB::table('messages')->whereIn('id', array_merge(...array_map(fn (array $room) => array_column($room['messages'], 'id'), $demo['rooms'])))->delete();
+
+        foreach ($demo['movie_nights'] as $night) {
+            DB::table('votes')->where('movie_night_id', $night['id'])->whereIn('user_id', $userIds)->delete();
+            DB::table('participants')->where('movie_night_id', $night['id'])->whereIn('user_id', $userIds)->delete();
+        }
+    }
+
     private function movieNight(array $night, callable $user, callable $movie, callable $at): void
     {
         $created = $at($night['at']);
-        DB::table('movie_nights')->insert(['id' => $night['id'], 'host_id' => $user($night['host']), 'title' => $night['title'],
+        $this->save('movie_nights', $night['id'], ['host_id' => $user($night['host']), 'title' => $night['title'],
             'description' => $night['description'], 'scheduled_at' => $at($night['scheduled_at']), 'location' => $night['location'],
-            'status' => $night['status'], 'created_at' => $created, 'updated_at' => $created]);
+            'status' => MovieNightStatus::from($night['status'])->value, 'created_at' => $created, 'updated_at' => $created]);
 
         // The host takes part like in MovieNightService::create.
-        $participants = [['user' => $night['host'], 'status' => 'accepted'], ...$night['participants']];
+        $participants = [['user' => $night['host'], 'status' => ParticipantStatus::Accepted->value], ...$night['participants']];
         foreach ($participants as $row) {
-            DB::table('participants')->insert(['movie_night_id' => $night['id'], 'user_id' => $user($row['user']), 'status' => $row['status'],
-                'responded_at' => $row['status'] === 'pending' ? null : $created, 'created_at' => $created]);
+            $status = ParticipantStatus::from($row['status']);
+            DB::table('participants')->insert(['movie_night_id' => $night['id'], 'user_id' => $user($row['user']), 'status' => $status->value,
+                'responded_at' => $status === ParticipantStatus::Pending ? null : $created, 'created_at' => $created]);
         }
 
         foreach ($night['candidates'] as $row) {
-            DB::table('candidates')->insert(['id' => $row['id'], 'movie_night_id' => $night['id'], 'movie_id' => $movie($row['movie']),
+            $this->save('candidates', $row['id'], ['movie_night_id' => $night['id'], 'movie_id' => $movie($row['movie']),
                 'added_by' => $user($row['added_by']), 'created_at' => $created]);
         }
 
@@ -100,7 +119,7 @@ class DemoSeeder extends Seeder
     }
 
     /** Engagement's events for the demo data, oldest first: [event, data, occurred_at]. */
-    private function events(array $demo, callable $user, callable $movie): array
+    private function events(DemoData $demo, callable $user, callable $movie): array
     {
         $events = [];
 

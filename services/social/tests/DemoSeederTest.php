@@ -39,6 +39,24 @@ class DemoSeederTest extends TestCase
         $this->assertSame(0, Activity::where('subject_id', '0193a7d2-de00-7aaa-8bbb-000000000003')->count());
     }
 
+    public function test_a_rerun_keeps_what_real_users_did_around_the_demo_users(): void
+    {
+        $real = '0193a7c0-1111-7aaa-8bbb-00000000beef';
+        $candidate = '0193a7e1-de00-7aaa-8bbb-000000000001';
+        $this->seedDemo();
+        DB::table('follows')->insert(['follower_id' => $real, 'following_id' => self::LINA, 'created_at' => '2026-11-16 10:00:00']);
+        DB::table('participants')->insert(['movie_night_id' => self::NIGHT, 'user_id' => $real, 'status' => 'accepted', 'created_at' => '2026-11-16 10:00:00']);
+        DB::table('votes')->insert(['movie_night_id' => self::NIGHT, 'user_id' => $real, 'candidate_id' => $candidate,
+            'created_at' => '2026-11-16 10:00:00', 'updated_at' => '2026-11-16 10:00:00']);
+
+        $this->seedDemo();
+
+        $this->assertTrue(DB::table('follows')->where('follower_id', $real)->where('following_id', self::LINA)->exists());
+        $this->assertTrue(DB::table('participants')->where('movie_night_id', self::NIGHT)->where('user_id', $real)->exists());
+        $this->assertSame($candidate, DB::table('votes')->where('movie_night_id', self::NIGHT)->where('user_id', $real)->value('candidate_id'));
+        $this->assertSame(3, DB::table('votes')->where('movie_night_id', self::NIGHT)->count(), 'The 2 demo votes and the real one.');
+    }
+
     public function test_linas_feed_respects_karims_privacy(): void
     {
         $this->seedDemo();

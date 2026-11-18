@@ -9,7 +9,8 @@ use App\Integration\Handlers\UserRegisteredHandler;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use RuntimeException;
+use MoviePlatform\Common\MovieNights\ParticipantStatus;
+use MoviePlatform\Common\Seeding\DemoData;
 
 /**
  * The demo users' notifications for seeds/demo.json (task 1289): welcome, new followers and movie night invitations,
@@ -22,13 +23,9 @@ class DemoSeeder extends Seeder
 
     public function run(): void
     {
-        if (app()->environment('production')) {
-            throw new RuntimeException('The demo data is never seeded in production.');
-        }
-
-        $demo = json_decode(file_get_contents(base_path('../../seeds/demo.json')), true, flags: JSON_THROW_ON_ERROR);
-        $user = fn (int $n) => $demo['users'][$n - 1];
-        $userIds = array_column($demo['users'], 'id');
+        $demo = DemoData::load();
+        $user = $demo->user(...);
+        $userIds = $demo->userIds();
 
         try {
             DB::transaction(function () use ($demo, $user, $userIds) {
@@ -52,7 +49,7 @@ class DemoSeeder extends Seeder
     }
 
     /** [handler, data, occurred_at], oldest first. */
-    private function events(array $demo, callable $user): array
+    private function events(DemoData $demo, callable $user): array
     {
         $events = [];
 
@@ -71,7 +68,7 @@ class DemoSeeder extends Seeder
                 $events[] = [MovieNightInviteSentHandler::class, ['movie_night_id' => $night['id'], 'user_id' => $user($row['user'])['id'],
                     'host_name' => $host['name'], 'scheduled_at' => $night['scheduled_at']], $night['at']];
 
-                if ($row['status'] !== 'pending') {
+                if (ParticipantStatus::from($row['status']) !== ParticipantStatus::Pending) {
                     $events[] = [MovieNightInviteAnsweredHandler::class, ['movie_night_id' => $night['id'], 'host_id' => $host['id'],
                         'user_name' => $user($row['user'])['name'], 'status' => $row['status']], Carbon::parse($night['at'])->addHour()->toIso8601ZuluString()];
                 }

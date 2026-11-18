@@ -45,6 +45,21 @@ class DemoSeederTest extends TestCase
             ->join('genres', 'genres.id', '=', 'movie_genre.genre_id')->where('movie_id', self::INCEPTION)->pluck('name')->all());
     }
 
+    public function test_a_rerun_leaves_a_movie_synced_from_tmdb_as_it_is(): void
+    {
+        $this->clearDemoTmdbIds();
+        $this->seedDemo();
+        $createdAt = DB::table('movies')->where('id', self::INCEPTION)->value('created_at');
+        DB::table('movies')->where('id', self::INCEPTION)->update(['overview' => 'The full TMDB overview.', 'synced_at' => '2026-11-15 10:00:00']);
+
+        $this->seedDemo();
+
+        $inception = DB::table('movies')->where('id', self::INCEPTION)->first();
+        $this->assertSame('The full TMDB overview.', $inception->overview);
+        $this->assertSame('2026-11-15 10:00:00', $inception->synced_at);
+        $this->assertSame($createdAt, $inception->created_at);
+    }
+
     public function test_it_stops_when_a_tmdb_sync_saved_the_movie_under_another_id(): void
     {
         $this->clearDemoTmdbIds();

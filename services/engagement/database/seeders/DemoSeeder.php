@@ -3,10 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use RuntimeException;
+use MoviePlatform\Common\Seeding\DemoData;
 
 /**
  * The demo users' watchlists, watch history, ratings, reviews and lists of seeds/demo.json (task 1289).
@@ -17,17 +16,13 @@ class DemoSeeder extends Seeder
 {
     public function run(): void
     {
-        if (app()->environment('production')) {
-            throw new RuntimeException('The demo data is never seeded in production.');
-        }
-
-        $demo = json_decode(file_get_contents(base_path('../../seeds/demo.json')), true, flags: JSON_THROW_ON_ERROR);
-        $user = fn (int $n) => $demo['users'][$n - 1]['id'];
-        $movie = fn (string $key) => $demo['movies'][$key]['id'];
-        $at = fn (string $time) => Carbon::parse($time)->utc();
+        $demo = DemoData::load();
+        $user = $demo->userId(...);
+        $movie = $demo->movieId(...);
+        $at = DemoData::at(...);
 
         DB::transaction(function () use ($demo, $user, $movie, $at) {
-            $userIds = array_column($demo['users'], 'id');
+            $userIds = $demo->userIds();
             foreach (['watchlist', 'watch_history', 'ratings', 'reviews', 'lists'] as $table) {
                 DB::table($table)->whereIn('user_id', $userIds)->delete();
             }

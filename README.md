@@ -117,7 +117,8 @@ its own terminal), then from the repository root:
 .\docker\seed-demo.ps1           # add -Fresh to wipe all six databases first
 ```
 
-It runs `php artisan migrate` and `php artisan db:seed` in each service, in this order: Identity, Catalog, Engagement,
+It runs `php artisan migrate` and `php artisan db:seed --class=DemoSeeder` in each service (a plain `db:seed` seeds
+nothing, and the admin of step 5 is separate), in this order: Identity, Catalog, Engagement,
 Social, Notification, Intelligence. Every service seeds its own database from the same file, `seeds/demo.json`, with
 fixed ids, so the six databases agree without any service reading another's database. You get:
 

@@ -29,6 +29,6 @@ class DemoSeederTest extends TestCase
             $lina->where('type', 'movie_night_invite_answered')->pluck('title')->values()->all());
         $this->assertSame(2, $lina->whereNull('read_at')->count(), 'The two newest stay unread.');
 
-        $this->assertSame('Lina Haddad started following you', DB::table('notifications')->where('user_id', self::OMAR)->where('type', 'new_follower')->value('title'));
+        $this->assertSame('Lina Haddad started following you', DB::table('notifications')->where('user_id', self::OMAR)->where('type', 'new_follower')->orderBy('created_at')->value('title'));
     }
 }

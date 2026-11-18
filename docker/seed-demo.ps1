@@ -13,7 +13,7 @@ foreach ($service in 'identity', 'catalog', 'engagement', 'social', 'notificatio
     try {
         php artisan $command --force
         if ($LASTEXITCODE -ne 0) { throw "$service`: $command failed." }
-        php artisan db:seed --force
+        php artisan db:seed --class=DemoSeeder --force
         if ($LASTEXITCODE -ne 0) { throw "$service`: seeding failed (see the message above)." }
     } finally {
         Pop-Location

@@ -5,10 +5,10 @@ namespace Database\Seeders;
 use App\Services\RecommendationService;
 use App\Services\TasteProfileService;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use MoviePlatform\Common\Exceptions\ServiceUnavailable;
+use MoviePlatform\Common\Seeding\DemoData;
 use RuntimeException;
 
 /**
@@ -23,14 +23,10 @@ class DemoSeeder extends Seeder
 
     public function run(): void
     {
-        if (app()->environment('production')) {
-            throw new RuntimeException('The demo data is never seeded in production.');
-        }
-
-        $demo = json_decode(file_get_contents(base_path('../../seeds/demo.json')), true, flags: JSON_THROW_ON_ERROR);
-        $user = fn (int $n) => $demo['users'][$n - 1]['id'];
-        $movie = fn (string $key) => $demo['movies'][$key]['id'];
-        $userIds = array_column($demo['users'], 'id');
+        $demo = DemoData::load();
+        $user = $demo->userId(...);
+        $movie = $demo->movieId(...);
+        $userIds = $demo->userIds();
 
         try {
             DB::transaction(function () use ($demo, $user, $movie, $userIds) {
@@ -42,11 +38,11 @@ class DemoSeeder extends Seeder
                 DB::table('sentiment_results')->whereIn('review_id', array_column($demo['reviews'], 'id'))->delete();
                 foreach ($demo['reviews'] as $row) {
                     DB::table('sentiment_results')->insert(['id' => (string) Str::uuid(), 'review_id' => $row['id'],
-                        'label' => $row['sentiment'][0], 'score' => $row['sentiment'][1], 'created_at' => Carbon::parse($row['at']), 'updated_at' => Carbon::parse($row['at'])]);
+                        'label' => $row['sentiment'][0], 'score' => $row['sentiment'][1], 'created_at' => DemoData::at($row['at']), 'updated_at' => DemoData::at($row['at'])]);
                 }
 
                 foreach ($demo['users'] as $row) {
-                    $this->profiles->setFavoriteGenres($row['id'], array_map(fn (string $genre) => $demo['genres'][$genre]['id'], $row['genres']));
+                    $this->profiles->setFavoriteGenres($row['id'], array_map($demo->genreId(...), $row['genres']));
                 }
 
                 foreach ($this->events($demo, $user, $movie) as [$event, $userId, $movieId, $score]) {
@@ -73,7 +69,7 @@ class DemoSeeder extends Seeder
     }
 
     /** Watches and ratings, oldest first: [watched|rated, user id, movie id, score]. */
-    private function events(array $demo, callable $user, callable $movie): array
+    private function events(DemoData $demo, callable $user, callable $movie): array
     {
         $events = [
             ...array_map(fn (array $row) => ['watched', $user($row['user']), $movie($row['movie']), null, $row['watched_at']], $demo['watch_history']),

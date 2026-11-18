@@ -4,8 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use MoviePlatform\Common\Seeding\DemoData;
 use RuntimeException;
 
 /**
@@ -16,14 +16,10 @@ class DemoSeeder extends Seeder
 {
     public function run(): void
     {
-        if (app()->environment('production')) {
-            throw new RuntimeException('The demo data is never seeded in production.');
-        }
-
-        $demo = json_decode(file_get_contents(base_path('../../seeds/demo.json')), true, flags: JSON_THROW_ON_ERROR);
+        $demo = DemoData::load();
 
         DB::transaction(function () use ($demo) {
-            User::whereIn('id', array_column($demo['users'], 'id'))->delete();
+            User::whereIn('id', $demo->userIds())->delete();
 
             foreach ($demo['users'] as $row) {
                 $taken = User::where('email', User::normalizeEmail($row['email']))->exists();
@@ -34,13 +30,13 @@ class DemoSeeder extends Seeder
 
                 $user = new User(['name' => $row['name'], 'email' => $row['email'], 'password' => $demo['password'], 'bio' => $row['bio']]);
                 $user->id = $row['id'];
-                $user->email_verified_at = $user->created_at = $user->updated_at = Carbon::parse($row['registered_at']);
+                $user->email_verified_at = $user->created_at = $user->updated_at = DemoData::at($row['registered_at']);
                 $user->save();
 
                 foreach ($row['genres'] as $genre) {
                     DB::table('user_genres')->insert([
                         'user_id' => $user->id,
-                        'genre_id' => $demo['genres'][$genre]['id'],
+                        'genre_id' => $demo->genreId($genre),
                         'created_at' => $user->created_at,
                     ]);
                 }
