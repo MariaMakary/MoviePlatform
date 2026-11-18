@@ -105,4 +105,16 @@ class RateLimitTest extends TestCase
             $this->seeStatusCode(429);
         }
     }
+
+    public function test_every_other_route_is_limited_per_user(): void
+    {
+        config(['throttle.api.attempts' => 2]);
+        $this->json('POST', '/api/login', ['email' => 'maria@example.com', 'password' => 'password']);
+        $headers = ['Authorization' => 'Bearer '.$this->response->json('data.token')];
+
+        $this->json('GET', '/api/me', [], $headers)->seeStatusCode(200);
+        $this->json('GET', '/api/me', [], $headers)->seeStatusCode(200);
+        $this->json('GET', '/api/me', [], $headers)->seeStatusCode(429);
+        $this->assertNotNull($this->response->headers->get('Retry-After'));
+    }
 }

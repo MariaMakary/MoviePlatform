@@ -19,7 +19,9 @@ token, which then expires on its own.
 | `POST /api/password/forgot` | 3 | 10 minutes | no |
 | `POST /api/password/reset` | 5 | 10 minutes | yes |
 
-Identity only sees the Gateway's IP, so the per-IP limit is in the Gateway (`gateway/config/throttle.php`).
+Identity only sees the Gateway's IP, so the per-IP limit is in the Gateway (`gateway/config/throttle.php`). The
+limiter is the `throttle` middleware of `packages/common`; every other Identity route also has the common limit of 60
+requests per minute per user (`docs/api/conventions.md`, section 6).
 
 A user, as returned by every endpoint below:
 

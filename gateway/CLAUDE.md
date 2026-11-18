@@ -114,7 +114,9 @@ resources/js/                  Echo (Reverb), Leaflet
 - Public forms that call Identity (login, register, forgot and reset password) also use the
   `App\Livewire\Concerns\ThrottlesByIp` trait: `if ($this->tooManyAttempts('login')) return;` first thing in the
   action, with the limits in `config/throttle.php`. Over it, the form shows "Too many attempts. Try again in N
-  seconds." and Identity is not called. Identity limits the same forms per email (`docs/api/identity.md`).
+  seconds." and Identity is not called. A successful login calls `clearAttempts('login')`, so only failed logins
+  count (a class shares one Wi-Fi IP). Identity limits the same forms per email (`docs/api/identity.md`), and every
+  service limits each user to 60 requests per minute; all limits are listed in `docs/security.md`.
 
 ## Real time
 

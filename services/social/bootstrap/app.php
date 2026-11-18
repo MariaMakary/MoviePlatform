@@ -31,6 +31,7 @@ $app->configure('events');
 $app->configure('broadcasting');
 
 $app->register(Illuminate\Broadcasting\BroadcastServiceProvider::class);
+$app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->register(MoviePlatform\Common\CommonServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 

@@ -161,7 +161,7 @@ own check, so one failing project does not hide the others:
 |---|---|
 | `common` | `composer update` and `vendor/bin/phpunit` in `packages/common` |
 | `identity` … `notification` | `composer install`, `php artisan migrate --force` and `vendor/bin/phpunit`, against a fresh PostgreSQL 16 container (the same engine as Docker) |
-| `gateway` | `composer install`, a `.env` from `.env.example` with a new `APP_KEY`, and `vendor/bin/phpunit` |
+| `gateway (install only)` | `composer install`, to check it still installs (no automated tests) |
 | `secrets` | `bash docker/check-secrets.sh` (below) |
 
 No real secret is used. Each job writes throwaway values into a temporary secrets folder and points `SECRETS_DIR` at
@@ -175,6 +175,9 @@ file in `secrets.example/` is not empty, the code reads a `secret('name')` that 
 `.env.example` has a value for `APP_KEY` or a `…PASSWORD`, `…SECRET`, `…TOKEN`, `…API_KEY` or `…PRIVATE_KEY` key, or
 a private key is committed outside `tests/Fixtures`. It prints names only, never a value. Run it before a PR with
 `bash docker/check-secrets.sh`.
+
+The same job runs gitleaks on the whole git history (secrets committed and deleted later). Results and the local
+command: `docs/security.md`.
 
 A PR can only be merged when every check is green (branch protection on `develop`). If a check fails, open it on the PR
 and read the `Test` step: it is the same output as `vendor/bin/phpunit` on your laptop.
