@@ -38,6 +38,8 @@ Payloads and rules: `docs/events.md`.
 - `Database\Seeders\AdminSeeder` (`php artisan db:seed --class=AdminSeeder`) creates `admin@kaia.com` with role admin
   from `config/admin.php`; the password is `secret('admin_password')`, at least 8 characters, or the seeder stops. If
   the email already exists it changes nothing, so it never turns someone else's account into an admin.
+- `App\Services\StatsService` builds `GET /api/stats` (admin): the totals in one query (`count(*) filter (where …)`)
+  and the signups of the last 30 UTC days, grouped by `created_at::date` and filled with `0` in PHP for empty days.
 - Social login uses Laravel Socialite in **stateless** mode (Lumen has no sessions).
 - Rate limits (task 1287): the `throttle:<name>` middleware of `packages/common` limits each public auth endpoint per
   lowercase email, with Identity's names in `config/throttle.php` (table in `docs/api/identity.md`); every other route
