@@ -10,7 +10,8 @@ trait SignsIn
     use WithServiceFallback;
 
     /** $next: a route to go to instead of the page the user came from (e.g. the genre picker after registration). */
-    protected function signIn(callable $call, string $greeting, ?string $next = null): void
+    /** True when the user is now logged in. */
+    protected function signIn(callable $call, string $greeting, ?string $next = null): bool
     {
         $this->unavailable = [];
 
@@ -23,11 +24,11 @@ trait SignsIn
                 default => throw $e,
             });
 
-            return;
+            return false;
         }
 
         if ($auth === null) {
-            return;
+            return false;
         }
 
         app(AuthSession::class)->start($auth);
@@ -36,9 +37,11 @@ trait SignsIn
         if ($next !== null) {
             $this->redirectRoute($next);
 
-            return;
+            return true;
         }
 
         $this->redirectIntended(route('home'));
+
+        return true;
     }
 }

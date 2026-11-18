@@ -110,6 +110,36 @@ It creates `admin@kaia.com` with role `admin`, with the password in `secrets/adm
 script in step 1, or set your own: at least 8 characters, one line). Running it again changes nothing. Log in with it
 on the Gateway to reach the admin pages.
 
+**6. Demo data** (optional, to see every page filled). Start Catalog first (`cd services/catalog; composer run dev` in
+its own terminal), then from the repository root:
+
+```powershell
+.\docker\seed-demo.ps1           # add -Fresh to wipe all six databases first
+```
+
+It runs `php artisan migrate` and `php artisan db:seed --class=DemoSeeder` in each service (a plain `db:seed` seeds
+nothing, and the admin of step 5 is separate), in this order: Identity, Catalog, Engagement,
+Social, Notification, Intelligence. Every service seeds its own database from the same file, `seeds/demo.json`, with
+fixed ids, so the six databases agree without any service reading another's database. You get:
+
+- 5 users: `lina@`, `omar@`, `sara@`, `karim@` and `nour@example.com`, all with the password `password`, plus the admin
+  of step 5. Each has favourite genres.
+- 10 movies and 12 genres with their real TMDB ids. Opening a movie page fills in the poster, cast and trailer from
+  TMDB (needs `secrets/tmdb_api_key`).
+- Ratings, reviews with their sentiment, watch history, watchlists, and public and private lists.
+- Follows, a movie night with invitations, candidates and votes, a chat room, and the activity feed (Karim hides his
+  ratings, to show privacy at work).
+- Welcome, new-follower and invitation notifications, taste profiles and recommendations.
+
+Social, Notification and Intelligence build their rows by replaying the demo events through their real services (the
+same code the RabbitMQ consumer runs), so the feed, the notification texts and the taste profiles are exactly what real
+use would make. Intelligence needs Catalog running for that; the sentiment comes from the file, so Azure is not called.
+
+Running it again replaces only the demo users' data. A seeder stops with a message when it cannot keep the databases
+in step: a demo email already used by another account, or a demo movie or genre already saved by a TMDB sync under
+another id (`catalog:sync-popular`, `catalog:sync-genres`). Then run it with `-Fresh`. The seeders refuse to run when
+`APP_ENV=production`. To change the demo data, edit `seeds/demo.json` only.
+
 ## Every day
 
 ```powershell
@@ -162,12 +192,22 @@ own check, so one failing project does not hide the others:
 | `common` | `composer update` and `vendor/bin/phpunit` in `packages/common` |
 | `identity` … `notification` | `composer install`, `php artisan migrate --force` and `vendor/bin/phpunit`, against a fresh PostgreSQL 16 container (the same engine as Docker) |
 | `gateway (install only)` | `composer install`, to check it still installs (no automated tests) |
+| `secrets` | `bash docker/check-secrets.sh` (below) |
 
 No real secret is used. Each job writes throwaway values into a temporary secrets folder and points `SECRETS_DIR` at
 it: random values for every name in `secrets.example/`, a fresh RSA key pair (`jwt_private_key`, and the runner's copy
 of `keys/jwt_public.pem`), and a random database password that is set on the job's PostgreSQL user and masked in the
 logs. The tests sign their own tokens with the keys in `tests/Fixtures/jwt`. RabbitMQ and Redis are not needed: tests
 mock RabbitMQ and use the `array` cache.
+
+`docker/check-secrets.sh` fails the `secrets` check when a secret could leak: a file under `secrets/` is committed, a
+file in `secrets.example/` is not empty, the code reads a `secret('name')` that `secrets.example/` does not list, a
+`.env.example` has a value for `APP_KEY` or a `…PASSWORD`, `…SECRET`, `…TOKEN`, `…API_KEY` or `…PRIVATE_KEY` key, or
+a private key is committed outside `tests/Fixtures`. It prints names only, never a value. Run it before a PR with
+`bash docker/check-secrets.sh`.
+
+The same job runs gitleaks on the whole git history (secrets committed and deleted later). Results and the local
+command: `docs/security.md`.
 
 A PR can only be merged when every check is green (branch protection on `develop`). If a check fails, open it on the PR
 and read the `Test` step: it is the same output as `vendor/bin/phpunit` on your laptop.

@@ -29,6 +29,7 @@ $app->singleton(
 $app->configure('app');
 $app->configure('events');
 
+$app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->register(MoviePlatform\Common\CommonServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 

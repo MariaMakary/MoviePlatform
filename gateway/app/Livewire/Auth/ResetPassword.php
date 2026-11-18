@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Auth;
 
+use App\Livewire\Concerns\ThrottlesByIp;
 use App\Livewire\Concerns\WithServiceFallback;
 use App\Services\Clients\IdentityClient;
 use Illuminate\Contracts\View\View;
@@ -14,6 +15,7 @@ use Livewire\Component;
 #[Title('Choose a new password')]
 class ResetPassword extends Component
 {
+    use ThrottlesByIp;
     use WithServiceFallback;
 
     #[Locked, Url]
@@ -29,6 +31,10 @@ class ResetPassword extends Component
     public function resetPassword(IdentityClient $identity)
     {
         $this->unavailable = [];
+
+        if ($this->tooManyAttempts('password_reset')) {
+            return null;
+        }
 
         $this->fromService('identity', fn () => $identity->resetPassword([
             'email' => $this->email,

@@ -31,6 +31,7 @@ resources/js/                  Echo (Reverb), Leaflet
   |---|---|
   | 2xx | the JSON as an array |
   | 422 | `ValidationException`: errors show under the form fields (`@error('score')`) |
+  | 429 | `ValidationException` on `form` with the service's message (`@error('form')`) |
   | other 4xx | `ServiceRequestException` (status + the service's message; renders the 403/404 page) |
   | no connection or 5xx | `ServiceUnavailable` (logged as a warning) |
 
@@ -106,6 +107,17 @@ resources/js/                  Echo (Reverb), Leaflet
 - **TMDB images:** build poster, backdrop and profile URLs with `App\Services\TmdbImage::url($path, 'w342')` (size
   from TMDB: `w185`, `w342`, `w780`, `original`…). Never build `image.tmdb.org` URLs by hand.
 
+## Rate limits
+
+- Every web request (pages and Livewire updates) goes through `throttle:web`: `config('throttle.web')` per logged-in
+  user, else per IP (`AppServiceProvider`). Over it: Laravel's 429 page.
+- Public forms that call Identity (login, register, forgot and reset password) also use the
+  `App\Livewire\Concerns\ThrottlesByIp` trait: `if ($this->tooManyAttempts('login')) return;` first thing in the
+  action, with the limits in `config/throttle.php`. Over it, the form shows "Too many attempts. Try again in N
+  seconds." and Identity is not called. A successful login calls `clearAttempts('login')`, so only failed logins
+  count (a class shares one Wi-Fi IP). Identity limits the same forms per email (`docs/api/identity.md`), and every
+  service limits each user to 60 requests per minute; all limits are listed in `docs/security.md`.
+
 ## Real time
 
 - The **Reverb** server runs from this project: `php artisan reverb:start` (port 8080), started by `composer run dev`.
@@ -128,6 +140,13 @@ resources/js/                  Echo (Reverb), Leaflet
   page) does this; the page itself also listens, for the host only, so the Finalize box shows the current leader.
 - The notification bell (`App\Livewire\Notifications\Bell`) listens to `user.{id}` `.NotificationCreated` the same
   way. Its view polls every 30 seconds only while `window.Echo` is not connected (Reverb down), as a fallback.
+- Livewire sends a component's listeners only when the page loads, so a channel whose id comes from a service must be
+  known in `mount()`. **Discussion room** (`/movies/{id}/discussion`, `App\Livewire\Social\RoomPage`; list of rooms at
+  `/discussions`): it loads the room and its latest messages in `mount()`; if Social was down and "Try again" works,
+  it redirects to itself so the listener is registered. Messages pile up (older ones from "Load older", new ones from
+  `.MessageSent` through `receive()`, which appends without duplicates), so it keeps them in properties instead of
+  reloading them in `render()`; only the authors' names and avatars are loaded there (Identity bulk lookup, missing
+  ones only). It dispatches `room-message-added` and `room-older-loaded` for the Alpine auto-scroll.
 
 ## Running
 

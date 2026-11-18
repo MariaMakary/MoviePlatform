@@ -1,0 +1,12 @@
+# gitleaks settings (task 1287, docs/security.md): the default rules, minus values that are public on purpose.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Values that are not secrets"
+# RSA key pairs generated only for the tests: they sign test tokens and are trusted nowhere else.
+paths = ['''(^|/)tests/Fixtures/jwt/[^/]+\.pem$''']
+# Reverb's app key is public by design: the Gateway sends it to every browser (VITE_REVERB_APP_KEY) so Echo can
+# connect. The secret part is reverb_app_secret, which lives only in secrets/.
+regexTarget = "line"
+regexes = ['''^\s*(VITE_)?REVERB_APP_KEY=''']

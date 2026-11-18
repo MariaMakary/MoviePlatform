@@ -3,6 +3,7 @@
 namespace App\Livewire\Auth;
 
 use App\Livewire\Concerns\SignsIn;
+use App\Livewire\Concerns\ThrottlesByIp;
 use App\Services\Clients\IdentityClient;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Title;
@@ -12,6 +13,7 @@ use Livewire\Component;
 class Register extends Component
 {
     use SignsIn;
+    use ThrottlesByIp;
 
     public string $name = '';
 
@@ -23,6 +25,10 @@ class Register extends Component
 
     public function register(IdentityClient $identity): void
     {
+        if ($this->tooManyAttempts('register')) {
+            return;
+        }
+
         $this->signIn(fn () => $identity->register([
             'name' => $this->name,
             'email' => $this->email,
