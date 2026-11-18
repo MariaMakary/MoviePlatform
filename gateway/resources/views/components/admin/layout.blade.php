@@ -3,6 +3,7 @@
 {{-- A new admin page: wrap its view in this component and add its link to $links. --}}
 @php($links = [
     ['label' => 'Dashboard', 'href' => route('admin.dashboard'), 'active' => request()->routeIs('admin.dashboard')],
+    ['label' => 'Movies', 'href' => route('admin.movies'), 'active' => request()->routeIs('admin.movies')],
 ])
 
 <div class="flex flex-col gap-6 md:flex-row md:gap-8">
