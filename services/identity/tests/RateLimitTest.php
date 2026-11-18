@@ -54,6 +54,13 @@ class RateLimitTest extends TestCase
         $this->seeStatusCode(429);
     }
 
+    public function test_an_email_that_is_not_a_string_gets_422_not_500(): void
+    {
+        $this->json('POST', '/api/login', ['email' => ['maria@example.com'], 'password' => 'wrong-password']);
+
+        $this->seeStatusCode(422);
+    }
+
     public function test_the_limit_is_per_email_and_ignores_case(): void
     {
         for ($i = 0; $i < 5; $i++) {
@@ -104,5 +111,17 @@ class RateLimitTest extends TestCase
             $this->json('POST', $uri, ['email' => 'new@example.com']);
             $this->seeStatusCode(429);
         }
+    }
+
+    public function test_every_other_route_is_limited_per_user(): void
+    {
+        config(['throttle.api.attempts' => 2]);
+        $this->json('POST', '/api/login', ['email' => 'maria@example.com', 'password' => 'password']);
+        $headers = ['Authorization' => 'Bearer '.$this->response->json('data.token')];
+
+        $this->json('GET', '/api/me', [], $headers)->seeStatusCode(200);
+        $this->json('GET', '/api/me', [], $headers)->seeStatusCode(200);
+        $this->json('GET', '/api/me', [], $headers)->seeStatusCode(429);
+        $this->assertNotNull($this->response->headers->get('Retry-After'));
     }
 }

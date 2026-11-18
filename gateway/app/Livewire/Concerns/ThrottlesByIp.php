@@ -11,7 +11,7 @@ trait ThrottlesByIp
     protected function tooManyAttempts(string $action): bool
     {
         $limit = config("throttle.$action");
-        $key = "throttle:$action:".request()->ip();
+        $key = $this->throttleKey($action);
 
         if (RateLimiter::tooManyAttempts($key, $limit['attempts'])) {
             $this->addError('form', 'Too many attempts. Try again in '.RateLimiter::availableIn($key).' seconds.');
@@ -22,5 +22,16 @@ trait ThrottlesByIp
         RateLimiter::hit($key, $limit['minutes'] * 60);
 
         return false;
+    }
+
+    /** After a successful login: only failed attempts count, so a class sharing one Wi-Fi IP is not locked out. */
+    protected function clearAttempts(string $action): void
+    {
+        RateLimiter::clear($this->throttleKey($action));
+    }
+
+    private function throttleKey(string $action): string
+    {
+        return "throttle:$action:".request()->ip();
     }
 }

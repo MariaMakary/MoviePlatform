@@ -25,7 +25,9 @@ class Login extends Component
             return;
         }
 
-        $this->signIn(fn () => $identity->login($this->email, $this->password), 'Welcome back');
+        if ($this->signIn(fn () => $identity->login($this->email, $this->password), 'Welcome back')) {
+            $this->clearAttempts('login');
+        }
     }
 
     public function render(): View
