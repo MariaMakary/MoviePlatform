@@ -53,6 +53,26 @@ class CatalogClient extends BaseClient
         return $this->get('/api/genres')['data'];
     }
 
+    public function adminMovies(string $query, int $page = 1): array
+    {
+        return $this->get('/api/admin/movies', array_filter(['q' => $query, 'page' => $page]));
+    }
+
+    public function updateMovie(string $id, array $data): array
+    {
+        return $this->put('/api/admin/movies/'.rawurlencode($id), $data)['data'];
+    }
+
+    public function deleteMovie(string $id): void
+    {
+        $this->delete('/api/admin/movies/'.rawurlencode($id));
+    }
+
+    public function importMovie(int $tmdbId): array
+    {
+        return $this->post('/api/admin/movies/import', ['tmdb_id' => $tmdbId])['data'];
+    }
+
     public function genreMovies(string $genreId, string $sort, int $page = 1): array
     {
         return $this->get('/api/genres/'.rawurlencode($genreId).'/movies', ['sort' => $sort, 'page' => $page]);
