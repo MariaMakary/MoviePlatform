@@ -22,6 +22,9 @@ Payloads and rules: `docs/events.md`.
   already processed.
 - `MovieDeleted` goes through `App\Services\MovieDataService`: it deletes the movie's ratings, reviews, watchlist and
   history entries and list items; the lists themselves stay.
+- Moderation (`/api/admin/reviews`, `App\Http\Controllers\Api\AdminReviewController`): `ReviewService::forAdmin()`
+  lists every review (no `visible()` scope) and `setHidden()` changes only `is_hidden` with a query, without touching
+  `updated_at`, like `UserDataService`. `AdminReviewResource` extends `ReviewResource` with both flags.
 - Review sentiment is not computed here: Intelligence sends it back with `review.analyzed`, stored as `sentiment_label` / `sentiment_score`.
 - Admin stats (`GET /api/stats`, `App\Services\StatsService`) are computed with grouped queries on every call, no
   cache. Limits are the constants `TOP` (10), `MIN_RATINGS` (3) and `MOVIE_COUNTS` (200). Tests empty the tables
