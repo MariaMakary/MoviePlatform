@@ -73,6 +73,14 @@ upserts one movie by `tmdb_id`: its fields, genres, top 15 cast, director(s), tr
 UNIQUE (`movie_id`, `person_id`, `role`); a credit that left TMDB's top 15 is removed. If TMDB is down, the commands
 print "TMDB is unavailable." and exit with code 1; movies saved before the error are kept.
 
+## Admin
+
+`App\Services\AdminMovieService` (routes under `/api/admin/movies`, `jwt` + `admin` middleware): list with a title
+search (`ilike`), edit (sets `is_edited = true`, which `MovieSyncService::sync` already respects), delete (publishes
+`MovieDeleted` through `EventPublisher` after the commit; genres and credits go with the cascade) and import
+(`MovieSyncService::sync`, `422` if the `tmdb_id` is already in the database). Tests sign tokens with the test keys in
+`tests/Fixtures/jwt` and mock `RabbitMqConnection` to capture what is published.
+
 ## Models
 
 `Movie`, `Genre`, `Person` (table `people`) with factories in `database/factories`. Credits live in `movie_person`
