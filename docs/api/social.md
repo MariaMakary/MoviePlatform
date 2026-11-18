@@ -586,6 +586,41 @@ characters (`errors.body`)
 
 **Real time:** broadcasts `MessageSent` on `private-room.{id}` once the message is saved (see below)
 
+## Admin
+
+### GET /api/stats
+
+Numbers for the admin dashboard (1269): the user activity chart and the most active users table. Grouped queries on
+every call, no cache. Every row counts, the activity of blocked users included (like Engagement's `GET /api/stats`).
+
+**Who:** admin
+
+**Response** `200`
+
+| Field | Type | Content |
+|---|---|---|
+| `activity_per_day` | object[] | exactly 30 `{date, count}`, the last 30 **UTC** days with today, oldest first; `count` = feed activities (ratings, reviews, watches, public lists) created that day, `0` for a day without any |
+| `follows` | integer | follow relationships |
+| `movie_nights` | object | `created`: every movie night, `finalized`: those with status `finalized` |
+| `messages_last_7_days` | integer | chat messages sent in the last 7 × 24 hours |
+| `most_active_users` | object[] | top 10 `{user_id, activities}` by feed activities of all time, most first; ties: smaller `user_id` first |
+
+User ids are Identity ids: the Gateway loads names and avatars with Identity's bulk lookup.
+
+```json
+{
+  "data": {
+    "activity_per_day": [{"date": "2026-10-20", "count": 0}, {"date": "2026-10-21", "count": 4}, …, {"date": "2026-11-18", "count": 7}],
+    "follows": 58,
+    "movie_nights": {"created": 9, "finalized": 4},
+    "messages_last_7_days": 31,
+    "most_active_users": [{"user_id": "0193a7c0-1111-7aaa-8bbb-000000000001", "activities": 42}]
+  }
+}
+```
+
+**Errors:** `401` no or invalid token · `403` `"This action is unauthorized."` (not an admin)
+
 ## Real time
 
 Social broadcasts through Reverb, which runs from the Gateway (`gateway/CLAUDE.md`, "Real time"). Channels are

@@ -36,3 +36,7 @@ $router->group(['middleware' => 'jwt'], function ($router) use ($uuid) {
     $router->get("/rooms/{id:$uuid}/messages", 'Api\RoomController@messages');
     $router->post("/rooms/{id:$uuid}/messages", 'Api\RoomController@store');
 });
+
+$router->group(['middleware' => ['jwt', 'admin']], function ($router) {
+    $router->get('/stats', 'Api\StatsController@show');
+});
