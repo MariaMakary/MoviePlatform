@@ -1,7 +1,7 @@
 # Security checks
 
-What protects MoviePlatform, how each part is checked, and the results of the last review (task 1287,
-2026-11-18). Update the results table in the PR that changes one of these areas.
+What protects MoviePlatform, how each part is checked, and the results of the last reviews (task 1287, 2026-11-18;
+authorization, task 1286, 2026-11-19). Update the results table in the PR that changes one of these areas.
 
 ## Results
 
@@ -13,6 +13,7 @@ What protects MoviePlatform, how each part is checked, and the results of the la
 | Blade never prints user input unescaped | Every Gateway view searched for `{!! !!}` | None: every view uses `{{ }}` |
 | Avatar uploads are images of at most 2 MB | Validation rules and tests in Identity and the Gateway | JPG or PNG only, at most 2048 KB |
 | Auth endpoints and APIs are rate limited | Tests in Identity (`RateLimitTest`) and common | 429 + `Retry-After` past the limits below |
+| Every authorization rule refuses the wrong user | Each rule tried on the running system with a wrong user, a guest and a forged token (2026-11-19): see [Authorization](#authorization) | 96/96 refused or allowed as expected; no failure |
 
 ## Secrets
 
@@ -79,3 +80,54 @@ PNG. Files are saved under a new UUID name, never the uploaded one.
 The services only see the Gateway's IP, so they count per email or per user and the per-IP limits are in the Gateway.
 The Gateway limits are high on purpose: a class on one university Wi-Fi shares one IP. Counters are kept in Redis
 (`CACHE_DRIVER=redis`), shared by every process of a service.
+
+## Authorization
+
+Every service decides for itself who may do what, from the JWT (`jwt` middleware: RS256, signature checked with
+`keys/jwt_public.pem`); the Gateway only hides pages. Rules and where they are enforced:
+
+| Rule | Enforced by |
+|---|---|
+| Only the author edits or deletes a review; only the owner changes a list or its movies | Engagement `ReviewPolicy` / `ListPolicy` (`403`) |
+| A private list is visible only to its owner | Engagement `ListService::findVisible` (`404`, like an unknown id, so nobody learns it exists); `publicListsOf` and the public search leave it out |
+| Only participants see a movie night or act on it; only the host invites, finalizes or cancels | Social `MovieNight::withParticipant` (`404` for others), host checks in `ParticipantService` / `MovieNightService` (`403`); removing a candidate needs who added it or the host (`403`) |
+| A user reads and marks only their own notifications | Notification `Notification::ownedBy` (`404` for another user's) |
+| Recommendations: only the user themselves or an admin | Intelligence gate `view-recommendations` (`403`) |
+| Admin endpoints need role `admin` | `jwt` + `admin` middleware of `packages/common` (`401` without a valid token, `403` for a normal user) |
+| `/api/internal/*` needs the service token | `service` middleware (`X-Service-Token` = `secret('service_token')`, `401` otherwise; a user's JWT is not enough) |
+| Admin pages need an admin session | Gateway `/admin` group with `auth.jwt` + `admin.page` (guest → `/login`, normal user → `403`); both are Livewire persistent middleware, so they also guard the pages' actions |
+| Private channels | Gateway `routes/channels.php` (`broadcast` guard): `user.{id}` only that user, `movie-night.{id}` only participants (asked to Social with the user's token), `room.{id}` any logged-in user (rooms are public); guests never |
+
+### How it was checked
+
+A script logged in three throwaway members (an owner, another user, an outsider) and the admin, gave the owner a
+review, a private list, a movie night (the other user invited and accepted) and a notification, then tried every rule
+on the running system (all six services and the Gateway, `develop` of 2026-11-19) with the wrong user, a guest and
+forged tokens, plus one allowed call per rule as a control. Gateway checks used real browser sessions (Livewire login,
+then pages and `POST /broadcasting/auth`). **96 of 96 answered as expected.**
+
+| Area | Tried | Answer |
+|---|---|---|
+| Engagement | Another user edits or deletes the review; changes, deletes, adds to or removes from the list | `403` |
+| Engagement | Another user or a guest opens the private list; it is missing from the owner's public lists, from "my lists" of another user and from the public search | `404` / absent |
+| Social | Non-participant opens, RSVPs, adds a candidate or votes; it is missing from their list of nights | `404` / absent |
+| Social | Participant (not host) invites, finalizes or cancels; removes a candidate someone else added | `403` |
+| Notification | Another user marks the notification read; it is missing from their list | `404` / absent |
+| Intelligence | Another user reads the recommendations (the user and an admin can) | `403` |
+| Admin endpoints | Engagement `/stats` and `/admin/reviews` (4), Catalog `/admin/movies` (4), Intelligence `/sentiment/analyze`, as a normal user and as a guest | `403` / `401`; the movie was still there after the refused delete |
+| Forged tokens | An admin token signed with another key, an `alg: none` token, a user's token with `role` changed to `admin` | `401` on every service tried |
+| Internal API | Catalog's four `/api/internal/*` routes without the token, with a wrong token, with a user's JWT | `401`; the right token gets `200` |
+| Gateway pages | `/admin`, `/admin/movies` as guest and as a normal user; `/feed`, `/lists`, `/movie-nights`, `/notifications`, `/profile` as guest; another user's private list and movie night | `302` to `/login` / `403` / `404` |
+| Gateway channels | `user.{id}` of someone else, `movie-night.{id}` as a non-participant, any channel as a guest, `room.{not a uuid}` | `403` |
+
+Admin endpoints that were not on `develop` yet are covered by their own tests: Identity `/api/admin/users` (1271,
+`AdminUserApiTest`), Social `/api/stats` (1267, `StatsApiTest`) and the Gateway's `/admin/reviews` and `/admin/users`
+pages (1189, 1273). Run the same checks again after they are merged.
+
+### Known limits
+
+- **A token stays valid until it expires (at most 30 minutes).** Services only check the signature, so a user who is
+  blocked or deleted keeps access to the other services until then; Identity refuses them at once (`/api/me`, login,
+  refresh) and the Gateway logs them out at its next token refresh. Accepted for this project: closing it would need a
+  token deny-list every service checks.
+- `room.{id}` lets any logged-in user listen to any room: rooms are public on purpose (one per movie).
