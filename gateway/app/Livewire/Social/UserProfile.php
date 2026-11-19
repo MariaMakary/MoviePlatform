@@ -13,7 +13,7 @@ use Livewire\Attributes\Locked;
 use Livewire\Component;
 
 /**
- * /users/{id}: Identity profile, Social follow counts and button, Engagement reviews and public lists.
+ * /users/{id}: Identity profile, Social follow counts and button and recent activity, Engagement reviews and public lists.
  * Reviews, ratings and lists follow the user's privacy settings for everyone but the user; when Social cannot say
  * what is allowed, those sections stay hidden. Each section falls back on its own.
  */
@@ -24,6 +24,8 @@ class UserProfile extends Component
     private const REVIEWS_SHOWN = 5;
 
     private const LISTS_SHOWN = 6;
+
+    private const ACTIVITY_SHOWN = 10;
 
     private const SHOW_ALL = ['show_reviews' => true, 'show_ratings' => true, 'show_lists' => true];
 
@@ -46,7 +48,14 @@ class UserProfile extends Component
             ? $this->fromService('lists', fn () => $engagement->userLists($this->id, 1, self::LISTS_SHOWN))
             : null;
 
-        $movieIds = array_column($reviews['data'] ?? [], 'movie_id');
+        // Social applies the privacy settings itself (and shows the owner everything), so it is always asked.
+        $activity = $this->fromService('activity', fn () => $social->userActivity($this->id, 1, self::ACTIVITY_SHOWN)['data']);
+
+        // One Catalog call for the reviews' and the activity's movies.
+        $movieIds = array_values(array_unique(array_filter([
+            ...array_column($reviews['data'] ?? [], 'movie_id'),
+            ...array_column($activity ?? [], 'movie_id'),
+        ])));
         $movies = $movieIds === [] ? [] : $this->fromService('movies', fn () => $catalog->movies($movieIds), []);
 
         return view('livewire.social.user-profile', [
@@ -55,6 +64,7 @@ class UserProfile extends Component
             'privacy' => $privacy,
             'reviews' => $reviews,
             'lists' => $lists,
+            'activity' => $activity,
             'movies' => array_column($movies, null, 'id'),
         ])->title($user['name'] ?? 'Profile');
     }
