@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LogoutController;
 use App\Livewire\Admin\Dashboard;
+use App\Livewire\Admin\Users as AdminUsers;
 use App\Livewire\Auth\FavoriteGenres;
 use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Auth\Login;
@@ -67,6 +68,7 @@ Route::get('/lists/{id}', ListPage::class)->whereUuid('id')->name('lists.show');
 
 Route::middleware(['auth.jwt', 'admin.page'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', Dashboard::class)->name('dashboard');
+    Route::get('/users', AdminUsers::class)->name('users');
 });
 
 Route::get('/movie-nights', MovieNights::class)->middleware('auth.jwt')->name('movie-nights.index');
