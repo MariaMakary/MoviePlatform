@@ -21,3 +21,7 @@ $router->group(['middleware' => 'jwt'], function ($router) {
 
     $router->get('/users/search', 'Api\UserController@search');
 });
+
+$router->group(['middleware' => ['jwt', 'admin']], function ($router) {
+    $router->get('/stats', 'Api\StatsController@show');
+});
