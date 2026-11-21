@@ -1,4 +1,17 @@
-<div wire:poll.30s class="relative" x-on:click.outside="$wire.expanded && $wire.close()" x-on:keydown.escape.window="$wire.expanded && $wire.close()">
+{{-- Live updates come through Echo (NotificationCreated). Polling every 30 seconds is only the fallback while the WebSocket is not connected. --}}
+<div class="relative"
+     x-data="{
+         timer: null,
+         init() {
+             this.timer = setInterval(() => {
+                 if (! document.hidden && window.Echo?.connector?.pusher?.connection?.state !== 'connected') {
+                     $wire.$refresh();
+                 }
+             }, 30000);
+         },
+         destroy() { clearInterval(this.timer); },
+     }"
+     x-on:click.outside="$wire.expanded && $wire.close()" x-on:keydown.escape.window="$wire.expanded && $wire.close()">
     <button type="button" wire:click="toggle" class="relative rounded-full p-2 text-gray-300 hover:bg-white/5 hover:text-white"
             aria-label="Notifications{{ $count ? " ({$count} unread)" : '' }}" aria-haspopup="true" aria-expanded="{{ $expanded ? 'true' : 'false' }}">
         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">

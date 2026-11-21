@@ -100,6 +100,11 @@ abstract class BaseClient
             );
         }
 
+        // Rate limited (e.g. Identity's login): shown on the form like a validation error.
+        if ($response->status() === 429) {
+            throw ValidationException::withMessages(['form' => [$response->json('message') ?? 'Too many attempts. Try again later.']]);
+        }
+
         if ($response->serverError()) {
             throw $this->unavailable($method, $path, null, $response->status());
         }

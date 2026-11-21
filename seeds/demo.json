@@ -1,0 +1,116 @@
+{
+  "_about": "Demo data shared by every service's DemoSeeder (task 1289). Fixed ids, so the six databases point at the same users and movies. Edit here only: each service reads its part. Every demo user's password is 'password'.",
+  "password": "password",
+  "users": [
+    {"id": "0193a7c0-de00-7aaa-8bbb-000000000001", "name": "Lina Haddad", "email": "lina@example.com", "bio": "Nolan fan, sci-fi first.", "genres": ["scifi", "adventure", "drama"], "registered_at": "2026-11-01T09:00:00Z"},
+    {"id": "0193a7c0-de00-7aaa-8bbb-000000000002", "name": "Omar Khoury", "email": "omar@example.com", "bio": "Crime movies and long nights.", "genres": ["crime", "thriller", "drama"], "registered_at": "2026-11-01T10:00:00Z"},
+    {"id": "0193a7c0-de00-7aaa-8bbb-000000000003", "name": "Sara Nassar", "email": "sara@example.com", "bio": "Animation and musicals.", "genres": ["animation", "music", "romance"], "registered_at": "2026-11-02T08:30:00Z"},
+    {"id": "0193a7c0-de00-7aaa-8bbb-000000000004", "name": "Karim Aoun", "email": "karim@example.com", "bio": null, "genres": ["action", "scifi"], "registered_at": "2026-11-03T18:00:00Z"},
+    {"id": "0193a7c0-de00-7aaa-8bbb-000000000005", "name": "Nour Saliba", "email": "nour@example.com", "bio": "Watching everything once.", "genres": [], "registered_at": "2026-11-05T12:00:00Z"}
+  ],
+  "genres": {
+    "action": {"id": "0193a7b0-de00-7aaa-8bbb-000000000028", "tmdb_id": 28, "name": "Action"},
+    "adventure": {"id": "0193a7b0-de00-7aaa-8bbb-000000000012", "tmdb_id": 12, "name": "Adventure"},
+    "animation": {"id": "0193a7b0-de00-7aaa-8bbb-000000000016", "tmdb_id": 16, "name": "Animation"},
+    "comedy": {"id": "0193a7b0-de00-7aaa-8bbb-000000000035", "tmdb_id": 35, "name": "Comedy"},
+    "crime": {"id": "0193a7b0-de00-7aaa-8bbb-000000000080", "tmdb_id": 80, "name": "Crime"},
+    "drama": {"id": "0193a7b0-de00-7aaa-8bbb-000000000018", "tmdb_id": 18, "name": "Drama"},
+    "family": {"id": "0193a7b0-de00-7aaa-8bbb-000000010751", "tmdb_id": 10751, "name": "Family"},
+    "fantasy": {"id": "0193a7b0-de00-7aaa-8bbb-000000000014", "tmdb_id": 14, "name": "Fantasy"},
+    "music": {"id": "0193a7b0-de00-7aaa-8bbb-000000010402", "tmdb_id": 10402, "name": "Music"},
+    "romance": {"id": "0193a7b0-de00-7aaa-8bbb-000000010749", "tmdb_id": 10749, "name": "Romance"},
+    "scifi": {"id": "0193a7b0-de00-7aaa-8bbb-000000000878", "tmdb_id": 878, "name": "Science Fiction"},
+    "thriller": {"id": "0193a7b0-de00-7aaa-8bbb-000000000053", "tmdb_id": 53, "name": "Thriller"}
+  },
+  "movies": {
+    "inception": {"id": "0193a7c1-de00-7aaa-8bbb-000000000101", "tmdb_id": 27205, "title": "Inception", "release_date": "2010-07-15", "runtime": 148, "vote_average": 8.4, "genres": ["action", "scifi", "adventure"], "overview": "A thief who steals secrets through dream-sharing is given one last job: to plant an idea instead."},
+    "dark_knight": {"id": "0193a7c1-de00-7aaa-8bbb-000000000102", "tmdb_id": 155, "title": "The Dark Knight", "release_date": "2008-07-16", "runtime": 152, "vote_average": 8.5, "genres": ["drama", "action", "crime", "thriller"], "overview": "Batman faces the Joker, a criminal who wants to plunge Gotham into chaos."},
+    "interstellar": {"id": "0193a7c1-de00-7aaa-8bbb-000000000103", "tmdb_id": 157336, "title": "Interstellar", "release_date": "2014-11-05", "runtime": 169, "vote_average": 8.4, "genres": ["adventure", "drama", "scifi"], "overview": "Explorers travel through a wormhole to find a new home for humanity."},
+    "parasite": {"id": "0193a7c1-de00-7aaa-8bbb-000000000104", "tmdb_id": 496243, "title": "Parasite", "release_date": "2019-05-30", "runtime": 133, "vote_average": 8.5, "genres": ["comedy", "thriller", "drama"], "overview": "A poor family slowly works its way into the household of a wealthy one."},
+    "spirited_away": {"id": "0193a7c1-de00-7aaa-8bbb-000000000105", "tmdb_id": 129, "title": "Spirited Away", "release_date": "2001-07-20", "runtime": 125, "vote_average": 8.5, "genres": ["animation", "family", "fantasy"], "overview": "A girl wanders into a world of spirits and must free her parents."},
+    "godfather": {"id": "0193a7c1-de00-7aaa-8bbb-000000000106", "tmdb_id": 238, "title": "The Godfather", "release_date": "1972-03-14", "runtime": 175, "vote_average": 8.7, "genres": ["drama", "crime"], "overview": "The aging head of a crime family hands control of his empire to his reluctant son."},
+    "pulp_fiction": {"id": "0193a7c1-de00-7aaa-8bbb-000000000107", "tmdb_id": 680, "title": "Pulp Fiction", "release_date": "1994-09-10", "runtime": 154, "vote_average": 8.5, "genres": ["thriller", "crime"], "overview": "Stories of two hitmen, a boxer and a gangster's wife intertwine in Los Angeles."},
+    "matrix": {"id": "0193a7c1-de00-7aaa-8bbb-000000000108", "tmdb_id": 603, "title": "The Matrix", "release_date": "1999-03-30", "runtime": 136, "vote_average": 8.2, "genres": ["action", "scifi"], "overview": "A hacker learns that his world is a simulation and joins the fight against its machines."},
+    "whiplash": {"id": "0193a7c1-de00-7aaa-8bbb-000000000109", "tmdb_id": 244786, "title": "Whiplash", "release_date": "2014-10-10", "runtime": 107, "vote_average": 8.4, "genres": ["drama", "music"], "overview": "A young drummer is pushed to his limits by a ruthless music teacher."},
+    "la_la_land": {"id": "0193a7c1-de00-7aaa-8bbb-000000000110", "tmdb_id": 313369, "title": "La La Land", "release_date": "2016-11-29", "runtime": 129, "vote_average": 7.9, "genres": ["comedy", "drama", "romance", "music"], "overview": "A jazz pianist and an aspiring actress fall in love while chasing their dreams in Los Angeles."}
+  },
+  "watch_history": [
+    {"user": 1, "movie": "inception", "watched_at": "2026-11-06T20:30:00Z"},
+    {"user": 1, "movie": "interstellar", "watched_at": "2026-11-08T21:00:00Z"},
+    {"user": 1, "movie": "matrix", "watched_at": "2026-11-10T19:00:00Z"},
+    {"user": 2, "movie": "godfather", "watched_at": "2026-11-04T22:00:00Z"},
+    {"user": 2, "movie": "pulp_fiction", "watched_at": "2026-11-07T23:00:00Z"},
+    {"user": 2, "movie": "dark_knight", "watched_at": "2026-11-11T20:00:00Z"},
+    {"user": 3, "movie": "spirited_away", "watched_at": "2026-11-05T17:00:00Z"},
+    {"user": 3, "movie": "la_la_land", "watched_at": "2026-11-09T20:00:00Z"},
+    {"user": 3, "movie": "whiplash", "watched_at": "2026-11-12T21:30:00Z"},
+    {"user": 4, "movie": "matrix", "watched_at": "2026-11-06T22:00:00Z"},
+    {"user": 4, "movie": "inception", "watched_at": "2026-11-13T21:00:00Z"},
+    {"user": 5, "movie": "parasite", "watched_at": "2026-11-14T20:00:00Z"}
+  ],
+  "ratings": [
+    {"id": "0193a7d0-de00-7aaa-8bbb-000000000001", "user": 1, "movie": "inception", "score": 5, "at": "2026-11-06T23:00:00Z"},
+    {"id": "0193a7d0-de00-7aaa-8bbb-000000000002", "user": 1, "movie": "interstellar", "score": 5, "at": "2026-11-09T00:10:00Z"},
+    {"id": "0193a7d0-de00-7aaa-8bbb-000000000003", "user": 1, "movie": "matrix", "score": 4, "at": "2026-11-10T21:30:00Z"},
+    {"id": "0193a7d0-de00-7aaa-8bbb-000000000004", "user": 2, "movie": "godfather", "score": 5, "at": "2026-11-05T01:00:00Z"},
+    {"id": "0193a7d0-de00-7aaa-8bbb-000000000005", "user": 2, "movie": "pulp_fiction", "score": 4, "at": "2026-11-08T01:40:00Z"},
+    {"id": "0193a7d0-de00-7aaa-8bbb-000000000006", "user": 2, "movie": "dark_knight", "score": 5, "at": "2026-11-11T23:00:00Z"},
+    {"id": "0193a7d0-de00-7aaa-8bbb-000000000007", "user": 3, "movie": "spirited_away", "score": 5, "at": "2026-11-05T19:30:00Z"},
+    {"id": "0193a7d0-de00-7aaa-8bbb-000000000008", "user": 3, "movie": "la_la_land", "score": 4, "at": "2026-11-09T22:30:00Z"},
+    {"id": "0193a7d0-de00-7aaa-8bbb-000000000009", "user": 3, "movie": "whiplash", "score": 3, "at": "2026-11-12T23:30:00Z"},
+    {"id": "0193a7d0-de00-7aaa-8bbb-000000000010", "user": 4, "movie": "matrix", "score": 5, "at": "2026-11-07T00:30:00Z"},
+    {"id": "0193a7d0-de00-7aaa-8bbb-000000000011", "user": 4, "movie": "inception", "score": 2, "at": "2026-11-13T23:40:00Z"},
+    {"id": "0193a7d0-de00-7aaa-8bbb-000000000012", "user": 5, "movie": "parasite", "score": 4, "at": "2026-11-14T22:20:00Z"}
+  ],
+  "reviews": [
+    {"id": "0193a7d1-de00-7aaa-8bbb-000000000001", "user": 1, "movie": "inception", "at": "2026-11-06T23:05:00Z", "sentiment": ["positive", 0.97], "body": "Every layer of the dream still surprises me on a second watch. The ending is perfect and the music by Hans Zimmer carries the whole movie."},
+    {"id": "0193a7d1-de00-7aaa-8bbb-000000000002", "user": 2, "movie": "dark_knight", "at": "2026-11-11T23:10:00Z", "sentiment": ["positive", 0.94], "body": "Heath Ledger's Joker is unforgettable. A crime movie first and a superhero movie second, and that is why it works."},
+    {"id": "0193a7d1-de00-7aaa-8bbb-000000000003", "user": 3, "movie": "whiplash", "at": "2026-11-12T23:35:00Z", "sentiment": ["neutral", 0.58], "body": "Brilliant drumming and editing, but I did not enjoy spending two hours with that teacher."},
+    {"id": "0193a7d1-de00-7aaa-8bbb-000000000004", "user": 4, "movie": "inception", "at": "2026-11-13T23:45:00Z", "sentiment": ["negative", 0.81], "body": "Too much explaining and not enough feeling. I was lost after the second level and stopped caring."}
+  ],
+  "watchlist": [
+    {"user": 1, "movie": "dark_knight", "at": "2026-11-07T10:00:00Z"},
+    {"user": 1, "movie": "parasite", "at": "2026-11-12T10:00:00Z"},
+    {"user": 2, "movie": "inception", "at": "2026-11-09T10:00:00Z"},
+    {"user": 3, "movie": "parasite", "at": "2026-11-10T10:00:00Z"},
+    {"user": 4, "movie": "interstellar", "at": "2026-11-13T10:00:00Z"},
+    {"user": 5, "movie": "godfather", "at": "2026-11-14T10:00:00Z"},
+    {"user": 5, "movie": "spirited_away", "at": "2026-11-15T10:00:00Z"}
+  ],
+  "lists": [
+    {"id": "0193a7d2-de00-7aaa-8bbb-000000000001", "user": 1, "title": "Best of Nolan", "description": "Mind-bending and loud.", "is_public": true, "at": "2026-11-09T12:00:00Z", "movies": ["inception", "interstellar", "dark_knight"]},
+    {"id": "0193a7d2-de00-7aaa-8bbb-000000000002", "user": 2, "title": "Crime classics", "description": null, "is_public": true, "at": "2026-11-08T12:00:00Z", "movies": ["godfather", "pulp_fiction", "dark_knight"]},
+    {"id": "0193a7d2-de00-7aaa-8bbb-000000000003", "user": 3, "title": "Comfort movies", "description": "For rainy evenings.", "is_public": false, "at": "2026-11-10T12:00:00Z", "movies": ["spirited_away", "la_la_land"]}
+  ],
+  "follows": [
+    {"follower": 1, "following": 2, "at": "2026-11-02T09:00:00Z"},
+    {"follower": 1, "following": 3, "at": "2026-11-03T09:00:00Z"},
+    {"follower": 2, "following": 1, "at": "2026-11-02T11:00:00Z"},
+    {"follower": 3, "following": 1, "at": "2026-11-03T10:00:00Z"},
+    {"follower": 4, "following": 1, "at": "2026-11-04T09:00:00Z"},
+    {"follower": 5, "following": 2, "at": "2026-11-06T09:00:00Z"},
+    {"follower": 1, "following": 4, "at": "2026-11-07T09:00:00Z"}
+  ],
+  "privacy": [
+    {"user": 4, "show_reviews": true, "show_ratings": false, "show_lists": true, "show_history": true}
+  ],
+  "movie_nights": [
+    {
+      "id": "0193a7e0-de00-7aaa-8bbb-000000000001", "host": 1, "title": "Friday Nolan night", "description": "Snacks at my place, vote for the movie.",
+      "scheduled_at": "2026-11-27T19:00:00Z", "location": "Beirut, Hamra", "status": "open", "at": "2026-11-15T10:00:00Z",
+      "participants": [{"user": 2, "status": "accepted"}, {"user": 3, "status": "pending"}, {"user": 4, "status": "declined"}],
+      "candidates": [
+        {"id": "0193a7e1-de00-7aaa-8bbb-000000000001", "movie": "dark_knight", "added_by": 1},
+        {"id": "0193a7e1-de00-7aaa-8bbb-000000000002", "movie": "interstellar", "added_by": 2}
+      ],
+      "votes": [{"user": 1, "candidate": "0193a7e1-de00-7aaa-8bbb-000000000001"}, {"user": 2, "candidate": "0193a7e1-de00-7aaa-8bbb-000000000002"}]
+    }
+  ],
+  "rooms": [
+    {"id": "0193a7e2-de00-7aaa-8bbb-000000000001", "movie": "inception", "at": "2026-11-06T23:10:00Z", "messages": [
+      {"id": "0193a7e3-de00-7aaa-8bbb-000000000001", "user": 1, "at": "2026-11-06T23:10:00Z", "body": "Was the top still spinning at the end?"},
+      {"id": "0193a7e3-de00-7aaa-8bbb-000000000002", "user": 4, "at": "2026-11-13T23:50:00Z", "body": "Does it matter? He stopped looking."},
+      {"id": "0193a7e3-de00-7aaa-8bbb-000000000003", "user": 2, "at": "2026-11-14T08:00:00Z", "body": "Watching it this weekend, no spoilers please!"}
+    ]}
+  ]
+}

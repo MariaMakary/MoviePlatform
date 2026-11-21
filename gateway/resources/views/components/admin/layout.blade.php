@@ -11,6 +11,10 @@
         ['label' => 'Reviews', 'href' => route('admin.reviews'), 'active' => $isCurrent('admin.reviews')],
     ];
 @endphp
+@php($links = [
+    ['label' => 'Dashboard', 'href' => route('admin.dashboard'), 'active' => request()->routeIs('admin.dashboard')],
+    ['label' => 'Movies', 'href' => route('admin.movies'), 'active' => request()->routeIs('admin.movies')],
+])
 
 <div class="flex flex-col gap-6 md:flex-row md:gap-8">
     <aside class="md:w-56 md:shrink-0">

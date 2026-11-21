@@ -24,3 +24,10 @@ $router->get('/genres', 'Api\GenreController@index');
 $router->get('/genres/{id:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}/movies', 'Api\GenreController@movies');
 
 $router->get('/people/{id:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}', 'Api\PersonController@show');
+
+$router->group(['middleware' => ['jwt', 'admin'], 'prefix' => 'admin'], function ($router) {
+    $router->get('/movies', 'Api\AdminMovieController@index');
+    $router->post('/movies/import', 'Api\AdminMovieController@import');
+    $router->put('/movies/{id:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}', 'Api\AdminMovieController@update');
+    $router->delete('/movies/{id:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}', 'Api\AdminMovieController@destroy');
+});

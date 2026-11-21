@@ -39,6 +39,10 @@ Payloads and rules: `docs/events.md`.
   from `config/admin.php`; the password is `secret('admin_password')`, at least 8 characters, or the seeder stops. If
   the email already exists it changes nothing, so it never turns someone else's account into an admin.
 - Social login uses Laravel Socialite in **stateless** mode (Lumen has no sessions).
+- Rate limits (task 1287): the `throttle:<name>` middleware of `packages/common` limits each public auth endpoint per
+  lowercase email, with Identity's names in `config/throttle.php` (table in `docs/api/identity.md`); every other route
+  gets the common `api` limit (60 per minute per user). Counters are in Redis (`CACHE_DRIVER=redis`; `array` in tests,
+  so they start empty in every test). A new public endpoint that takes an email gets its own entry there.
 
 ## Before coding
 
