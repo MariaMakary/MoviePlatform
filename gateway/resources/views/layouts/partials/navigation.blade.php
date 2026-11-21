@@ -8,6 +8,7 @@
     ['label' => 'Lists', 'href' => $loggedIn ? route('lists.index') : route('lists.browse'), 'active' => request()->routeIs('lists.*')],
     $loggedIn ? ['label' => 'People', 'href' => route('people'), 'active' => request()->routeIs('people', 'users.*')] : null,
     ['label' => 'Movie nights', 'href' => route('movie-nights.index'), 'active' => request()->routeIs('movie-nights.*')],
+    $loggedIn ? ['label' => 'Discussions', 'href' => route('rooms.index'), 'active' => request()->routeIs('rooms.*', 'movies.discussion')] : null,
     ['label' => 'Cinemas', 'href' => route('cinemas'), 'active' => request()->routeIs('cinemas')],
     app(\App\Services\AuthSession::class)->isAdmin() ? ['label' => 'Admin', 'href' => route('admin.dashboard'), 'active' => request()->routeIs('admin.*')] : null,
 ])))

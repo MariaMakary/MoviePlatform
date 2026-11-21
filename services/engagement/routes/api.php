@@ -38,4 +38,9 @@ $router->group(['middleware' => 'jwt'], function ($router) use ($uuid) {
 
 $router->group(['middleware' => ['jwt', 'admin']], function ($router) {
     $router->get('/stats', 'Api\StatsController@show');
+
+    $router->get('/admin/reviews', 'Api\AdminReviewController@index');
+    $router->patch('/admin/reviews/{id}/hide', 'Api\AdminReviewController@hide');
+    $router->patch('/admin/reviews/{id}/unhide', 'Api\AdminReviewController@unhide');
+    $router->delete('/admin/reviews/{id}', 'Api\AdminReviewController@destroy');
 });

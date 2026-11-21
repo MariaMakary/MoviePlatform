@@ -29,4 +29,6 @@ $router->group(['middleware' => ['jwt', 'admin']], function ($router) use ($uuid
     $router->patch("/admin/users/{id:$uuid}/block", 'Api\AdminUserController@block');
     $router->patch("/admin/users/{id:$uuid}/unblock", 'Api\AdminUserController@unblock');
     $router->delete("/admin/users/{id:$uuid}", 'Api\AdminUserController@destroy');
+$router->group(['middleware' => ['jwt', 'admin']], function ($router) {
+    $router->get('/stats', 'Api\StatsController@show');
 });

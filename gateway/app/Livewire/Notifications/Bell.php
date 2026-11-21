@@ -19,6 +19,17 @@ class Bell extends Component
 
     public bool $expanded = false;
 
+    /**
+     * Notification broadcasts NotificationCreated on user.{id} once a notification is saved: re-render to get the
+     * new count (and the list when open). The view polls every 30 seconds only while the WebSocket is not connected.
+     */
+    public function getListeners(): array
+    {
+        $userId = app(AuthSession::class)->user()['id'] ?? null;
+
+        return $userId ? ["echo-private:user.{$userId},.NotificationCreated" => '$refresh'] : [];
+    }
+
     public function toggle(): void
     {
         $this->expanded = ! $this->expanded;

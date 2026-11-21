@@ -1,11 +1,3 @@
-@php
-    $badges = [
-        'positive' => ['Positive', 'bg-cerulean/15 text-sky-300 ring-cerulean/30'],
-        'neutral' => ['Neutral', 'bg-white/5 text-gray-300 ring-white/15'],
-        'negative' => ['Negative', 'bg-neon-rose/15 text-pink-200 ring-neon-rose/30'],
-    ];
-@endphp
-
 <section id="reviews-section" aria-labelledby="reviews-title" class="space-y-4">
     <div>
         <h2 id="reviews-title" class="text-xl font-bold text-white sm:text-2xl">Reviews</h2>
@@ -55,7 +47,6 @@
                         $isMine = $user && $review['user_id'] === $user['id'];
                         $name = $isMine ? $user['name'] : ($author['name'] ?? 'KAIA member');
                         $avatar = $isMine ? $user['avatar'] : ($author['avatar'] ?? null);
-                        $badge = $badges[$review['sentiment_label'] ?? ''] ?? null;
                     @endphp
                     <li wire:key="review-{{ $review['id'] }}" @class(['rounded-2xl border p-4', 'border-cerulean/40 bg-cerulean/5' => $isMine, 'border-white/10 bg-white/[0.02]' => ! $isMine])>
                         <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
@@ -65,9 +56,7 @@
                                 <x-rating-stars :value="$review['author_score']" size="sm" />
                             @endif
                             <x-date :value="$review['created_at']" format="j M Y" class="text-xs text-gray-400" />
-                            @if ($badge)
-                                <span class="rounded-full px-2 py-0.5 text-xs font-medium ring-1 {{ $badge[1] }}">{{ $badge[0] }}</span>
-                            @endif
+                            @include('livewire.engagement.reviews.sentiment-badge', ['label' => $review['sentiment_label']])
                         </div>
 
                         @if ($isMine && $editing)
