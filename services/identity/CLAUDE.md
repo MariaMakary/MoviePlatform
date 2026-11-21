@@ -31,10 +31,14 @@ Payloads and rules: `docs/events.md`.
   collide, and publishes `UserGenresUpdated` with the full new list after the commit.
 - Avatars are files in `public/avatars/<uuid>.<ext>` (gitignored, so they stay on the laptop that runs Identity),
   served by `php -S`; `users.avatar` holds the full URL built from `APP_URL`. `ProfileService` deletes a previous avatar
-  only when its URL points to that folder, never an avatar from Google or GitHub. Deleting a user (1271) must delete
-  the file the same way. Uploads are checked by content (`mimes:jpg,png`); in tests build a real
+  only when its URL points to that folder, never an avatar from Google or GitHub. Deleting a user (1271) deletes
+  the file the same way (`ProfileService::deleteAvatarFile`, after the commit). Uploads are checked by content (`mimes:jpg,png`); in tests build a real
   `new UploadedFile($tempPath, $name, null, null, true)`, because `UploadedFile::fake()` reports its type from the file
   name.
+- User management (`/api/admin/users`, 1271): `App\Services\AdminUserService` lists users (`AdminUserResource`, with
+  email, role and `is_blocked`), blocks, unblocks and deletes. Each change locks the user row and publishes
+  `UserBlocked` / `UserUnblocked` / `UserDeleted` after the commit, only when something changed. An admin cannot block
+  or delete their own account (`422`). Login and refresh already refuse blocked users (`AuthService::ensureNotBlocked`).
 - `Database\Seeders\AdminSeeder` (`php artisan db:seed --class=AdminSeeder`) creates `admin@kaia.com` with role admin
   from `config/admin.php`; the password is `secret('admin_password')`, at least 8 characters, or the seeder stops. If
   the email already exists it changes nothing, so it never turns someone else's account into an admin.

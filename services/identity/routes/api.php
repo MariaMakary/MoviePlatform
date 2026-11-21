@@ -7,8 +7,10 @@ $router->post('/login', ['middleware' => 'throttle:login', 'uses' => 'Api\AuthCo
 $router->post('/password/forgot', ['middleware' => 'throttle:password_forgot', 'uses' => 'Api\PasswordResetController@forgot']);
 $router->post('/password/reset', ['middleware' => 'throttle:password_reset', 'uses' => 'Api\PasswordResetController@reset']);
 
+$uuid = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}';
+
 $router->get('/users', 'Api\UserController@index');
-$router->get('/users/{id:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}', 'Api\UserController@show');
+$router->get("/users/{id:$uuid}", 'Api\UserController@show');
 
 $router->group(['middleware' => 'jwt'], function ($router) {
     $router->post('/logout', 'Api\AuthController@logout');
@@ -22,6 +24,10 @@ $router->group(['middleware' => 'jwt'], function ($router) {
     $router->get('/users/search', 'Api\UserController@search');
 });
 
-$router->group(['middleware' => ['jwt', 'admin']], function ($router) {
+$router->group(['middleware' => ['jwt', 'admin']], function ($router) use ($uuid) {
     $router->get('/stats', 'Api\StatsController@show');
+    $router->get('/admin/users', 'Api\AdminUserController@index');
+    $router->patch("/admin/users/{id:$uuid}/block", 'Api\AdminUserController@block');
+    $router->patch("/admin/users/{id:$uuid}/unblock", 'Api\AdminUserController@unblock');
+    $router->delete("/admin/users/{id:$uuid}", 'Api\AdminUserController@destroy');
 });

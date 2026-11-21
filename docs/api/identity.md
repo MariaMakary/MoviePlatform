@@ -347,6 +347,95 @@ plain characters. Blocked users are left out. At most **10** users, sorted by na
 
 **Errors:** `401` no or invalid token · `422` `q` missing, shorter than 2 or longer than 100 characters
 
+## Admin: user management
+
+Used by the Gateway's `/admin/users` page (1273). Every route needs an **admin** token (`jwt` + `admin` middleware):
+a normal user gets `403` `"This action is unauthorized."`. The events go out after the database transaction commits,
+with the payloads of `docs/events.md`, and only when something changed: blocking a blocked user answers `200` and
+publishes nothing.
+
+An admin user:
+
+| Field | Type | Content |
+|---|---|---|
+| `id` | uuid | |
+| `name` | string | |
+| `email` | string | always lowercase |
+| `avatar` | string \| null | |
+| `role` | string | `user` or `admin` |
+| `is_blocked` | boolean | a blocked user cannot log in or refresh a token (`403` `"Account blocked."`) |
+| `created_at` | date | when the account was created |
+
+### GET /api/admin/users
+
+Every user, blocked users and admins included, newest first.
+
+**Who:** admin
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `q` | string | query, optional, max 100: matches any part of the name **or** the email, in any letter case; `%` and `_` are plain characters. Empty lists everyone |
+| `page` | integer | query, default 1 |
+| `per_page` | integer | query, default 20, max 100 |
+
+**Response** `200`
+
+```json
+{
+  "data": [
+    {"id": "0193a7c0-1111-7aaa-8bbb-000000000001", "name": "Maria Makary", "email": "maria@example.com", "avatar": null, "role": "user", "is_blocked": false, "created_at": "2026-10-30T18:20:00Z"}
+  ],
+  "meta": {"current_page": 1, "last_page": 1, "total": 1}
+}
+```
+
+**Errors:** `401` no or invalid token · `403` not an admin · `422` `q` longer than 100 characters
+
+### PATCH /api/admin/users/{id}/block
+
+Sets `is_blocked` to `true`. Engagement and Social hide the user's reviews, lists and activity when they receive the
+event. Another admin can be blocked. Like a deleted user, a token the user already holds is refused by Identity at once
+but accepted by the other services until it expires; the Gateway logs them out at its next refresh.
+
+**Who:** admin
+
+**Response** `200`, the admin user
+
+**Errors:** `401` no or invalid token · `403` not an admin · `404` `"User not found."` (`"Not found."` when `id` is not
+a UUID) · `422` `"You cannot block your own account."`
+
+**Events:** publishes `UserBlocked`, only when the user was not blocked
+
+### PATCH /api/admin/users/{id}/unblock
+
+Sets `is_blocked` back to `false`: the user can log in again and their content shows again (reviews an admin hid stay
+hidden).
+
+**Who:** admin
+
+**Response** `200`, the admin user
+
+**Errors:** `401` no or invalid token · `403` not an admin · `404` `"User not found."`
+
+**Events:** publishes `UserUnblocked`, only when the user was blocked
+
+### DELETE /api/admin/users/{id}
+
+Deletes the account with its favorite genres, a pending password reset and its uploaded avatar file (an avatar from
+Google or GitHub is only a URL, nothing to delete). The other services delete their data when they receive the event.
+Identity refuses a token the user still holds at once (`GET /api/me` and refresh answer `401`); the other
+services only check the signature, so it works there until it expires (at most 30 minutes).
+
+**Who:** admin
+
+**Response** `204`
+
+**Errors:** `401` no or invalid token · `403` not an admin · `404` `"User not found."` · `422`
+`"You cannot delete your own account."`
+
+**Events:** publishes `UserDeleted`
 ## Admin
 
 ### GET /api/stats
