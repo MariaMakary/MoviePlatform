@@ -1,6 +1,16 @@
 @props(['title'])
 
 {{-- A new admin page: wrap its view in this component and add its link to $links. --}}
+@php
+    // The page's path, also during Livewire updates (their request goes to /livewire/update, so routeIs() is false).
+    $currentPath = trim(\Livewire\Livewire::originalPath(), '/');
+    $isCurrent = fn (string $route) => $currentPath === trim((string) parse_url(route($route), PHP_URL_PATH), '/');
+
+    $links = [
+        ['label' => 'Dashboard', 'href' => route('admin.dashboard'), 'active' => $isCurrent('admin.dashboard')],
+        ['label' => 'Reviews', 'href' => route('admin.reviews'), 'active' => $isCurrent('admin.reviews')],
+    ];
+@endphp
 @php($links = [
     ['label' => 'Dashboard', 'href' => route('admin.dashboard'), 'active' => request()->routeIs('admin.dashboard')],
     ['label' => 'Movies', 'href' => route('admin.movies'), 'active' => request()->routeIs('admin.movies')],
