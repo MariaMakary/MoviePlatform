@@ -27,6 +27,25 @@
         <x-service-unavailable :service="$unavailable['privacy']" :retry="true" />
     @endif
 
+    <section class="space-y-4" aria-labelledby="activity-heading">
+        <h2 id="activity-heading" class="text-xl font-semibold text-white">Recent activity</h2>
+
+        @if ($this->isUnavailable('activity'))
+            <x-service-unavailable :service="$unavailable['activity']" :retry="true" />
+        @elseif (($activity ?? []) === [])
+            <x-empty-state title="No recent activity" description="Ratings, reviews, watched movies and public lists show up here." />
+        @else
+            <ul class="space-y-3">
+                @foreach ($activity as $entry)
+                    {{-- Every entry is this user's: the profile's Identity answer is their author card. --}}
+                    <x-activity-card :entry="$entry" :author="$user"
+                                     :movie="$entry['movie_id'] ? ($movies[$entry['movie_id']] ?? null) : null"
+                                     wire:key="activity-{{ $entry['id'] }}" />
+                @endforeach
+            </ul>
+        @endif
+    </section>
+
     @if ($privacy['show_reviews'] ?? false)
         <section class="space-y-4" aria-labelledby="reviews-heading">
             <h2 id="reviews-heading" class="text-xl font-semibold text-white">

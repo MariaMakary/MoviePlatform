@@ -100,13 +100,19 @@ class SocialClient extends BaseClient
         $this->delete('/api/follow/'.rawurlencode($userId));
     }
 
-    /** `{data: [{user_id, followed_at}], meta}`, newest first. */
     /** What the people the current user follows did, newest first: {id, user_id, type, subject_id, movie_id, data, created_at}. */
     public function feed(int $page = 1, int $perPage = 20): array
     {
         return $this->get('/api/feed', ['page' => $page, 'per_page' => $perPage]);
     }
 
+    /** One user's activity, same shape as feed(). Social hides what their privacy hides from others; the owner sees all. */
+    public function userActivity(string $userId, int $page = 1, int $perPage = 20): array
+    {
+        return $this->get('/api/users/'.rawurlencode($userId).'/activity', ['page' => $page, 'per_page' => $perPage]);
+    }
+
+    /** `{data: [{user_id, followed_at}], meta}`, newest first. */
     public function followers(string $userId, int $page = 1, int $perPage = 20): array
     {
         return $this->get('/api/users/'.rawurlencode($userId).'/followers', ['page' => $page, 'per_page' => $perPage]);
