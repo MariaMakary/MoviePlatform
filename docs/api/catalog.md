@@ -497,3 +497,33 @@ Imports one movie from TMDB by its TMDB id, with its genres, cast, directors and
 
 **Errors:** `401` · `403` · `422` `"This movie is already in the catalog."` or `"TMDB has no movie with this id."`
 (`errors.tmdb_id`) · `503` `"TMDB is unavailable."`
+
+### POST /api/admin/genre-counts
+
+Turns per-movie counts into totals per genre, for the admin dashboard's popular genres chart (1269). The Gateway
+takes `movie_counts` from Engagement's `GET /api/stats` (watches + ratings of the 200 most active movies) and sends it
+here with the admin's token, because only Catalog knows each movie's genres.
+
+A movie adds its count to **every** genre it has. Movie ids Catalog doesn't know (deleted movies) are ignored, and
+genres whose total is 0 are left out.
+
+**Who:** admin
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `movie_counts` | object | required (can be `{}`), at most 1000 keys; each key a Catalog movie id (UUID), each value an integer ≥ 0 |
+
+```json
+{"movie_counts": {"0193a7c1-3333-7aaa-8bbb-000000000100": 54, "0193a7c1-3333-7aaa-8bbb-000000000101": 20}}
+```
+
+**Response** `200`: `{genre, count}` by genre name, highest count first (ties alphabetical). Not paginated.
+
+```json
+{"data": [{"genre": "Science Fiction", "count": 74}, {"genre": "Action", "count": 54}, {"genre": "Adventure", "count": 20}]}
+```
+
+**Errors:** `401` · `403` · `422` `movie_counts` missing or not an object, more than 1000 keys, a key that is not a
+UUID, or a value that is not an integer ≥ 0 (`errors.movie_counts` or `errors.movie_counts.<id>`)

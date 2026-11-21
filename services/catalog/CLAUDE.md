@@ -81,6 +81,10 @@ search (`ilike`), edit (sets `is_edited = true`, which `MovieSyncService::sync` 
 (`MovieSyncService::sync`, `422` if the `tmdb_id` is already in the database). Tests sign tokens with the test keys in
 `tests/Fixtures/jwt` and mock `RabbitMqConnection` to capture what is published.
 
+`App\Services\GenreStatsService` (`POST /api/admin/genre-counts`, admin) sums `{movie_id: count}` per genre name
+through `movie_genre`: a movie counts for each of its genres, unknown ids are skipped. It never calls Engagement: the
+Gateway brings the counts.
+
 ## Models
 
 `Movie`, `Genre`, `Person` (table `people`) with factories in `database/factories`. Credits live in `movie_person`
