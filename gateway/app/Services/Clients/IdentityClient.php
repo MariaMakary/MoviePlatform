@@ -76,4 +76,27 @@ class IdentityClient extends BaseClient
     {
         $this->post('/api/password/reset', $data);
     }
+
+    /** Admin (1271): every user with email, role and is_blocked, newest first; $search matches name or email. */
+    public function adminUsers(?string $search, int $page = 1, int $perPage = 20): array
+    {
+        return $this->get('/api/admin/users', array_filter(['q' => $search, 'page' => $page, 'per_page' => $perPage]));
+    }
+
+    /** Identity publishes UserBlocked; Engagement and Social then hide the user's content. */
+    public function blockUser(string $userId): array
+    {
+        return $this->patch('/api/admin/users/'.rawurlencode($userId).'/block')['data'];
+    }
+
+    public function unblockUser(string $userId): array
+    {
+        return $this->patch('/api/admin/users/'.rawurlencode($userId).'/unblock')['data'];
+    }
+
+    /** Identity publishes UserDeleted; every service then deletes the user's data. */
+    public function deleteUser(string $userId): void
+    {
+        $this->delete('/api/admin/users/'.rawurlencode($userId));
+    }
 }

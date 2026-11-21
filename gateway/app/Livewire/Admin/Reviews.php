@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Exceptions\ServiceRequestException;
 use App\Exceptions\ServiceUnavailable;
+use App\Livewire\Concerns\KeepsPageInRange;
 use App\Livewire\Concerns\WithServiceFallback;
 use App\Services\Clients\CatalogClient;
 use App\Services\Clients\EngagementClient;
@@ -21,6 +22,7 @@ use Livewire\Component;
 #[Title('Reviews · Admin')]
 class Reviews extends Component
 {
+    use KeepsPageInRange;
     use WithServiceFallback;
 
     private const PER_PAGE = 20;
@@ -125,10 +127,9 @@ class Reviews extends Component
 
     public function render(EngagementClient $engagement, IdentityClient $identity, CatalogClient $catalog): View
     {
-        $this->page = max(1, $this->page);
         $filters = $this->filters();
 
-        $result = $this->fromService('reviews', fn () => $engagement->adminReviews($filters, $this->page, self::PER_PAGE));
+        $result = $this->loadPage(fn (int $page) => $this->fromService('reviews', fn () => $engagement->adminReviews($filters, $page, self::PER_PAGE)));
         $reviews = $result['data'] ?? [];
         $movieIds = array_values(array_unique([...array_column($reviews, 'movie_id'), ...($filters['movie_id'] ? [$filters['movie_id']] : [])]));
 
