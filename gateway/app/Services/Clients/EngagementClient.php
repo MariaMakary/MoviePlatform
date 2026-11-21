@@ -130,6 +130,35 @@ class EngagementClient extends BaseClient
         $this->delete('/api/lists/'.rawurlencode($listId).'/movies/'.rawurlencode($movieId));
     }
 
+    /**
+     * Admin: every review (hidden and author-blocked too), newest first, each with is_hidden and author_blocked (1188).
+     * $filters: sentiment, movie_id, hidden (bool); empty ones are not sent.
+     */
+    public function adminReviews(array $filters, int $page = 1, int $perPage = 20): array
+    {
+        if (isset($filters['hidden'])) {
+            $filters['hidden'] = $filters['hidden'] ? 'true' : 'false';
+        }
+
+        return $this->get('/api/admin/reviews', [...array_filter($filters, fn ($value) => $value !== null && $value !== ''), 'page' => $page, 'per_page' => $perPage]);
+    }
+
+    public function hideReview(string $reviewId): array
+    {
+        return $this->patch('/api/admin/reviews/'.rawurlencode($reviewId).'/hide')['data'];
+    }
+
+    public function unhideReview(string $reviewId): array
+    {
+        return $this->patch('/api/admin/reviews/'.rawurlencode($reviewId).'/unhide')['data'];
+    }
+
+    /** Admin delete of any review (the author's own delete is deleteReview). */
+    public function adminDeleteReview(string $reviewId): void
+    {
+        $this->delete('/api/admin/reviews/'.rawurlencode($reviewId));
+    }
+
     private function contains(string $path, array $movieIds): array
     {
         $found = [];

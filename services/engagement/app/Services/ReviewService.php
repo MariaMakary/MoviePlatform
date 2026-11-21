@@ -68,6 +68,34 @@ class ReviewService
         $review->delete();
     }
 
+    /** Every review for moderation, hidden and author-blocked ones included, newest first. Empty filters are ignored. */
+    public function forAdmin(array $filters): Builder
+    {
+        $query = Review::query()->select('reviews.*')->withAuthorScore()->latest()->orderByDesc('id');
+
+        if (($filters['sentiment'] ?? '') !== '') {
+            $query->where('sentiment_label', $filters['sentiment']);
+        }
+
+        if (($filters['movie_id'] ?? '') !== '') {
+            $query->where('movie_id', $filters['movie_id']);
+        }
+
+        if (($filters['hidden'] ?? '') !== '') {
+            $query->where('is_hidden', filter_var($filters['hidden'], FILTER_VALIDATE_BOOLEAN));
+        }
+
+        return $query;
+    }
+
+    /** Admin moderation: only `is_hidden`, without touching `updated_at` (not an edit by the author). */
+    public function setHidden(Review $review, bool $hidden): Review
+    {
+        Review::whereKey($review->id)->toBase()->update(['is_hidden' => $hidden]);
+
+        return $this->find($review->id);
+    }
+
     private function listed(): Builder
     {
         return Review::query()->select('reviews.*')->withAuthorScore()->visible()->latest()->orderByDesc('id');

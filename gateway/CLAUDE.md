@@ -56,9 +56,13 @@ resources/js/                  Echo (Reverb), Leaflet
   side menu. The alias is `admin.page` because `admin` is taken by `packages/common` (JWT bearer token). This only
   guards the page: the service still checks the token on every admin endpoint. The side menu finds the current page
   with `Livewire::originalPath()`, so the link stays active after a Livewire update (`routeIs()` is false there).
-  `/admin/users` (`App\Livewire\Admin\Users`) blocks, unblocks and deletes users through Identity only (its events do
-  the rest in the other services); each action is confirmed in one `x-modal` (`confirm($action, $id, $name)`, then
-  `apply`), and the admin's own row has no buttons.
+  Pages so far: Dashboard, **Movies** (`/admin/movies`, `App\Livewire\Admin\Movies`: Catalog's admin endpoints; edit
+  and delete in `x-modal`s; every change flashes and redirects to the same search and page), **Reviews**
+  (`/admin/reviews`, `App\Livewire\Admin\Reviews`: Engagement's admin endpoints; hide, unhide and delete go through
+  one `x-modal` confirmation, `confirm($action, $id)` then `apply`) and **Users** (`/admin/users`,
+  `App\Livewire\Admin\Users`: blocks, unblocks and deletes through Identity only, whose events do the rest in the other
+  services; one `x-modal` confirmation, `confirm($action, $id, $name)` then `apply`; the admin's own row has no
+  buttons). Reviews and Users go back to the last page that still has rows when an action empties the current one.
 - **Token renewal:** `RefreshJwt` runs on every web request. When a logged-in user's token expires in less than 10
   minutes, it calls Identity's `POST /api/token/refresh` and stores the new token, so an active user stays logged in.
   Identity refusing (401/403: expired, deleted or blocked) logs the user out to `/login` with a message; Identity down
@@ -142,6 +146,15 @@ resources/js/                  Echo (Reverb), Leaflet
   `broadcastAs()` as it is). `$refresh` re-renders the component, which loads its data again in `render()`, so the
   page stays right even if an event is missed. `App\Livewire\Social\Shortlist` (the voting section of the movie night
   page) does this; the page itself also listens, for the host only, so the Finalize box shows the current leader.
+- The notification bell (`App\Livewire\Notifications\Bell`) listens to `user.{id}` `.NotificationCreated` the same
+  way. Its view polls every 30 seconds only while `window.Echo` is not connected (Reverb down), as a fallback.
+- Livewire sends a component's listeners only when the page loads, so a channel whose id comes from a service must be
+  known in `mount()`. **Discussion room** (`/movies/{id}/discussion`, `App\Livewire\Social\RoomPage`; list of rooms at
+  `/discussions`): it loads the room and its latest messages in `mount()`; if Social was down and "Try again" works,
+  it redirects to itself so the listener is registered. Messages pile up (older ones from "Load older", new ones from
+  `.MessageSent` through `receive()`, which appends without duplicates), so it keeps them in properties instead of
+  reloading them in `render()`; only the authors' names and avatars are loaded there (Identity bulk lookup, missing
+  ones only). It dispatches `room-message-added` and `room-older-loaded` for the Alpine auto-scroll.
 
 ## Running
 

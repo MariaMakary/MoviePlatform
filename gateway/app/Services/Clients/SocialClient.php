@@ -70,6 +70,26 @@ class SocialClient extends BaseClient
         return $this->post("/api/movie-nights/{$id}/cancel")['data'];
     }
 
+    public function rooms(int $page, int $perPage): array
+    {
+        return $this->get('/api/rooms', ['page' => $page, 'per_page' => $perPage]);
+    }
+
+    public function roomForMovie(string $movieId): array
+    {
+        return $this->get('/api/rooms/by-movie/'.rawurlencode($movieId))['data'];
+    }
+
+    public function roomMessages(string $roomId, ?string $before = null): array
+    {
+        return $this->get('/api/rooms/'.rawurlencode($roomId).'/messages', array_filter(['before' => $before]));
+    }
+
+    public function sendMessage(string $roomId, string $body): array
+    {
+        return $this->post('/api/rooms/'.rawurlencode($roomId).'/messages', ['body' => $body])['data'];
+    }
+
     public function follow(string $userId): array
     {
         return $this->post('/api/follow/'.rawurlencode($userId))['data'];

@@ -392,3 +392,138 @@ served (the filmography then holds only the movies already synced) and the sync 
 ```
 
 **Errors:** `404` `"Person not found."` (unknown id, or not a UUID)
+
+## Admin
+
+Manage the local movie database. Every endpoint needs an **admin** token (`jwt` + `admin` middleware): no token →
+`401`, a user token → `403` `"This action is unauthorized."`. An `{id}` that is not a UUID answers `404`.
+
+An admin movie has more fields than a movie card:
+
+| Field | Type | Content |
+|---|---|---|
+| `id` | uuid | Catalog `movies.id` |
+| `tmdb_id` | integer \| null | `null` for a movie added by hand |
+| `title` | string | |
+| `overview` | string \| null | |
+| `poster_path` | string \| null | TMDB image path (`/abc.jpg`), what `PUT` takes |
+| `poster_url` | string \| null | full URL (w342) |
+| `release_date` | date (`YYYY-MM-DD`) \| null | |
+| `runtime` | integer \| null | minutes |
+| `genre_ids` | uuid[] | Catalog genre ids, sorted by genre name |
+| `genres` | string[] | genre names, alphabetical |
+| `is_edited` | boolean | `true` once an admin edited it: the TMDB sync then never changes its fields or genres |
+| `synced_at` | datetime \| null | last TMDB sync |
+| `updated_at` | datetime | |
+
+### GET /api/admin/movies
+
+All local movies, by title, 20 per page.
+
+**Who:** admin
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `q` | string | query, optional, max 100, part of the title (case-insensitive) |
+| `page` | integer | query, default 1 |
+
+**Response** `200`
+
+```json
+{
+  "data": [
+    {"id": "0193a7c1-3333-7aaa-8bbb-000000000100", "tmdb_id": 27205, "title": "Inception", "overview": "Cobb, a skilled thief…", "poster_path": "/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg", "poster_url": "https://image.tmdb.org/t/p/w342/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg", "release_date": "2010-07-15", "runtime": 148, "genre_ids": ["0193a7c1-4444-7aaa-8bbb-000000000001", "0193a7c1-4444-7aaa-8bbb-000000000017"], "genres": ["Action", "Science Fiction"], "is_edited": false, "synced_at": "2026-11-18T09:00:00Z", "updated_at": "2026-11-18T09:00:00Z"}
+  ],
+  "meta": {"current_page": 1, "last_page": 5, "total": 98}
+}
+```
+
+**Errors:** `401` · `403` · `422` `q` longer than 100, `page` not a positive integer
+
+### PUT /api/admin/movies/{id}
+
+Replaces the movie's editable fields and genres, and sets `is_edited = true`, so `catalog:sync-popular`, the 7-day
+re-sync of the movie page and search never overwrite them (the cast, directors and trailer still come from TMDB).
+Every field is sent; `null` clears it.
+
+**Who:** admin
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `title` | string | required, max 255 (trimmed) |
+| `overview` | string \| null | present, max 5000 |
+| `poster_path` | string \| null | present, a TMDB image path: starts with `/`, letters, digits, `_`, `-`, `.` only, max 255 |
+| `release_date` | string \| null | present, `YYYY-MM-DD` |
+| `runtime` | integer \| null | present, 1–1000 |
+| `genre_ids` | uuid[] | present (can be empty), each an existing Catalog genre id, no repeats |
+
+**Response** `200`, the admin movie
+
+**Errors:** `401` · `403` · `404` `"Movie not found."` · `422` per field (`errors.genre_ids.<position>`: `"This genre
+does not exist."`)
+
+### DELETE /api/admin/movies/{id}
+
+Deletes the movie with its genres and credits.
+
+**Who:** admin
+
+**Response** `204`, no body
+
+**Errors:** `401` · `403` · `404` `"Movie not found."`
+
+**Events:** publishes `MovieDeleted` `{movie_id}` after the delete is committed, so Engagement, Social and Intelligence
+remove their data about it (`docs/events.md`). A TMDB movie that is still popular or found by a search is created
+again from TMDB, with a **new** id.
+
+### POST /api/admin/movies/import
+
+Imports one movie from TMDB by its TMDB id, with its genres, cast, directors and trailer
+(`MovieSyncService::sync`).
+
+**Who:** admin
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `tmdb_id` | integer | required, ≥ 1 |
+
+**Response** `201`, the admin movie
+
+**Errors:** `401` · `403` · `422` `"This movie is already in the catalog."` or `"TMDB has no movie with this id."`
+(`errors.tmdb_id`) · `503` `"TMDB is unavailable."`
+
+### POST /api/admin/genre-counts
+
+Turns per-movie counts into totals per genre, for the admin dashboard's popular genres chart (1269). The Gateway
+takes `movie_counts` from Engagement's `GET /api/stats` (watches + ratings of the 200 most active movies) and sends it
+here with the admin's token, because only Catalog knows each movie's genres.
+
+A movie adds its count to **every** genre it has. Movie ids Catalog doesn't know (deleted movies) are ignored, and
+genres whose total is 0 are left out.
+
+**Who:** admin
+
+**Request**
+
+| Field | Type | Rules |
+|---|---|---|
+| `movie_counts` | object | required (can be `{}`), at most 1000 keys; each key a Catalog movie id (UUID), each value an integer ≥ 0 |
+
+```json
+{"movie_counts": {"0193a7c1-3333-7aaa-8bbb-000000000100": 54, "0193a7c1-3333-7aaa-8bbb-000000000101": 20}}
+```
+
+**Response** `200`: `{genre, count}` by genre name, highest count first (ties alphabetical). Not paginated.
+
+```json
+{"data": [{"genre": "Science Fiction", "count": 74}, {"genre": "Action", "count": 54}, {"genre": "Adventure", "count": 20}]}
+```
+
+**Errors:** `401` · `403` · `422` `movie_counts` missing or not an object, more than 1000 keys, a key that is not a
+UUID, or a value that is not an integer ≥ 0 (`errors.movie_counts` or `errors.movie_counts.<id>`)

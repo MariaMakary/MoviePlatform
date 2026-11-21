@@ -1,0 +1,9 @@
+{
+  "password": "password",
+  "genres": {"drama": {"id": "0193a7b0-de00-7aaa-8bbb-000000000001", "tmdb_id": 18, "name": "Drama"}},
+  "movies": {"inception": {"id": "0193a7c1-de00-7aaa-8bbb-000000000001", "title": "Inception"}},
+  "users": [
+    {"id": "0193a7c0-de00-7aaa-8bbb-000000000001", "name": "Lina"},
+    {"id": "0193a7c0-de00-7aaa-8bbb-000000000002", "name": "Omar"}
+  ]
+}

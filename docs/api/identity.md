@@ -436,3 +436,38 @@ services only check the signature, so it works there until it expires (at most 3
 `"You cannot delete your own account."`
 
 **Events:** publishes `UserDeleted`
+## Admin
+
+### GET /api/stats
+
+User numbers for the admin dashboard ("Users" card and signups chart). Counts every account in the database.
+
+**Who:** admin (`jwt` + `admin`)
+
+**Response** `200`
+
+| Field | Type | Content |
+|---|---|---|
+| `total_users` | integer | every account, blocked and admins included |
+| `blocked_users` | integer | accounts with `is_blocked` |
+| `admins` | integer | accounts with role `admin` |
+| `signups` | `[{date, count}]` | new accounts per day for the **last 30 days** (today included, UTC days), oldest first; always 30 entries, `count: 0` for a day without signups |
+
+```json
+{
+  "data": {
+    "total_users": 42,
+    "blocked_users": 2,
+    "admins": 1,
+    "signups": [
+      {"date": "2026-10-20", "count": 0},
+      {"date": "2026-10-21", "count": 3},
+      {"date": "2026-11-18", "count": 1}
+    ]
+  }
+}
+```
+
+(Shortened: `signups` always has 30 entries.)
+
+**Errors:** `401` no or invalid token · `403` `"This action is unauthorized."` (not an admin)

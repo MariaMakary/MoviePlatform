@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Exceptions\ServiceRequestException;
 use App\Exceptions\ServiceUnavailable;
+use App\Livewire\Concerns\KeepsPageInRange;
 use App\Livewire\Concerns\WithServiceFallback;
 use App\Services\AuthSession;
 use App\Services\Clients\IdentityClient;
@@ -22,6 +23,7 @@ use Livewire\Component;
 #[Title('Users · Admin')]
 class Users extends Component
 {
+    use KeepsPageInRange;
     use WithServiceFallback;
 
     private const PER_PAGE = 20;
@@ -113,10 +115,9 @@ class Users extends Component
 
     public function render(IdentityClient $identity): View
     {
-        $this->page = max(1, $this->page);
         $search = Str::limit(trim($this->q), self::MAX_SEARCH, '');
 
-        $result = $this->fromService('users', fn () => $identity->adminUsers($search, $this->page, self::PER_PAGE));
+        $result = $this->loadPage(fn (int $page) => $this->fromService('users', fn () => $identity->adminUsers($search, $page, self::PER_PAGE)));
 
         return view('livewire.admin.users', [
             'users' => $result['data'] ?? [],

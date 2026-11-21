@@ -8,6 +8,8 @@
 
     $links = [
         ['label' => 'Dashboard', 'href' => route('admin.dashboard'), 'active' => $isCurrent('admin.dashboard')],
+        ['label' => 'Movies', 'href' => route('admin.movies'), 'active' => $isCurrent('admin.movies')],
+        ['label' => 'Reviews', 'href' => route('admin.reviews'), 'active' => $isCurrent('admin.reviews')],
         ['label' => 'Users', 'href' => route('admin.users'), 'active' => $isCurrent('admin.users')],
     ];
 @endphp

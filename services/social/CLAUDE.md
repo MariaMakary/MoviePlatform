@@ -77,6 +77,13 @@ Payloads and rules: `docs/events.md`.
   votes, participations, messages, follows both ways, privacy settings and activities. Candidates the user added to
   someone else's night are kept (other people's votes point at them).
 
+## Admin stats
+
+- `GET /api/stats` (jwt + admin, `App\Services\StatsService`, task 1267) for the dashboard (1269): activities per UTC
+  day for the last 30 days (zeros filled in PHP), follows, movie nights created and finalized, messages of the last 7
+  days and the 10 most active users by activities. Grouped queries on every call, no cache; blocked users count. Tests
+  empty the tables inside their transaction first, so local data never changes the numbers.
+
 ## Models
 
 - `MovieNight` (UUID, `HasUuids`, `MovieNightFactory`): `status` is the `MoviePlatform\Common\MovieNights\MovieNightStatus` enum (`Open`,
