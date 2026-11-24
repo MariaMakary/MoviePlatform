@@ -27,6 +27,9 @@ Payloads and rules: `docs/events.md`.
   only through `NotificationService::notify()`. Example: `UserRegisteredHandler` (welcome). The movie night handlers put
   `{movie_night_id}` in `data` so the Gateway links to the night; `MovieNightFinalizedHandler` creates one notification
   per id in `participant_ids` (never the host).
+- `UserDeletedHandler` deletes every notification of the deleted user (`NotificationService::deleteAllFor`). Running it
+  again deletes nothing more, and the consumer skips an envelope id it already processed. Notification does not
+  consume `user.blocked`: a blocked user cannot log in, and their notifications are still there after an unblock.
 - A date inside a notification's text (the invite's `scheduled_at`) is shown in `APP_DISPLAY_TIMEZONE`
   (`config/notifications.php`, default Asia/Beirut, the same as the Gateway) with the Gateway's `x-date` format
   `j M Y, H:i`. The text is stored once, so the time zone is chosen here, not by the reader.
