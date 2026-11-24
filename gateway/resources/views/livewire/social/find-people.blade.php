@@ -3,8 +3,11 @@
 
     <div>
         <label for="people-search" class="sr-only">Search by name</label>
-        <input id="people-search" type="search" wire:model.live.debounce.300ms="q" placeholder="Search by name" maxlength="100" autocomplete="off"
-               class="block w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-gray-500 focus:ring-[1.5px] focus:ring-neon-rose/75 focus:outline-none">
+        <div class="relative">
+            <input id="people-search" type="search" wire:model.live.debounce.300ms="q" placeholder="Search by name" maxlength="100" autocomplete="off"
+                   class="block w-full rounded-lg border border-white/10 bg-white/5 py-3 pl-4 pr-10 text-white placeholder-gray-500 focus:ring-[1.5px] focus:ring-neon-rose/75 focus:outline-none">
+            <x-search-spinner target="q" />
+        </div>
     </div>
 
     @if (! $searching)

@@ -5,8 +5,11 @@
     <div class="grid gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr]">
         <div>
             <label for="search-q" class="block text-sm font-medium text-gray-200">Title</label>
-            <input id="search-q" type="search" wire:model.live.debounce.300ms="q" placeholder="Search a movie…" autocomplete="off" maxlength="100" autofocus
-                   class="mt-1 block w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-gray-500 focus:ring-[1.5px] focus:ring-neon-rose/75 focus:outline-none">
+            <div class="relative mt-1">
+                <input id="search-q" type="search" wire:model.live.debounce.300ms="q" placeholder="Search a movie…" autocomplete="off" maxlength="100" autofocus
+                       class="block w-full rounded-lg border border-white/10 bg-white/5 py-2 pl-3 pr-10 text-sm text-white placeholder-gray-500 focus:ring-[1.5px] focus:ring-neon-rose/75 focus:outline-none">
+                <x-search-spinner target="q" />
+            </div>
         </div>
 
         @if ($genres !== [])

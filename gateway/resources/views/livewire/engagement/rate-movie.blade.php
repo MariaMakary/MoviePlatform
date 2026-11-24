@@ -39,7 +39,7 @@
                     </span>
                 </span>
             @else
-                <button type="button" wire:click="logIn" class="font-semibold text-cerulean hover:underline">Log in to rate</button>
+                <button type="button" wire:click="logIn" wire:loading.attr="disabled" wire:target="logIn" class="font-semibold text-cerulean hover:underline">Log in to rate</button>
             @endif
         </div>
     @endif

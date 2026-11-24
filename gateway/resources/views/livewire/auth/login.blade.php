@@ -19,7 +19,7 @@
             <a href="{{ route('password.request') }}" class="text-gray-400 hover:text-white hover:underline">Forgot password?</a>
         </p>
 
-        <x-button type="submit" class="w-full" wire:loading.attr="disabled">Log in</x-button>
+        <x-button type="submit" class="w-full" wire:loading.attr="disabled" wire:target="login">Log in</x-button>
     </form>
 
     <p class="text-center text-sm text-gray-400">

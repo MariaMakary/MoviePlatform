@@ -36,7 +36,7 @@
         @if ($filteredMovie)
             <span class="inline-flex items-center gap-2 rounded-full bg-cerulean/15 py-1 pr-1 pl-3 text-sm text-sky-200 ring-1 ring-cerulean/30">
                 Movie: <span class="max-w-48 truncate font-medium">{{ $filteredMovie }}</span>
-                <button type="button" wire:click="clearMovie" class="rounded-full p-1 hover:bg-white/10" aria-label="Show every movie">
+                <button type="button" wire:click="clearMovie" wire:loading.attr="disabled" wire:target="clearMovie" class="rounded-full p-1 hover:bg-white/10" aria-label="Show every movie">
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
                 </button>
             </span>
@@ -95,7 +95,7 @@
                                     @endif
                                 </td>
                                 <td class="px-4 py-3">
-                                    <button type="button" wire:click="filterMovie('{{ $review['movie_id'] }}')" class="text-left text-gray-200 hover:text-white hover:underline"
+                                    <button type="button" wire:click="filterMovie('{{ $review['movie_id'] }}')" wire:loading.attr="disabled" wire:target="filterMovie('{{ $review['movie_id'] }}')" class="text-left text-gray-200 hover:text-white hover:underline"
                                             title="Show only this movie's reviews">
                                         {{ $movieTitle ?? 'Unknown movie' }}
                                     </button>

@@ -10,7 +10,7 @@ services. Sessions and cache are in Redis (`predis`).
 app/Livewire/<Module>/         Auth, Catalog, Engagement, Social, Intelligence, Notifications, Admin
 app/Services/Clients/          BaseClient + one client per service (IdentityClient, CatalogClient, …)
 app/Services/Aggregators/      combine several services for one page (e.g. MoviePageAggregator)
-resources/views/components/    shared: x-logo, x-nav-link, x-date, x-flash, x-movie-card, x-movie-row (+ .item), x-rating-stars, x-avatar, x-button, x-input, x-modal, x-empty-state, x-service-unavailable, x-icons.star / bookmark / plus / weather
+resources/views/components/    shared: x-logo, x-nav-link, x-date, x-flash, x-movie-card, x-movie-row (+ .item), x-rating-stars, x-avatar, x-button, x-input, x-modal, x-empty-state, x-service-unavailable, x-error-page, x-search-spinner, x-icons.star / bookmark / plus / weather
 resources/views/layouts/       app.blade.php (navbar, flash area, footer) + partials/ (navigation, search, user-menu, notification-bell, footer)
 resources/views/livewire/<module>/
 resources/js/                  Echo (Reverb), Leaflet
@@ -92,6 +92,14 @@ resources/js/                  Echo (Reverb), Leaflet
   descriptions, reviews, messages) gets `wrap-anywhere`, so a long word or link breaks instead of widening the page.
   A dropdown wider than about 250 px is `fixed inset-x-4` on phones and `sm:absolute` from 640 px. A row with a title
   and a button gets `flex-wrap`.
+- **Errors and loading:** `resources/views/errors/` has the custom 403, 404, 419, 429, 500 and 503 pages, built with
+  `<x-error-page>`. A 403/404 from a service (`ServiceRequestException`) shows the service's message. 500 uses no
+  navbar or Livewire, so it renders even when the layout fails. You only see them with `APP_DEBUG=false`; with `true`
+  Laravel shows its debug page. `<x-button>` with `wire:click` (or `wire:target`) shows a spinner and is disabled while
+  that action runs, so give a submit button `wire:target="<form method>"`; a plain `<button wire:click>` needs
+  `wire:loading.attr="disabled" wire:target="…"`. A live search input gets `<x-search-spinner target="q" />` in a
+  `relative` wrapper. Every list shows its data, `<x-empty-state>` (a dropdown or a small block: one short line) or
+  `<x-service-unavailable>`, never nothing.
 - Colors: use the theme tokens `jet`, `cerulean` and `neon-rose` (`bg-cerulean`, `text-neon-rose`…), never new hex values.
 - Full-page Livewire components use `layouts/app.blade.php` automatically (`config/livewire.php`); set the tab title
   with `#[Title('…')]`. Flash messages: `session()->flash('success' | 'error' | 'info', '…')`, shown by `x-flash` in the

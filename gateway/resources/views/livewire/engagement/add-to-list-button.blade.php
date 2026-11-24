@@ -1,6 +1,6 @@
 <div class="relative inline-flex flex-col items-start gap-1" x-data="{ open: false }" x-on:click.outside="open = false" x-on:keydown.escape.window="open = false">
     @if (! $loggedIn)
-        <button type="button" wire:click="logIn"
+        <button type="button" wire:click="logIn" wire:loading.attr="disabled" wire:target="logIn"
                 class="inline-flex items-center gap-2 rounded-lg bg-white/5 px-3 py-2 text-sm font-semibold text-gray-100 ring-1 ring-white/10 transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-cerulean focus-visible:outline-none">
             <x-icons.plus class="h-4 w-4" />
             Log in to add to a list

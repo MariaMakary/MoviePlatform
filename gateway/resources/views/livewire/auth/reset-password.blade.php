@@ -26,7 +26,7 @@
             <x-input label="New password" name="password" type="password" wire:model="password" autocomplete="new-password" minlength="8" required autofocus />
             <x-input label="Confirm new password" name="password_confirmation" type="password" wire:model="password_confirmation" autocomplete="new-password" required />
 
-            <x-button type="submit" class="w-full" wire:loading.attr="disabled">Change password</x-button>
+            <x-button type="submit" class="w-full" wire:loading.attr="disabled" wire:target="resetPassword">Change password</x-button>
         </form>
     @endif
 </div>

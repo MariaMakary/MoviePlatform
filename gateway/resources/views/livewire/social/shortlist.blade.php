@@ -20,9 +20,12 @@
             <div class="space-y-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
                 <div>
                     <label for="shortlist-search" class="block text-sm font-medium text-gray-200">Add a movie</label>
-                    <input id="shortlist-search" type="search" wire:model.live.debounce.300ms="search" x-on:keydown.enter.prevent autocomplete="off" maxlength="100"
-                           placeholder="Search by title"
-                           class="mt-1 block w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-gray-500 transition focus:ring-[1.5px] focus:ring-neon-rose/75 focus:outline-none">
+                    <div class="relative mt-1">
+                        <input id="shortlist-search" type="search" wire:model.live.debounce.300ms="search" x-on:keydown.enter.prevent autocomplete="off" maxlength="100"
+                               placeholder="Search by title"
+                               class="block w-full rounded-lg border border-white/10 bg-white/5 py-2 pl-3 pr-10 text-sm text-white placeholder-gray-500 transition focus:ring-[1.5px] focus:ring-neon-rose/75 focus:outline-none">
+                        <x-search-spinner target="search" />
+                    </div>
                     <p class="mt-1 text-xs text-gray-500">Type at least {{ \App\Livewire\Social\Shortlist::MIN_SEARCH_LENGTH }} letters of the title.</p>
                 </div>
 
