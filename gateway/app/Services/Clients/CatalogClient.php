@@ -82,4 +82,9 @@ class CatalogClient extends BaseClient
     {
         return $this->get('/api/people/'.rawurlencode($id))['data'];
     }
+
+    public function genreCounts(array $movieCounts): array
+    {
+        return $this->post('/api/admin/genre-counts', ['movie_counts' => (object) $movieCounts])['data'];
+    }
 }

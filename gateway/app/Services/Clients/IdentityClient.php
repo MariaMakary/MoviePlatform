@@ -99,4 +99,9 @@ class IdentityClient extends BaseClient
     {
         $this->delete('/api/admin/users/'.rawurlencode($userId));
     }
+
+    public function stats(): array
+    {
+        return $this->get('/api/stats')['data'];
+    }
 }

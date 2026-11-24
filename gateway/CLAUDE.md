@@ -13,7 +13,7 @@ app/Services/Aggregators/      combine several services for one page (e.g. Movie
 resources/views/components/    shared: x-logo, x-nav-link, x-date, x-flash, x-movie-card, x-movie-row (+ .item), x-rating-stars, x-avatar, x-button, x-input, x-modal, x-empty-state, x-service-unavailable, x-icons.star / bookmark / plus / weather
 resources/views/layouts/       app.blade.php (navbar, flash area, footer) + partials/ (navigation, search, user-menu, notification-bell, footer)
 resources/views/livewire/<module>/
-resources/js/                  Echo (Reverb), Leaflet
+resources/js/                  Echo (Reverb), Leaflet, Chart.js (admin-charts.js)
 ```
 
 ## Rules
@@ -56,7 +56,11 @@ resources/js/                  Echo (Reverb), Leaflet
   side menu. The alias is `admin.page` because `admin` is taken by `packages/common` (JWT bearer token). This only
   guards the page: the service still checks the token on every admin endpoint. The side menu finds the current page
   with `Livewire::originalPath()`, so the link stays active after a Livewire update (`routeIs()` is false there).
-  Pages so far: Dashboard, **Movies** (`/admin/movies`, `App\Livewire\Admin\Movies`: Catalog's admin endpoints; edit
+  Pages so far: **Dashboard** (`/admin`, `App\Livewire\Admin\Dashboard`, 1269: the `GET /api/stats` of Identity,
+  Engagement and Social, plus Catalog's `genre-counts` with Engagement's `movie_counts`; each block uses its own
+  `fromService` section, so a stopped service only empties its own cards, charts and tables. Charts:
+  `@include('livewire.admin.partials.chart', [...])` with `{type: line|bar|doughnut, labels, values}`; the view calls
+  `window.mountAdminChart($el)` from `x-init`, which loads Chart.js only on that page), **Movies** (`/admin/movies`, `App\Livewire\Admin\Movies`: Catalog's admin endpoints; edit
   and delete in `x-modal`s; every change flashes and redirects to the same search and page), **Reviews**
   (`/admin/reviews`, `App\Livewire\Admin\Reviews`: Engagement's admin endpoints; hide, unhide and delete go through
   one `x-modal` confirmation, `confirm($action, $id)` then `apply`) and **Users** (`/admin/users`,
