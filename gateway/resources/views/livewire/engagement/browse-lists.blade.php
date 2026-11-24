@@ -47,7 +47,7 @@
                             <div class="flex flex-1 flex-col gap-1 p-4">
                                 <h2 class="line-clamp-2 font-semibold text-white group-hover:text-sky-300">{{ $list['title'] }}</h2>
                                 @if ($list['description'])
-                                    <p class="line-clamp-2 text-sm text-gray-400">{{ $list['description'] }}</p>
+                                    <p class="line-clamp-2 text-sm wrap-anywhere text-gray-400">{{ $list['description'] }}</p>
                                 @endif
                                 <p class="mt-auto pt-2 text-xs text-gray-500">{{ $list['movie_count'] }} {{ Str::plural('movie', $list['movie_count']) }}</p>
                             </div>

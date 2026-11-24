@@ -28,11 +28,11 @@
                     <a href="{{ route('lists.show', $list['id']) }}"
                        class="flex h-full flex-col gap-2 rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition hover:border-cerulean/60 hover:bg-white/5 focus-visible:ring-2 focus-visible:ring-cerulean focus-visible:outline-none">
                         <div class="flex items-start justify-between gap-3">
-                            <h2 class="line-clamp-2 font-semibold text-white">{{ $list['title'] }}</h2>
+                            <h2 class="line-clamp-2 min-w-0 font-semibold wrap-anywhere text-white">{{ $list['title'] }}</h2>
                             @include('livewire.engagement.lists.visibility', ['isPublic' => $list['is_public']])
                         </div>
                         @if ($list['description'])
-                            <p class="line-clamp-3 text-sm text-gray-400">{{ $list['description'] }}</p>
+                            <p class="line-clamp-3 text-sm wrap-anywhere text-gray-400">{{ $list['description'] }}</p>
                         @endif
                         <p class="mt-auto pt-2 text-xs text-gray-500">Updated <x-date :value="$list['updated_at']" format="j M Y" /></p>
                     </a>

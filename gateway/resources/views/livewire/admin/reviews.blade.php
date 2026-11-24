@@ -82,7 +82,7 @@
                             @endphp
                             <tr wire:key="admin-review-{{ $review['id'] }}" class="align-top">
                                 <td class="max-w-xs px-4 py-3 text-gray-200">
-                                    <p class="line-clamp-3">{{ Str::limit($review['body'], 160) }}</p>
+                                    <p class="line-clamp-3 wrap-anywhere">{{ Str::limit($review['body'], 160) }}</p>
                                 </td>
                                 <td class="px-4 py-3">
                                     @if ($author)

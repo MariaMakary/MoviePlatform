@@ -1,5 +1,5 @@
 <div class="mx-auto max-w-3xl space-y-6">
-    <div class="flex items-center justify-between gap-4">
+    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <h1 class="text-2xl font-bold tracking-tight text-white">Notifications</h1>
 
         @if (! $this->isUnavailable('notifications') && $notifications !== [])

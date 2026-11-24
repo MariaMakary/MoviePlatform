@@ -8,7 +8,7 @@
                 <div class="min-w-0 flex-1 space-y-2">
                     <h1 class="truncate text-3xl font-bold tracking-tight text-white">{{ $user['name'] }}</h1>
                     @if ($user['bio'])
-                        <p class="text-sm leading-relaxed whitespace-pre-line text-gray-300">{{ $user['bio'] }}</p>
+                        <p class="text-sm leading-relaxed whitespace-pre-line wrap-anywhere text-gray-300">{{ $user['bio'] }}</p>
                     @endif
                     <livewire:social.follow-stats :user-id="$id" :key="'stats-'.$id" />
                 </div>

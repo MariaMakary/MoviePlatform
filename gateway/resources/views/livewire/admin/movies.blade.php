@@ -21,7 +21,7 @@
     </section>
 
     <div class="flex flex-wrap items-center justify-between gap-3">
-        <div class="w-full sm:w-72">
+        <div class="w-full sm:w-72 sm:max-w-full">
             <label for="q" class="sr-only">Search by title</label>
             <input id="q" type="search" wire:model.live.debounce.400ms="q" placeholder="Search by title…" maxlength="100"
                    class="block w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-gray-500 focus:ring-[1.5px] focus:ring-neon-rose/75 focus:outline-none">
@@ -37,7 +37,7 @@
         <x-empty-state title="No movies found" :description="$q !== '' ? 'No title matches “'.$q.'”.' : 'Import one from TMDB above, or run catalog:sync-popular.'" />
     @else
         <div class="overflow-x-auto rounded-2xl border border-white/10">
-            <table class="w-full text-left text-sm">
+            <table class="w-full min-w-[36rem] text-left text-sm">
                 <thead class="bg-white/[0.03] text-xs tracking-wide text-gray-400 uppercase">
                     <tr>
                         <th scope="col" class="px-4 py-3"><span class="sr-only">Poster</span></th>

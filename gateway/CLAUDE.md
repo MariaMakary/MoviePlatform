@@ -86,6 +86,12 @@ resources/js/                  Echo (Reverb), Leaflet
 - Always reuse the shared layout and Blade components. Escape output with `{{ }}`, never `{!! !!}` with user input.
   Every component, with its props and example data, is shown at **http://localhost:8000/dev/components** (only when
   `APP_ENV=local`). Check it before building UI; add a section there when you add a shared component.
+- **Responsive** (375, 768 and 1280 px, no horizontal page scroll): the navbar shows its links from `xl` (1280 px),
+  the search box from `2xl` (a search icon in between) and below `xl` the menu button. Wrap a table in
+  `overflow-x-auto` and give it a `min-w-[…]`, so it scrolls instead of squeezing. Text a user typed (titles, bios,
+  descriptions, reviews, messages) gets `wrap-anywhere`, so a long word or link breaks instead of widening the page.
+  A dropdown wider than about 250 px is `fixed inset-x-4` on phones and `sm:absolute` from 640 px. A row with a title
+  and a button gets `flex-wrap`.
 - Colors: use the theme tokens `jet`, `cerulean` and `neon-rose` (`bg-cerulean`, `text-neon-rose`…), never new hex values.
 - Full-page Livewire components use `layouts/app.blade.php` automatically (`config/livewire.php`); set the tab title
   with `#[Title('…')]`. Flash messages: `session()->flash('success' | 'error' | 'info', '…')`, shown by `x-flash` in the

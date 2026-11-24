@@ -8,7 +8,7 @@
     @elseif ($night)
         <section class="space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
             <div class="flex flex-wrap items-start justify-between gap-3">
-                <h1 class="text-2xl font-bold tracking-tight text-white">{{ $night['title'] }}</h1>
+                <h1 class="min-w-0 text-2xl font-bold tracking-tight wrap-anywhere text-white">{{ $night['title'] }}</h1>
                 @include('livewire.social.partials.status-badges', ['night' => $night, 'userId' => $userId])
             </div>
 
@@ -45,7 +45,7 @@
             </dl>
 
             @if ($night['description'])
-                <p class="text-sm whitespace-pre-line text-gray-200">{{ $night['description'] }}</p>
+                <p class="text-sm whitespace-pre-line wrap-anywhere text-gray-200">{{ $night['description'] }}</p>
             @endif
 
             @if ($canAnswer)

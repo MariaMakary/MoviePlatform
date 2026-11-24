@@ -26,7 +26,7 @@
     </button>
 
     @if ($expanded)
-        <div class="absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-xl border border-white/10 bg-jet shadow-xl shadow-black/40 sm:w-96">
+        <div class="fixed inset-x-4 top-16 z-50 mt-2 overflow-hidden rounded-xl border border-white/10 bg-jet shadow-xl shadow-black/40 sm:absolute sm:inset-x-auto sm:top-auto sm:right-0 sm:w-96">
             <div class="flex items-center justify-between border-b border-white/10 px-4 py-3">
                 <p class="text-sm font-semibold text-white">Notifications</p>
                 @if ($count)

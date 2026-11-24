@@ -24,7 +24,7 @@
 
                 <div class="min-w-0 flex-1 space-y-4">
                     <div>
-                        <h1 class="text-3xl font-bold tracking-tight text-white sm:text-5xl">{{ $movie['title'] }}</h1>
+                        <h1 class="text-3xl font-bold tracking-tight wrap-anywhere text-white sm:text-5xl">{{ $movie['title'] }}</h1>
                         <p class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-300">
                             @if ($movie['release_date'])
                                 <span>
@@ -83,7 +83,7 @@
         <section class="grid gap-8 lg:grid-cols-3">
             <div class="space-y-3 lg:col-span-2">
                 <h2 class="text-xl font-bold text-white">Overview</h2>
-                <p class="leading-relaxed text-gray-300">{{ $movie['overview'] ?? 'No overview yet.' }}</p>
+                <p class="leading-relaxed wrap-anywhere text-gray-300">{{ $movie['overview'] ?? 'No overview yet.' }}</p>
             </div>
 
             @if ($movie['directors'] !== [])

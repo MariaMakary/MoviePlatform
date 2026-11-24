@@ -8,11 +8,11 @@
                     <a href="{{ route('lists.index') }}" class="text-sm text-gray-400 hover:text-white">&larr; My lists</a>
                 @endif
                 <div class="flex flex-wrap items-center gap-3">
-                    <h1 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">{{ $list['title'] }}</h1>
+                    <h1 class="text-2xl font-bold tracking-tight wrap-anywhere text-white sm:text-3xl">{{ $list['title'] }}</h1>
                     @include('livewire.engagement.lists.visibility', ['isPublic' => $list['is_public']])
                 </div>
                 @if ($list['description'])
-                    <p class="max-w-2xl text-gray-300">{{ $list['description'] }}</p>
+                    <p class="max-w-2xl wrap-anywhere text-gray-300">{{ $list['description'] }}</p>
                 @endif
                 <p class="text-sm text-gray-400">
                     {{ count($list['movie_ids']) }} {{ Str::plural('movie', count($list['movie_ids'])) }} · Updated <x-date :value="$list['updated_at']" format="j M Y" />
