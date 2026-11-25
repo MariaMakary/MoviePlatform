@@ -35,6 +35,11 @@ class NotificationService
         return $notification;
     }
 
+    public function deleteAllFor(string $userId): int
+    {
+        return Notification::ownedBy($userId)->delete();
+    }
+
     public function listFor(string $userId): Builder
     {
         return Notification::ownedBy($userId)->latest()->orderByDesc('id');
