@@ -35,7 +35,7 @@
         @else
             <p class="text-sm text-gray-400">{{ number_format($total) }} {{ Str::plural('user', $total) }}</p>
 
-            <div class="overflow-x-auto rounded-2xl border border-white/10">
+            <div class="relative overflow-x-auto rounded-2xl border border-white/10">
                 <table class="w-full min-w-[48rem] text-left text-sm">
                     <thead class="border-b border-white/10 bg-white/[0.03] text-xs tracking-wider text-gray-400 uppercase">
                         <tr>

@@ -72,7 +72,7 @@ class Movies extends Component
         $this->poster_path = (string) $movie['poster_path'];
         $this->genre_ids = $movie['genre_ids'];
 
-        $this->dispatch('open-modal', 'edit-movie');
+        $this->dispatch('open-modal', name: 'edit-movie');
     }
 
     public function save(CatalogClient $catalog)
@@ -131,7 +131,7 @@ class Movies extends Component
     {
         unset($this->unavailable['delete']);
         $this->deleting = ['id' => $id, 'title' => $title];
-        $this->dispatch('open-modal', 'delete-movie');
+        $this->dispatch('open-modal', name: 'delete-movie');
     }
 
     public function delete(CatalogClient $catalog)
