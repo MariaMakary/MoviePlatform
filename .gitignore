@@ -12,3 +12,6 @@ node_modules/
 Thumbs.db
 .idea/
 .vscode/
+
+# Playwright MCP browser logs and snapshots
+.playwright-mcp/

@@ -3,11 +3,11 @@
         <label for="invite-search" class="block text-sm font-medium text-gray-200">Invite people</label>
         <div class="relative mt-1">
             <input id="invite-search" type="search" wire:model.live.debounce.300ms="search" x-on:keydown.enter.prevent autocomplete="off" maxlength="100"
-                   placeholder="Search by name" @disabled(count($invitees) >
+                   placeholder="Search by name" @disabled(count($invitees) >= $maxInvitees)
+                   @error('invitees') aria-invalid="true" aria-describedby="invitees-error" @enderror
+                   class="block w-full rounded-lg border border-white/10 bg-white/5 py-2 pl-3 pr-10 text-sm text-white placeholder-gray-500 transition focus:ring-[1.5px] focus:ring-neon-rose/75 focus:outline-none disabled:opacity-50">
             <x-search-spinner target="search" />
-        </div>= $maxInvitees)
-               @error('invitees') aria-invalid="true" aria-describedby="invitees-error" @enderror
-               class="block w-full rounded-lg border border-white/10 bg-white/5 py-2 pl-3 pr-10 text-sm text-white placeholder-gray-500 transition focus:ring-[1.5px] focus:ring-neon-rose/75 focus:outline-none disabled:opacity-50">
+        </div>
         <p class="mt-1 text-xs text-gray-500">
             {{ count($invitees) >= $maxInvitees ? "You can invite up to {$maxInvitees} people at a time." : 'Type at least 2 letters of their name.' }}
         </p>
