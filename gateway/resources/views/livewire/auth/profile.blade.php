@@ -30,7 +30,7 @@
                 <p class="truncate text-xl font-semibold text-white">{{ $user['name'] }}</p>
                 <p class="truncate text-sm text-gray-400">{{ $user['email'] }}</p>
                 @if ($user['bio'])
-                    <p class="text-sm whitespace-pre-line text-gray-200">{{ $user['bio'] }}</p>
+                    <p class="text-sm whitespace-pre-line wrap-anywhere text-gray-200">{{ $user['bio'] }}</p>
                 @else
                     <p class="text-sm text-gray-500">No bio yet.</p>
                 @endif
@@ -74,7 +74,7 @@
             <x-input label="New password" name="password" type="password" wire:model="password" autocomplete="new-password" minlength="8" required />
             <x-input label="Confirm new password" name="password_confirmation" type="password" wire:model="password_confirmation" autocomplete="new-password" required />
 
-            <div class="flex items-center justify-between gap-4">
+            <div class="flex flex-wrap items-center justify-between gap-4">
                 <a href="{{ route('password.request') }}" class="text-sm text-gray-400 hover:text-white hover:underline">Signed up with Google or GitHub?</a>
                 <x-button type="submit" wire:loading.attr="disabled" wire:target="changePassword">Change password</x-button>
             </div>

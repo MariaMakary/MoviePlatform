@@ -48,7 +48,7 @@
                                 </a>
                                 <x-date :value="$message['created_at']" format="j M, H:i" class="text-xs text-gray-500" />
                             </div>
-                            <p class="text-sm break-words whitespace-pre-line text-gray-200">{{ $message['body'] }}</p>
+                            <p class="text-sm whitespace-pre-line wrap-anywhere text-gray-200">{{ $message['body'] }}</p>
                         </div>
                     </article>
                 @empty

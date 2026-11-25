@@ -1,5 +1,5 @@
 <div class="mx-auto max-w-3xl space-y-6">
-    <div class="flex items-center justify-between gap-4">
+    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
         <h1 class="text-2xl font-bold tracking-tight text-white">My movie nights</h1>
         <x-button :href="route('movie-nights.create')">
             <x-icons.plus class="h-4 w-4" />

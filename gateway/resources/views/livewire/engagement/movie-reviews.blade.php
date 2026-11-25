@@ -71,7 +71,7 @@
                                 </div>
                             </form>
                         @else
-                            <p class="mt-3 text-sm leading-relaxed whitespace-pre-line text-gray-200">{{ $review['body'] }}</p>
+                            <p class="mt-3 text-sm leading-relaxed whitespace-pre-line wrap-anywhere text-gray-200">{{ $review['body'] }}</p>
                             @if ($isMine)
                                 <div class="mt-3 flex gap-2">
                                     <x-button variant="ghost" size="sm" wire:click="startEditing">Edit</x-button>

@@ -14,7 +14,7 @@
                 <li wire:key="room-{{ $room['id'] }}">
                     <a href="{{ route('movies.discussion', $room['movie_id']) }}"
                        class="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 transition hover:border-cerulean/60 focus-visible:ring-2 focus-visible:ring-cerulean focus-visible:outline-none">
-                        <span class="truncate font-semibold text-white">{{ $room['name'] }}</span>
+                        <span class="min-w-0 truncate font-semibold text-white">{{ $room['name'] }}</span>
                         <span class="shrink-0 text-xs text-gray-400">
                             @if ($room['last_message_at'])
                                 Last message <x-date :value="$room['last_message_at']" format="j M, H:i" />
