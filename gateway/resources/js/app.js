@@ -14,3 +14,5 @@ if (document.readyState === 'loading') {
     mountCinemaMaps();
 }
 document.addEventListener('livewire:navigated', mountCinemaMaps);
+
+window.mountAdminChart = (root) => import('./admin-charts').then(({ mountAdminChart }) => mountAdminChart(root));

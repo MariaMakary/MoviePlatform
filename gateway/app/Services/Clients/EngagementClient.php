@@ -169,4 +169,9 @@ class EngagementClient extends BaseClient
 
         return $found;
     }
+
+    public function stats(): array
+    {
+        return $this->get('/api/stats')['data'];
+    }
 }

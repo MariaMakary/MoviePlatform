@@ -146,4 +146,9 @@ class SocialClient extends BaseClient
     {
         return $this->get('/api/users/'.rawurlencode($userId).'/privacy')['data'];
     }
+
+    public function stats(): array
+    {
+        return $this->get('/api/stats')['data'];
+    }
 }
