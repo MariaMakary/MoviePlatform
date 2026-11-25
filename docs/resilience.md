@@ -1,7 +1,9 @@
 # Resilience checks
 
-What happens to the Gateway when a service or a database stops, and the results of the last runs (failure testing,
-task 1282, 2026-11-25). Run the same checks again after a change to a page's fallback, and update the tables in that PR.
+What happens to the Gateway when a service or a database stops, and to events when a consumer stops or fails, with
+the results of the last runs (failure testing, task 1282, and [event delivery](#event-delivery), task 1283, both
+2026-11-25). Run the same checks again after a change to a page's fallback or to the event consumer, and update the
+tables in that PR.
 
 ## Results
 
@@ -50,3 +52,70 @@ Filed for 1297 (Bug fixing) as tasks tagged `Bug`.
   bell is on every page, a stopped Notification service makes every logged-in page about 3 s slower.
 - **`/profile` with Identity down** shows one notice for the whole page: the name, genres and password forms all
   need Identity. The link to the privacy settings (which only need Social) is hidden with them.
+
+## Event delivery
+
+What happens to events when Social's `events:consume` stops and when a handler fails (task 1283, 2026-11-25), checked
+with the RabbitMQ management UI (http://localhost:15672, "Queues and Streams"). The consumer and the retries are in
+`packages/common` (`EventConsumer`), so every consuming service behaves the same way.
+
+| Check | Result |
+|---|---|
+| No message is lost while the consumer is stopped | **Pass**: 8 events waited in `social.events` with no consumer; once it restarted, all 8 were processed and both feeds were complete |
+| A failing message reaches the DLQ | **Pass**: 4 attempts (the first try and 3 retries), then `social.events.dlq` |
+| A dead letter is replayed after the fix | **Pass**: `php artisan events:replay-dlq` moved it back, it was processed once and the feed shows it |
+
+### 1. Stop the consumer, then post
+
+1. Lina (`lina@example.com`) and Omar (`omar@example.com`) follow each other, so each one's ratings and reviews are in the other's feed. Before:
+   4 entries in each feed.
+2. Stop **only** Social's `events:consume` (in `composer run dev`, the `events` process; its `server` keeps
+   running). `social.events` shows **Consumers: 0**.
+3. Post as Omar: 4 ratings and 2 reviews; as Lina: 1 rating and 1 review. Every request answers `200`/`201`:
+   Engagement publishes to the exchange and does not wait for Social.
+4. `social.events` shows **8 Ready**: 5 `RatingAdded` and 3 `ReviewCreated`. The feeds still have 4 entries each.
+
+![social.events holds 8 ready messages while Social's consumer is stopped](resilience/1-consumer-stopped.png)
+
+### 2. Restart the consumer
+
+5. Start `events:consume` again. Within a few seconds `social.events` is back to **0**, with **Consumers: 1**.
+6. Lina's feed has **10** entries (+6: Omar's 4 ratings and 2 reviews), Omar's **6** (+2: Lina's rating and review).
+   Nothing is missing.
+
+![social.events drains from 8 to 0 when the consumer is back](resilience/2-consumer-restarted.png)
+
+### 3. Force a handler error
+
+7. Break Social's database on purpose: `docker exec movieplatform-social-db-1 psql -U social_user -d social_db -c
+   "ALTER TABLE activities RENAME TO activities_broken_1283"`.
+8. Omar rates a movie. Social's log (`services/social/storage/logs/`) shows `Event RatingAdded failed (attempt 1)`
+   to `(attempt 4)` (`relation "activities" does not exist`), then `moved to the dead-letter queue`.
+9. `social.events.dlq` shows **1 Ready**; `social.events` is empty, so the next events are not blocked.
+
+![social.events.dlq holds the failed message](resilience/3-dead-letter.png)
+
+### 4. Fix and replay
+
+10. Fix it: rename the table back (`ALTER TABLE activities_broken_1283 RENAME TO activities`).
+11. In `services/social`: `php artisan events:replay-dlq` → `Moved 1 message(s) from social.events.dlq to
+    social.events`.
+12. The consumer processes it at once: one row in `processed_events` for that event id, no new error in the log, and
+    the rating is in Lina's feed. (Omar had rated that movie before, so his rating entry is updated in place: the
+    feed keeps 10 entries.)
+
+![Both Social queues are empty after the replay](resilience/4-replayed.png)
+
+### Notes
+
+- **The retries are immediate.** The 4 attempts happen within the same second, with no wait between them, so a
+  failure that lasts longer than that (a database restarting, an outside API down) always ends in the DLQ. That is
+  safe, nothing is lost, but someone has to run `events:replay-dlq` afterwards.
+- **"Retry up to 3 times"** (`docs/events.md`) means 4 attempts in total: `EventConsumer::RETRIES` is 3 retries
+  after the first try.
+- **Intelligence's DLQ was not empty**: `intelligence.events.dlq` held 11 `ReviewCreated` messages (visible in the
+  screenshots), from 2026-11-18 to today. Intelligence's log says `Azure AI Language is unavailable` on every
+  attempt: the sentiment call fails on this laptop (check the key in `secrets/azure_language_key` and
+  `AZURE_LANGUAGE_ENDPOINT`). Once it works, `php artisan events:replay-dlq` in `services/intelligence` analyzes those
+  reviews.
+- In the screenshots the RabbitMQ user name is replaced with "(hidden)": it is a secret (`secrets/rabbitmq_user`).
