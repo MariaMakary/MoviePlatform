@@ -15,7 +15,7 @@ export from the fields sent. They take the same fields:
 | `end` | date | optional, ≥ `start`. Timed event: defaults to `start` + 2 hours. All-day event: the **last day** of the event (inclusive), defaults to `start` |
 | `all_day` | boolean | optional, default `false`. In a query string: `1` or `0` |
 | `location` | string | optional, max 255 |
-| `url` | string | optional, a valid URL, max 2048 |
+| `url` | string | optional, an `http` or `https` URL without line breaks, max 2048 |
 
 ### POST /api/calendar/ics
 

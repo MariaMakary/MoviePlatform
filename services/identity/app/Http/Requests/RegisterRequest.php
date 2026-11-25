@@ -16,7 +16,7 @@ class RegisterRequest
                     $fail('The email has already been taken.');
                 }
             }],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => PasswordRules::NEW,
         ];
     }
 }

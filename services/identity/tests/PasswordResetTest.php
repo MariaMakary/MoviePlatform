@@ -237,6 +237,12 @@ class PasswordResetTest extends TestCase
             'email' => 'maria@example.com', 'token' => 'x', 'password' => 'short', 'password_confirmation' => 'other',
         ])->seeStatusCode(422);
         $this->assertSame(['password'], array_keys($this->response->getData(true)['errors']));
+
+        $long = str_repeat('a', 73);
+        $this->json('POST', '/api/password/reset', [
+            'email' => 'maria@example.com', 'token' => 'x', 'password' => $long, 'password_confirmation' => $long,
+        ])->seeStatusCode(422);
+        $this->assertSame(['password'], array_keys($this->response->getData(true)['errors']));
     }
 
     public function test_forgot_needs_a_valid_email(): void

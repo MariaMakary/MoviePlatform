@@ -4,6 +4,9 @@ namespace App\Http\Requests;
 
 class UpdateMovieRequest
 {
+    /** TMDB has 19 movie genres; the cap only stops a huge list (one `exists` query per id). */
+    public const MAX_GENRES = 20;
+
     public static function rules(): array
     {
         return [
@@ -12,7 +15,7 @@ class UpdateMovieRequest
             'poster_path' => ['present', 'nullable', 'string', 'max:255', 'regex:#^/[A-Za-z0-9_.-]+$#'],
             'release_date' => ['present', 'nullable', 'date_format:Y-m-d'],
             'runtime' => ['present', 'nullable', 'integer', 'between:1,1000'],
-            'genre_ids' => ['present', 'array'],
+            'genre_ids' => ['present', 'array', 'max:'.self::MAX_GENRES],
             'genre_ids.*' => ['uuid', 'distinct', 'exists:genres,id'],
         ];
     }

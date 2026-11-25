@@ -152,6 +152,10 @@ class MovieNightApiTest extends TestCase
         $this->create(['title' => '']);
         $this->seeStatusCode(422);
         $this->assertArrayHasKey('title', $this->errors());
+
+        $this->create(['location' => null, 'meeting_link' => "https://meet.example.com/abc\n"]);
+        $this->seeStatusCode(422);
+        $this->assertSame(['meeting_link'], array_keys($this->errors()));
     }
 
     public function test_the_list_has_hosted_and_invited_nights_soonest_first(): void

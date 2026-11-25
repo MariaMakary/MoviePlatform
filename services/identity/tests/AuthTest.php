@@ -127,6 +127,10 @@ public function test_login_ignores_the_case_of_the_email(): void
         $this->json('POST', '/api/login', ['email' => 'not-an-email'])
             ->seeStatusCode(422)
             ->seeJsonStructure(['message', 'errors' => ['email', 'password']]);
+
+        $this->json('POST', '/api/login', ['email' => 'maria@example.com', 'password' => str_repeat('a', 256)])
+            ->seeStatusCode(422)
+            ->seeJsonStructure(['errors' => ['password']]);
     }
 
     public function test_logout_returns_204(): void

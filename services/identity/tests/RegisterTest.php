@@ -121,6 +121,21 @@ class RegisterTest extends TestCase
         $this->assertSame([], $this->published);
     }
 
+    public function test_a_password_longer_than_bcrypt_reads_gets_422(): void
+    {
+        $password = str_repeat('a', 73);
+
+        $this->register(['password' => $password, 'password_confirmation' => $password]);
+
+        $this->seeStatusCode(422);
+        $this->assertSame(['password'], array_keys($this->response->getData(true)['errors']));
+        $this->assertSame([], $this->published);
+
+        $password = str_repeat('a', 72);
+        $this->register(['password' => $password, 'password_confirmation' => $password]);
+        $this->seeStatusCode(201);
+    }
+
     public function test_the_password_must_be_confirmed(): void
     {
         $this->register(['password_confirmation' => 'password124']);

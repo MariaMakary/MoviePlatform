@@ -260,6 +260,14 @@ class ProfileTest extends TestCase
 
         $this->seeStatusCode(422);
         $this->assertArrayHasKey('password', $this->errors());
+
+        $long = str_repeat('a', 73);
+        $this->json('PUT', '/api/me/password', [
+            'current_password' => str_repeat('a', 256), 'password' => $long, 'password_confirmation' => $long,
+        ], $this->headers());
+
+        $this->seeStatusCode(422);
+        $this->assertEqualsCanonicalizing(['current_password', 'password'], array_keys($this->errors()));
         $this->assertTrue(Hash::check('password', $this->user->fresh()->password));
     }
 

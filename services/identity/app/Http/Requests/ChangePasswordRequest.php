@@ -7,8 +7,8 @@ class ChangePasswordRequest
     public static function rules(): array
     {
         return [
-            'current_password' => ['nullable', 'string'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'current_password' => ['nullable', 'string', 'max:'.PasswordRules::MAX_CHECKED_LENGTH],
+            'password' => PasswordRules::NEW,
         ];
     }
 }

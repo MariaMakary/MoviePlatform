@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use App\Http\Requests\UpdateMovieRequest;
 use App\Models\Genre;
 use App\Models\Movie;
 use Firebase\JWT\JWT;
@@ -209,6 +210,11 @@ class AdminMovieTest extends TestCase
             $this->edit($movie, $overrides);
             $this->seeStatusCode(422);
         }
+
+        $genreIds = Genre::factory()->count(UpdateMovieRequest::MAX_GENRES + 1)->create()->pluck('id')->all();
+        $this->edit($movie, ['genre_ids' => $genreIds]);
+        $this->seeStatusCode(422);
+        $this->assertSame(['genre_ids'], array_keys($this->response->getData(true)['errors']));
 
         $this->json('PUT', "/api/admin/movies/{$movie->id}", ['title' => 'Only a title'], $this->auth());
         $this->seeStatusCode(422);
