@@ -3,7 +3,9 @@
         <div class="space-y-1">
             <h2 class="text-lg font-semibold text-white">Favorite genres</h2>
             <p class="text-sm text-gray-400">
-                @if ($savedNames->isNotEmpty())
+                @if ($this->isUnavailable('identity'))
+                    Your saved genres can't be loaded right now.
+                @elseif ($savedNames->isNotEmpty())
                     {{ $savedNames->join(', ') }}
                 @else
                     None picked yet.
@@ -23,7 +25,10 @@
         </p>
     @endif
 
-    @if ($this->isUnavailable('genres'))
+    {{-- Identity down: the saved genres are unknown, so no form (saving would replace them with this new pick) --}}
+    @if ($this->isUnavailable('identity'))
+        <x-service-unavailable :service="$unavailable['identity']" :retry="true" />
+    @elseif ($this->isUnavailable('genres'))
         <x-service-unavailable :service="$unavailable['genres']" :retry="true" />
     @elseif ($genres === [])
         <x-empty-state title="No genres yet" description="Genres show up here once Catalog has synced them from TMDB." />
@@ -57,8 +62,8 @@
         </form>
     @endif
 
-    {{-- Catalog down: "Skip for now" must still work --}}
-    @if (! $embedded && $this->isUnavailable('genres'))
+    {{-- Identity or Catalog down: "Skip for now" must still work --}}
+    @if (! $embedded && ($this->isUnavailable('identity') || $this->isUnavailable('genres')))
         <a href="{{ route('home') }}" class="inline-block text-sm text-gray-400 hover:text-white hover:underline">Skip for now</a>
     @endif
 </div>
