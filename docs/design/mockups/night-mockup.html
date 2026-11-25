@@ -1,0 +1,201 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KAIA movie night mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Saira+Semi+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mockup-base.css">
+<style>
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:15px;margin:28px 0 14px}
+.back svg{width:16px;height:16px}
+.head{display:flex;gap:20px;align-items:center}
+.head .date{width:88px;padding:12px 0}
+.head .date .d{font-size:42px}
+.head h1{font-size:46px;line-height:1}
+.head .info{display:flex;flex-wrap:wrap;gap:6px 18px;color:var(--muted);font-size:15px;margin-top:8px}
+.head .info span{display:inline-flex;align-items:center;gap:6px}
+.head .info svg{width:16px;height:16px}
+.head .pills{display:flex;gap:8px;margin-top:10px}
+.head .host{margin-left:auto;display:flex;gap:10px;align-self:center}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:32px;margin-top:32px}
+h2{font-size:26px;line-height:1.1}
+.shead{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.shead .pill{margin-left:auto}
+.hint{color:var(--muted);font-size:15px;margin-bottom:16px}
+.cand{display:flex;gap:16px;align-items:center;padding:14px;margin-bottom:12px}
+.cand.mine{border-color:var(--cerl);box-shadow:inset 0 0 0 1px var(--cerl)}
+.cand img{width:68px;height:102px;border-radius:8px;object-fit:cover;flex:none}
+.cand .mid{flex:1;min-width:0}
+.cand h3{font-size:21px;line-height:1.15}
+.cand .by{color:var(--subtle);font-size:14px;margin:2px 0 10px}
+.bar{height:8px;border-radius:99px;background:var(--s2);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--cerl)}
+.cand.lead .bar i{background:var(--rose)}
+.count{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:14px;color:var(--muted)}
+.count b{color:var(--text)}
+.count .faces span{width:24px;height:24px;font-size:9px;border-width:2px}
+.cand .act{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.cand .act .btn{min-width:120px}
+.voted{color:var(--cerl);font-weight:600;display:inline-flex;align-items:center;gap:6px;height:44px}
+.rm{width:44px;height:44px;display:grid;place-items:center;color:var(--subtle);border-radius:10px}
+.lead-tag{font:600 12px 'Instrument Sans';color:var(--rose);margin-left:8px;vertical-align:middle}
+.add{display:flex;align-items:center;gap:10px;height:52px;padding:0 16px;border:1px dashed #454d60;border-radius:12px;color:var(--subtle);margin-top:4px}
+aside .card{padding:20px;margin-bottom:16px}
+aside h3{font-size:20px;margin-bottom:12px}
+.people div{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:15px}
+.people .avatar{width:32px;height:32px;font-size:12px}
+.people small{margin-left:auto;font-size:13px}
+.ok{color:var(--ok)}.wait{color:var(--warn)}.no{color:var(--subtle)}
+.group{font-size:13px;color:var(--subtle);font-weight:600;margin:10px 0 2px}
+.picker{display:flex;align-items:center;gap:8px;height:44px;padding:0 12px;border:1px solid #454d60;border-radius:10px;color:var(--subtle);font-size:15px;margin-bottom:10px}
+.leader{display:flex;gap:12px;align-items:center;margin-bottom:14px}
+.leader img{width:44px;height:66px;border-radius:6px;object-fit:cover}
+.leader b{display:block;font-weight:600;line-height:1.3}
+.leader small{color:var(--muted)}
+
+/* finalized state */
+.st-final{display:none!important}
+body.is-final .st-vote{display:none!important}
+body.is-final .st-final{display:block!important}body.is-final .pills.st-final{display:flex!important}
+.winner{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line);margin-top:24px}
+.winner>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.winner::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--bg) 10%,rgba(12,14,19,.75) 45%,rgba(12,14,19,.1) 80%)}
+.winner .in{position:relative;z-index:1;padding:44px 40px;display:flex;gap:28px;align-items:flex-end}
+.winner .p{width:150px;border-radius:12px;border:1px solid var(--line)}
+.winner small{color:var(--cerl);font-weight:600;font-size:15px}
+.winner h2{font-size:54px;line-height:.95;margin:6px 0 10px;max-width:560px}
+.winner .info{color:var(--muted);font-size:15px}
+.winner .row{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.results{padding:6px 20px}
+.results div{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line);font-size:15px}
+.results div:first-child{border-top:0}
+.results span{margin-left:auto;color:var(--muted)}
+@media (max-width:640px){
+  .head{flex-wrap:wrap}
+  .head h1{font-size:34px}
+  .head .host{margin-left:0;width:100%}
+  .head .host .btn{flex:1}
+  .layout{grid-template-columns:1fr}
+  .cand{flex-wrap:wrap}
+  .cand img{width:56px;height:84px}
+  .cand .act{flex-direction:row;width:100%;justify-content:space-between}
+  .cand .act .btn{flex:1}
+  .winner .in{flex-direction:column;align-items:flex-start;padding:28px 20px}
+  .winner .p{width:100px}
+  .winner h2{font-size:38px}
+  body{padding-bottom:80px}
+}
+</style>
+<script>document.addEventListener('DOMContentLoaded',()=>{if(location.hash==='#final')document.body.classList.add('is-final')})</script>
+</head>
+<body>
+<header class="b"><div class="wrap navb"><a class="logo" href="#"><img src="../../../gateway/public/images/brand/kaia-logo-name-transparent.png" alt="KAIA"></a><nav><a href="#">Home</a><a class="on" href="#">Movie nights</a><a href="#">Lists</a><a href="#">People</a></nav><div class="r"><a class="ib" href="#" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></a><a class="ib" href="#" aria-label="Notifications"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><i></i></a><span class="av">MM</span></div></div></header>
+
+<main class="wrap">
+  <a class="back" href="#"><svg viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg>Movie nights</a>
+  <div class="head">
+    <div class="date"><div class="m">FRI</div><div class="d">28</div><div class="w">20:30</div></div>
+    <div>
+      <h1>Friday sci-fi</h1>
+      <div class="info"><span><svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>At home</span><span><svg viewBox="0 0 24 24"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="m16 10 6-3v10l-6-3"/></svg><a href="#" style="color:var(--cerl);font-weight:600">meet.example.com/friday</a></span><span>Snacks on me, bring a blanket.</span></div>
+      <div class="pills st-vote"><span class="pill live"><i></i>Voting open</span><span class="pill">You're hosting</span></div>
+      <div class="pills st-final"><span class="pill chosen">Movie chosen</span><span class="pill">You're hosting</span></div>
+    </div>
+    <div class="host st-vote"><a class="btn quiet danger" href="#">Cancel night</a><a class="btn main" href="#">Finalize</a></div>
+  </div>
+
+  <div class="st-final">
+    <div class="winner">
+      <img src="https://image.tmdb.org/t/p/w1280/r08LxMJCbf1SiJIWeyH9aJmdqwC.jpg" alt="">
+      <div class="in">
+        <img class="p" src="https://image.tmdb.org/t/p/w342/bjiS5ipwxb9JFy3XRRN4OAilSeX.jpg" alt="">
+        <div>
+          <small>We're watching</small>
+          <h2>Spider-Man: Brand New Day</h2>
+          <p class="info">Fri 28 Nov at 20:30, at home and online. Won with 3 of 5 votes.</p>
+          <div class="row"><a class="btn main" href="#"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Add to calendar</a><a class="btn quiet" href="#">Join the call</a><a class="btn quiet" href="#">Open movie page</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div>
+      <div class="st-vote">
+        <div class="shead"><h2>Shortlist</h2><span class="pill live"><i></i>Updates live</span></div>
+        <p class="hint">One vote each. You can change it until the host finalizes.</p>
+
+        <div class="card cand lead">
+          <img src="https://image.tmdb.org/t/p/w342/bjiS5ipwxb9JFy3XRRN4OAilSeX.jpg" alt="">
+          <div class="mid"><h3>Spider-Man: Brand New Day<span class="lead-tag">Leading</span></h3><p class="by">2026, 2h 25m. Added by Sami H.</p>
+            <div class="bar"><i style="width:60%"></i></div>
+            <div class="count"><b>3 votes</b>60%<span class="faces"><span style="background:#8f3a6a">SH</span><span style="background:#6b5a2f">KB</span><span style="background:#3d6b4a">LK</span></span></div></div>
+          <div class="act"><a class="btn blue" href="#">Vote</a></div>
+        </div>
+
+        <div class="card cand mine">
+          <img src="https://image.tmdb.org/t/p/w342/iOb2fjXLbpJgyQXe46n1WtGCnaa.jpg" alt="">
+          <div class="mid"><h3>Project Hail Mary</h3><p class="by">2026, 2h 36m. Added by you</p>
+            <div class="bar"><i style="width:40%"></i></div>
+            <div class="count"><b>2 votes</b>40%<span class="faces"><span style="background:#3a2140">MM</span><span style="background:#2f6f8f">NA</span></span></div></div>
+          <div class="act"><span class="voted"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Your vote</span><a class="rm" href="#" aria-label="Remove from shortlist"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></a></div>
+        </div>
+
+        <div class="card cand">
+          <img src="https://image.tmdb.org/t/p/w342/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg" alt="">
+          <div class="mid"><h3>The Odyssey</h3><p class="by">2026, 2h 52m. Added by Nour A.</p>
+            <div class="bar"><i style="width:0"></i></div>
+            <div class="count"><b>No votes yet</b></div></div>
+          <div class="act"><a class="btn blue" href="#">Vote</a><a class="rm" href="#" aria-label="Remove from shortlist"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></a></div>
+        </div>
+
+        <div class="add"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Add a movie to the shortlist</div>
+      </div>
+
+      <div class="st-final">
+        <h2 style="margin-bottom:14px">Final votes</h2>
+        <div class="card results">
+          <div><img src="https://image.tmdb.org/t/p/w342/bjiS5ipwxb9JFy3XRRN4OAilSeX.jpg" alt="" style="width:32px;height:48px;border-radius:4px;object-fit:cover"><b>Spider-Man: Brand New Day</b><span>3 votes</span></div>
+          <div><img src="https://image.tmdb.org/t/p/w342/iOb2fjXLbpJgyQXe46n1WtGCnaa.jpg" alt="" style="width:32px;height:48px;border-radius:4px;object-fit:cover">Project Hail Mary<span>2 votes</span></div>
+          <div><img src="https://image.tmdb.org/t/p/w342/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg" alt="" style="width:32px;height:48px;border-radius:4px;object-fit:cover">The Odyssey<span>0 votes</span></div>
+        </div>
+      </div>
+    </div>
+
+    <aside>
+      <div class="card st-vote">
+        <h3>Ready to finalize?</h3>
+        <div class="leader"><img src="https://image.tmdb.org/t/p/w342/bjiS5ipwxb9JFy3XRRN4OAilSeX.jpg" alt=""><div><b>Spider-Man: Brand New Day</b><small>Leading with 3 of 5 votes</small></div></div>
+        <p class="muted" style="font-size:14px">1 person hasn't answered yet. Finalizing closes voting and tells everyone.</p>
+      </div>
+      <div class="card people">
+        <h3>Who's coming</h3>
+        <p class="group">Going (5)</p>
+        <div><span class="avatar">MM</span>You<small class="subtle">Host</small></div>
+        <div><span class="avatar" style="background:#4a2140;color:#ffc4e2">SH</span>Sami H.<small class="ok">Going</small></div>
+        <div><span class="avatar" style="background:#4d3f1f;color:#f6d690">KB</span>Karim B.<small class="ok">Going</small></div>
+        <div><span class="avatar" style="background:#1f3b4d;color:#9fd8f2">NA</span>Nour A.<small class="ok">Going</small></div>
+        <div><span class="avatar" style="background:#23402c;color:#9fe0b4">LK</span>Lina K.<small class="ok">Going</small></div>
+        <p class="group">Waiting (1)</p>
+        <div><span class="avatar" style="background:var(--s2);color:var(--muted)">JD</span>Jad D.<small class="wait">Not answered</small></div>
+      </div>
+      <div class="card st-vote">
+        <h3>Invite more people</h3>
+        <div class="picker"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Search by name</div>
+        <a class="btn quiet" href="#" style="width:100%">Send invitations</a>
+      </div>
+    </aside>
+  </div>
+  <div style="height:64px"></div>
+</main>
+
+<nav class="tabbar">
+  <a href="#"><svg viewBox="0 0 24 24"><path d="M3 11 12 4l9 7v9h-6v-6H9v6H3z"/></svg>Home</a>
+  <a class="on" href="#"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Nights</a>
+  <a href="#"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Lists</a>
+  <a href="#"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M16 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-5-6.7"/></svg>People</a>
+  <a href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>You</a>
+</nav>
+</body>
+</html>
