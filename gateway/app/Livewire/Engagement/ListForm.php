@@ -3,6 +3,7 @@
 namespace App\Livewire\Engagement;
 
 use App\Exceptions\ServiceUnavailable;
+use App\Livewire\Concerns\WithServiceFallback;
 use App\Services\AuthSession;
 use App\Services\Clients\EngagementClient;
 use Illuminate\Contracts\View\View;
@@ -11,8 +12,14 @@ use Livewire\Component;
 
 class ListForm extends Component
 {
+    use WithServiceFallback;
+
     #[Locked]
     public ?string $listId = null;
+
+    /** Editing: the list's values are loaded once, so a re-render keeps what the user typed. */
+    #[Locked]
+    public bool $filled = false;
 
     public string $title = '';
 
@@ -20,23 +27,17 @@ class ListForm extends Component
 
     public bool $isPublic = false;
 
-    public function mount(AuthSession $auth, EngagementClient $engagement, ?string $id = null): void
+    public function mount(?string $id = null): void
     {
-        if ($id === null) {
-            return;
-        }
-
-        $list = $engagement->list($id);
-        abort_unless($list['user_id'] === ($auth->user()['id'] ?? null), 403, 'Only the owner can edit this list.');
-
-        $this->listId = $list['id'];
-        $this->title = $list['title'];
-        $this->description = $list['description'] ?? '';
-        $this->isPublic = $list['is_public'];
+        $this->listId = $id;
     }
 
     public function save(EngagementClient $engagement)
     {
+        if ($this->listId !== null && ! $this->filled) {
+            return null;
+        }
+
         $this->title = trim($this->title);
         $this->description = trim($this->description);
 
@@ -67,8 +68,21 @@ class ListForm extends Component
         return $this->redirectRoute('lists.show', $list['id']);
     }
 
-    public function render(): View
+    public function render(AuthSession $auth, EngagementClient $engagement): View
     {
+        if ($this->listId !== null && ! $this->filled) {
+            $list = $this->fromService('list', fn () => $engagement->list($this->listId));
+
+            if ($list !== null) {
+                abort_unless($list['user_id'] === ($auth->user()['id'] ?? null), 403, 'Only the owner can edit this list.');
+
+                $this->title = $list['title'];
+                $this->description = $list['description'] ?? '';
+                $this->isPublic = $list['is_public'];
+                $this->filled = true;
+            }
+        }
+
         return view('livewire.engagement.list-form')->title($this->listId === null ? 'New list' : 'Edit list');
     }
 }
