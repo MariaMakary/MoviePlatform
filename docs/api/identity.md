@@ -47,7 +47,7 @@ Creates an account with email and password and logs it in. The email is saved in
 |---|---|---|
 | `name` | string | required, max 100 |
 | `email` | string | required, valid email, max 255, not already used (in any letter case) |
-| `password` | string | required, min 8 |
+| `password` | string | required, min 8, max 72 (bcrypt reads only the first 72 bytes) |
 | `password_confirmation` | string | required, equal to `password` |
 
 **Response** `201`, same body as login
@@ -71,7 +71,7 @@ Logs in with email and password. The email is compared in lowercase.
 | Field | Type | Rules |
 |---|---|---|
 | `email` | string | required, valid email, max 255 |
-| `password` | string | required |
+| `password` | string | required, max 255 |
 
 **Response** `200`
 
@@ -182,8 +182,8 @@ Changes the password. Tokens already issued stay valid until they expire.
 
 | Field | Type | Rules |
 |---|---|---|
-| `current_password` | string | the password used today |
-| `password` | string | required, min 8 |
+| `current_password` | string | the password used today, max 255 |
+| `password` | string | required, min 8, max 72 (bcrypt reads only the first 72 bytes) |
 | `password_confirmation` | string | required, equal to `password` |
 
 **Response** `204`, no body
@@ -257,7 +257,7 @@ their first password. Tokens already issued stay valid until they expire.
 |---|---|---|
 | `email` | string | required, valid email, max 255 |
 | `token` | string | required, from the link |
-| `password` | string | required, min 8 |
+| `password` | string | required, min 8, max 72 (bcrypt reads only the first 72 bytes) |
 | `password_confirmation` | string | required, equal to `password` |
 
 **Response** `204`, no body

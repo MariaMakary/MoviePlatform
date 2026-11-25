@@ -101,6 +101,15 @@ class CalendarTest extends TestCase
         $this->assertStringStartsWith('application/json', $this->response->headers->get('Content-Type'));
     }
 
+    public function test_the_url_must_be_http_or_https_without_line_breaks(): void
+    {
+        foreach (['ftp://example.com/x', "https://example.com/x\n", 'javascript:alert(1)'] as $url) {
+            $this->json('POST', '/api/calendar/ics', ['title' => 'Dune', 'start' => '2026-11-03', 'url' => $url])
+                ->seeStatusCode(422);
+            $this->assertSame(['url'], array_keys($this->response->getData(true)['errors']));
+        }
+    }
+
     public function test_end_before_start_is_rejected(): void
     {
         $this->json('POST', '/api/calendar/ics', ['title' => 'Dune', 'start' => '2026-11-03T18:00:00Z', 'end' => '2026-11-02T18:00:00Z'])

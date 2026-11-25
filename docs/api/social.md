@@ -285,7 +285,7 @@ Creates a movie night hosted by the caller, who is added as an `accepted` partic
 | `description` | string \| null | optional, max 2000 |
 | `scheduled_at` | date | required, in the future; an offset (`+02:00`) is converted to UTC |
 | `location` | string \| null | required without `meeting_link`, max 255 |
-| `meeting_link` | string \| null | required without `location`, `http`/`https` URL, max 255 |
+| `meeting_link` | string \| null | required without `location`, `http`/`https` URL without line breaks, max 255 |
 
 **Response** `201`
 

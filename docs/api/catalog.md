@@ -459,7 +459,7 @@ Every field is sent; `null` clears it.
 | `poster_path` | string \| null | present, a TMDB image path: starts with `/`, letters, digits, `_`, `-`, `.` only, max 255 |
 | `release_date` | string \| null | present, `YYYY-MM-DD` |
 | `runtime` | integer \| null | present, 1–1000 |
-| `genre_ids` | uuid[] | present (can be empty), each an existing Catalog genre id, no repeats |
+| `genre_ids` | uuid[] | present (can be empty), at most 20, each an existing Catalog genre id, no repeats |
 
 **Response** `200`, the admin movie
 

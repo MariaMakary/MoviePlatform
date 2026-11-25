@@ -4,6 +4,9 @@ namespace App\Http\Requests;
 
 class StoreMovieNightRequest
 {
+    // Laravel's url rule lets a trailing line break through.
+    private const NO_CONTROL_CHARACTERS = 'not_regex:/[\x00-\x1F\x7F]/';
+
     public static function rules(): array
     {
         return [
@@ -11,7 +14,7 @@ class StoreMovieNightRequest
             'description' => ['nullable', 'string', 'max:2000'],
             'scheduled_at' => ['required', 'date', 'after:now'],
             'location' => ['nullable', 'required_without:meeting_link', 'string', 'max:255'],
-            'meeting_link' => ['nullable', 'required_without:location', 'string', 'url:http,https', 'max:255'],
+            'meeting_link' => ['nullable', 'required_without:location', 'string', self::NO_CONTROL_CHARACTERS, 'url:http,https', 'max:255'],
         ];
     }
 
