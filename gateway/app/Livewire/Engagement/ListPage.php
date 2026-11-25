@@ -39,7 +39,7 @@ class ListPage extends Component
             $engagement->deleteList($this->id);
         } catch (ServiceUnavailable) {
             $this->error = "Couldn't delete the list. Try again.";
-            $this->dispatch('close-modal', 'delete-list');
+            $this->dispatch('close-modal', name: 'delete-list');
 
             return null;
         }

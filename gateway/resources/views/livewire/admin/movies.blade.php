@@ -39,7 +39,7 @@
     @elseif ($movies === [])
         <x-empty-state title="No movies found" :description="$q !== '' ? 'No title matches “'.$q.'”.' : 'Import one from TMDB above, or run catalog:sync-popular.'" />
     @else
-        <div class="overflow-x-auto rounded-2xl border border-white/10">
+        <div class="relative overflow-x-auto rounded-2xl border border-white/10">
             <table class="w-full min-w-[36rem] text-left text-sm">
                 <thead class="bg-white/[0.03] text-xs tracking-wide text-gray-400 uppercase">
                     <tr>
@@ -72,7 +72,7 @@
                             <td class="px-4 py-2">
                                 <div class="flex justify-end gap-2">
                                     <x-button size="sm" variant="ghost" wire:click="edit('{{ $movie['id'] }}')" wire:loading.attr="disabled" wire:target="edit('{{ $movie['id'] }}')">Edit</x-button>
-                                    <x-button size="sm" variant="danger" wire:click="confirmDelete('{{ $movie['id'] }}', @js($movie['title']))">Delete</x-button>
+                                    <x-button size="sm" variant="danger" wire:click="confirmDelete('{{ $movie['id'] }}', {{ \Illuminate\Support\Js::from($movie['title']) }})">Delete</x-button>
                                 </div>
                             </td>
                         </tr>
