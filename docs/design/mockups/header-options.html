@@ -1,0 +1,88 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KAIA header options</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Saira+Semi+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mockup-base.css">
+<style>
+body{padding:28px 0 40px}
+.opt{margin-bottom:34px}
+.cap{max-width:1280px;margin:0 auto 10px;padding:0 32px;color:var(--muted);font-size:14px}
+.cap b{color:var(--text);font-weight:600;margin-right:8px}
+.frame{position:relative;height:150px;overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.frame>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;opacity:.55}
+.frame::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,var(--bg),transparent 70%)}
+.h{position:relative;z-index:2;height:68px;display:flex;align-items:center;gap:36px}
+.logo img{height:34px;width:auto;display:block}
+.r{margin-left:auto;display:flex;align-items:center;gap:6px}
+.ib{width:44px;height:44px;display:grid;place-items:center;border-radius:50%;color:#c9ced8}
+.av{width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.12)}
+.av.ini{display:grid;place-items:center;font-size:12px;font-weight:600;background:linear-gradient(135deg,#ff2d95,#007ba7);color:#fff;border:0}
+.bell{position:relative}
+.bell i{position:absolute;top:11px;right:12px;width:8px;height:8px;border-radius:50%;background:var(--rose);box-shadow:0 0 0 2px var(--bg)}
+
+/* A: underline */
+.a .h{background:var(--bg);border-bottom:1px solid var(--line)}
+.a nav{display:flex;gap:30px;height:100%}
+.a nav a{display:flex;align-items:center;height:100%;font-size:15px;font-weight:500;color:var(--muted);position:relative}
+.a nav a.on{color:var(--text)}
+.a nav a.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;border-radius:2px;background:var(--rose)}
+.kbd{display:flex;align-items:center;gap:10px;height:40px;padding:0 12px 0 14px;border-radius:999px;background:var(--s1);color:var(--subtle);font-size:14px;margin-right:6px}
+.kbd span{margin-left:18px;font-size:12px;border:1px solid var(--line);border-radius:6px;padding:1px 7px;color:var(--muted)}
+
+/* B: transparent over the backdrop */
+.b .h{background:linear-gradient(180deg,rgba(12,14,19,.85),rgba(12,14,19,0))}
+.b nav{display:flex;gap:28px}
+.b nav a{font:600 17px 'Saira Semi Condensed';letter-spacing:.02em;color:rgba(243,244,247,.7)}
+.b nav a.on{color:#fff}
+.b nav a.on::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--rose);margin-right:8px;vertical-align:middle;transform:translateY(-2px)}
+.b .ib{background:rgba(12,14,19,.35);backdrop-filter:none}
+
+/* C: centred */
+.c>.frame>.h{background:var(--bg);border-bottom:1px solid var(--line)}
+.c nav a{white-space:nowrap}
+.c nav{display:flex;gap:4px;padding:4px;border-radius:999px;background:var(--s1);border:1px solid var(--line)}
+.c nav a{height:36px;padding:0 16px;display:flex;align-items:center;border-radius:999px;font-size:14px;font-weight:500;color:var(--muted)}
+.c nav a.on{background:var(--text);color:var(--bg);font-weight:600}
+.c .r{justify-self:end}
+</style>
+</head>
+<body>
+
+<div class="opt a">
+  <p class="cap"><b>A. Quiet underline</b>Plain text links, the current page gets a thin pink line at the bottom edge. Search is a small rounded field with a "/" shortcut.</p>
+  <div class="frame"><img src="https://image.tmdb.org/t/p/w1280/r08LxMJCbf1SiJIWeyH9aJmdqwC.jpg" alt="">
+    <div class="h"><div class="wrap h" style="width:100%;max-width:1280px;border:0;background:none">
+      <a class="logo" href="#"><img src="../../../gateway/public/images/brand/kaia-logo-name-transparent.png" alt="KAIA"></a>
+      <nav><a href="#">Home</a><a class="on" href="#">Movie nights</a><a href="#">Lists</a><a href="#">People</a></nav>
+      <div class="r"><span class="kbd"><svg viewBox="0 0 24 24" style="width:17px;height:17px"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Search<span>/</span></span><a class="ib bell" href="#"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><i></i></a><span class="av ini">MM</span></div>
+    </div></div>
+  </div>
+</div>
+
+<div class="opt b">
+  <p class="cap"><b>B. Cinema overlay</b>On pages with a backdrop (home, movie, finalized night) the header sits on the image and turns solid when you scroll. Links in the title font, the current page marked with a small pink dot.</p>
+  <div class="frame"><img src="https://image.tmdb.org/t/p/w1280/r08LxMJCbf1SiJIWeyH9aJmdqwC.jpg" alt="">
+    <div class="h"><div class="wrap h" style="width:100%;max-width:1280px;background:none">
+      <a class="logo" href="#"><img src="../../../gateway/public/images/brand/kaia-logo-name-transparent.png" alt="KAIA"></a>
+      <nav><a href="#">Home</a><a class="on" href="#">Movie nights</a><a href="#">Lists</a><a href="#">People</a></nav>
+      <div class="r"><a class="ib" href="#"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></a><a class="ib bell" href="#"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><i></i></a><span class="av ini">MM</span></div>
+    </div></div>
+  </div>
+</div>
+
+<div class="opt c">
+  <p class="cap"><b>C. Centred switcher</b>The four sections in one rounded bar in the middle, the current one filled white. Search and account on the right.</p>
+  <div class="frame"><img src="https://image.tmdb.org/t/p/w1280/r08LxMJCbf1SiJIWeyH9aJmdqwC.jpg" alt="">
+    <div class="h"><div class="wrap h" style="width:100%;max-width:1280px;border:0;background:none;display:grid;grid-template-columns:1fr auto 1fr">
+      <a class="logo" href="#"><img src="../../../gateway/public/images/brand/kaia-logo-name-transparent.png" alt="KAIA"></a>
+      <nav><a href="#">Home</a><a class="on" href="#">Movie nights</a><a href="#">Lists</a><a href="#">People</a></nav>
+      <div class="r"><a class="ib" href="#"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></a><a class="ib bell" href="#"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><i></i></a><span class="av ini">MM</span></div>
+    </div></div>
+  </div>
+</div>
+
+</body>
+</html>

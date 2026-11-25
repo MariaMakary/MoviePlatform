@@ -1,0 +1,122 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KAIA movie nights mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Saira+Semi+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mockup-base.css">
+<style>
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:40px 0 8px}
+.top h1{font-size:44px;line-height:1}
+.top p{color:var(--muted);margin-top:6px}
+section{margin-top:36px}
+section>h2{font-size:24px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+section>h2 small{font:600 13px 'Instrument Sans';color:var(--bg);background:var(--rose);border-radius:999px;padding:1px 8px}
+.invite{display:flex;align-items:center;gap:20px;padding:18px 20px;border-left:3px solid var(--rose)}
+.invite h3{font-size:22px;line-height:1.15}
+.invite .info{color:var(--muted);font-size:15px}
+.invite .from{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14px;margin-top:6px}
+.invite .from .avatar{width:24px;height:24px;font-size:10px}
+.invite .act{margin-left:auto;display:flex;gap:10px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.night{overflow:hidden;display:flex;flex-direction:column}
+.cover{position:relative;height:150px;display:flex}
+.cover img{flex:1;min-width:0;object-fit:cover;height:100%}
+.cover::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,var(--s1) 2%,rgba(21,24,32,.2) 70%)}
+.cover .pill{position:absolute;top:12px;left:12px;z-index:1;background:rgba(12,14,19,.85)}
+.body{display:flex;gap:16px;padding:0 18px 18px;margin-top:-30px;position:relative;z-index:1}
+.body h3{font-size:22px;line-height:1.15}
+.body .info{color:var(--muted);font-size:14px;margin:2px 0 10px}
+.foot{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px;color:var(--muted)}
+.lead{color:var(--text);font-weight:600}
+.past{padding:4px 0}
+.prow{display:flex;align-items:center;gap:16px;padding:14px 20px;border-top:1px solid var(--line)}
+.prow:first-child{border-top:0}
+.prow img{width:40px;height:60px;border-radius:6px;object-fit:cover}
+.prow b{font-weight:600}
+.prow .when{margin-left:auto;color:var(--subtle);font-size:14px;text-align:right}
+.prow.cancelled{opacity:.6}
+@media (max-width:640px){
+  .top{flex-direction:column;align-items:stretch}
+  .top h1{font-size:34px}
+  .invite{flex-wrap:wrap}
+  .invite .act{margin-left:0;width:100%}
+  .invite .act .btn{flex:1}
+  .grid{grid-template-columns:1fr}
+  body{padding-bottom:80px}
+}
+</style>
+</head>
+<body>
+<header class="b"><div class="wrap navb"><a class="logo" href="#"><img src="../../../gateway/public/images/brand/kaia-logo-name-transparent.png" alt="KAIA"></a><nav><a href="#">Home</a><a class="on" href="#">Movie nights</a><a href="#">Lists</a><a href="#">People</a></nav><div class="r"><a class="ib" href="#" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></a><a class="ib" href="#" aria-label="Notifications"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><i></i></a><span class="av">MM</span></div></div></header>
+
+<main class="wrap">
+  <div class="top">
+    <div><h1>Movie nights</h1><p>Plan a night, invite friends and vote on what to watch.</p></div>
+    <a class="btn main" href="#"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Plan a movie night</a>
+  </div>
+
+  <section>
+    <h2>Invitations <small>1</small></h2>
+    <div class="card invite">
+      <div class="date"><div class="m">SAT</div><div class="d">6</div><div class="w">21:00</div></div>
+      <div>
+        <h3>Horror double feature</h3>
+        <p class="info">Cinema City, Beirut. 2 movies on the shortlist so far.</p>
+        <p class="from"><span class="avatar" style="background:#1f3b4d;color:#9fd8f2">LK</span>Lina K. invited you</p>
+      </div>
+      <div class="act"><a class="btn quiet" href="#">Decline</a><a class="btn blue" href="#">Accept</a></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Upcoming</h2>
+    <div class="grid">
+      <a class="card night" href="#">
+        <div class="cover"><img src="https://image.tmdb.org/t/p/w342/bjiS5ipwxb9JFy3XRRN4OAilSeX.jpg" alt=""><img src="https://image.tmdb.org/t/p/w342/iOb2fjXLbpJgyQXe46n1WtGCnaa.jpg" alt=""><img src="https://image.tmdb.org/t/p/w342/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg" alt=""><span class="pill live"><i></i>Voting open</span></div>
+        <div class="body"><div class="date"><div class="m">FRI</div><div class="d">28</div><div class="w">20:30</div></div><div style="flex:1;min-width:0;padding-top:30px">
+          <h3>Friday sci-fi</h3><p class="info">At home. You're hosting.</p>
+          <div class="foot"><span>Leading: <span class="lead">Spider-Man: Brand New Day</span></span></div>
+          <div class="foot" style="margin-top:10px"><span class="faces"><span style="background:#2f6f8f">NA</span><span style="background:#8f3a6a">SH</span><span style="background:#6b5a2f">KB</span><span style="background:#3d6b4a">LK</span></span><span>4 going, 1 waiting</span></div>
+        </div></div>
+      </a>
+      <a class="card night" href="#">
+        <div class="cover"><img src="https://image.tmdb.org/t/p/w1280/cKvDv2LpwVEqbdXWoQl4XgGN6le.jpg" alt=""><span class="pill final">Iron Man</span></div>
+        <div class="body"><div class="date"><div class="m">TUE</div><div class="d">2</div><div class="w">19:00</div></div><div style="flex:1;min-width:0;padding-top:30px">
+          <h3>Marvel rewatch</h3><p class="info">Online. Hosted by Karim B.</p>
+          <div class="foot"><span>Movie chosen: <span class="lead">Iron Man</span></span></div>
+          <div class="foot" style="margin-top:10px"><span class="faces"><span style="background:#6b5a2f">KB</span><span style="background:#3a2140">MM</span><span style="background:#2f6f8f">NA</span></span><span>3 going</span></div>
+        </div></div>
+      </a>
+      <a class="card night" href="#">
+        <div class="cover" style="background:var(--s2);align-items:center;justify-content:center;color:var(--subtle)"><span class="pill wait">No movies yet</span><svg viewBox="0 0 24 24" style="width:40px;height:40px"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="m7 2 5 4 5-4"/></svg></div>
+        <div class="body"><div class="date"><div class="m">SUN</div><div class="d">14</div><div class="w">18:00</div></div><div style="flex:1;min-width:0;padding-top:30px">
+          <h3>Family afternoon</h3><p class="info">At Nour's. Hosted by Nour A.</p>
+          <div class="foot"><span>Add the first movie to the shortlist</span></div>
+          <div class="foot" style="margin-top:10px"><span class="faces"><span style="background:#2f6f8f">NA</span><span style="background:#3a2140">MM</span></span><span>2 going</span></div>
+        </div></div>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Past</h2>
+    <div class="card past">
+      <div class="prow"><img src="https://image.tmdb.org/t/p/w342/qJ2tW6WMUDux911r6m7haRef0WH.jpg" alt=""><div><b>Batman marathon</b><div class="muted" style="font-size:14px">Watched The Dark Knight with 5 people</div></div><div class="when">21 Nov</div></div>
+      <div class="prow"><img src="https://image.tmdb.org/t/p/w342/rstcAnBeCkxNQjNp3YXrF6IP1tW.jpg" alt=""><div><b>Bollywood night</b><div class="muted" style="font-size:14px">Watched Kalki 2898-AD with 3 people</div></div><div class="when">9 Nov</div></div>
+      <div class="prow cancelled"><span style="width:40px;height:60px;border-radius:6px;background:var(--s2);flex:none"></span><div><b>Halloween party</b><div class="muted" style="font-size:14px">Cancelled by the host</div></div><div class="when">31 Oct</div></div>
+    </div>
+  </section>
+  <div style="height:64px"></div>
+</main>
+
+<nav class="tabbar">
+  <a href="#"><svg viewBox="0 0 24 24"><path d="M3 11 12 4l9 7v9h-6v-6H9v6H3z"/></svg>Home</a>
+  <a class="on" href="#"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Nights</a>
+  <a href="#"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Lists</a>
+  <a href="#"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M16 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-5-6.7"/></svg>People</a>
+  <a href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>You</a>
+</nav>
+</body>
+</html>

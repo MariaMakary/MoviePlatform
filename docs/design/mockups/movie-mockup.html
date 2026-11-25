@@ -1,0 +1,224 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KAIA movie page mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Saira+Semi+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mockup-base.css">
+<style>
+:root{--bg:#0c0e13;--s1:#151820;--s2:#1e222c;--line:#2b3140;--text:#f3f4f7;--muted:#a2a9b8;--subtle:#7d8596;--cer:#007ba7;--cerl:#3eb1de;--rose:#ff2d95;--pos:#4fc98a;--neg:#ff7a9c}
+*{box-sizing:border-box;margin:0}
+html{color-scheme:dark}
+body{background:var(--bg);color:var(--text);font:16px/1.5 'Instrument Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.display{font-family:'Saira Semi Condensed',sans-serif;letter-spacing:-.01em}
+.wrap{max-width:1280px;margin:0 auto;padding:0 32px}
+svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;gap:28px;height:64px}
+.links{display:flex;gap:4px}
+.links a{padding:10px 14px;border-radius:8px;color:var(--muted);font-weight:500;font-size:15px}
+.right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.search{display:flex;align-items:center;gap:10px;width:300px;height:44px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:var(--s1);color:var(--subtle);font-size:15px}
+.icon{width:44px;height:44px;display:grid;place-items:center;border-radius:10px;color:var(--muted);position:relative}
+.msearch{display:none}
+.avatar{width:36px;height:36px;border-radius:50%;background:#3a2140;display:grid;place-items:center;font-weight:600;font-size:13px;color:#ffc4e2}
+
+.top{position:relative;overflow:hidden}
+.top>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 20%}
+.top::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--bg) 0%,rgba(12,14,19,.88) 38%,rgba(12,14,19,.35) 75%),linear-gradient(0deg,var(--bg) 0%,rgba(12,14,19,0) 55%)}
+.top .wrap{position:relative;z-index:1;display:flex;gap:36px;align-items:flex-end;padding-top:120px;padding-bottom:40px}
+.poster{width:220px;flex:none;aspect-ratio:2/3;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+.poster img{width:100%;height:100%;object-fit:cover;display:block}
+.facts{flex:1;min-width:0}
+.facts h1{font-size:64px;line-height:.95;font-weight:700}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;margin:14px 0;color:var(--muted);font-size:15px}
+.meta .tmdb{color:var(--text);font-weight:600;display:flex;gap:6px;align-items:center}
+.meta .tmdb svg{width:16px;height:16px;fill:var(--rose);stroke:none}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{height:36px;padding:0 14px;display:inline-flex;align-items:center;border-radius:999px;border:1px solid var(--line);background:var(--s1);font-size:14px;color:var(--text)}
+.actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:22px}
+.btn{height:48px;padding:0 18px;border-radius:10px;display:inline-flex;align-items:center;gap:10px;font-weight:600;font-size:15px;white-space:nowrap}
+.btn.main{background:var(--rose);color:var(--bg)}
+.btn.quiet{background:var(--s2);border:1px solid var(--line)}
+.btn.icononly{width:48px;padding:0;justify-content:center}
+.rate{display:flex;align-items:center;gap:4px;height:48px;padding:0 6px 0 14px;border-radius:10px;border:1px solid var(--line);background:var(--s1);color:var(--muted);font-size:14px}
+.rate .stars{display:flex}
+.rate .stars span{width:36px;height:44px;display:grid;place-items:center}
+.rate .stars svg{width:22px;height:22px;stroke:var(--subtle)}
+.rate .stars .on svg{fill:var(--rose);stroke:var(--rose)}
+
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:48px;margin-top:40px}
+h2{font:700 28px/1.1 'Saira Semi Condensed';margin-bottom:14px}
+.sub{color:var(--muted);font-size:15px;margin:-8px 0 16px}
+.overview{color:#d4d8e0;font-size:17px;line-height:1.65;max-width:68ch}
+.trailer{position:relative;margin-top:36px;aspect-ratio:16/9;border-radius:16px;overflow:hidden;border:1px solid var(--line)}
+.trailer img{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.6)}
+.play{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;font-weight:600}
+.play i{width:76px;height:76px;border-radius:50%;background:var(--text);color:var(--bg);display:grid;place-items:center}
+.play i svg{width:28px;height:28px;fill:var(--bg);stroke:none;margin-left:4px}
+.play small{color:var(--muted);font-weight:400}
+aside .box{background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px}
+aside h3{font:700 20px/1.1 'Saira Semi Condensed';margin-bottom:14px}
+.person{display:flex;align-items:center;gap:12px}
+.person img{width:48px;height:48px;border-radius:50%;object-fit:cover}
+.person b{font-weight:600}
+.person small{display:block;color:var(--muted);font-size:14px}
+dl{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;font-size:15px}
+dt{color:var(--muted)}
+.lists a{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.lists a:first-of-type{border-top:0;padding-top:0}
+.stack{display:flex;flex:none}
+.stack img{width:30px;height:45px;border-radius:4px;object-fit:cover;border:2px solid var(--s1);margin-left:-12px}
+.stack img:first-child{margin-left:0}
+.lists b{font-weight:600;font-size:15px;display:block}
+.lists small{color:var(--muted);font-size:13px}
+
+section{margin-top:48px}
+.cast{display:grid;grid-template-columns:repeat(8,1fr);gap:16px;text-align:center}
+.cast img{width:100%;aspect-ratio:1;border-radius:50%;object-fit:cover;border:1px solid var(--line)}
+.cast b{display:block;font-size:14px;font-weight:600;margin-top:8px;line-height:1.3}
+.cast small{color:var(--muted);font-size:13px}
+.write{display:flex;gap:14px;align-items:flex-start;background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:18px}
+.write .field{flex:1;min-height:52px;border:1px solid #454d60;border-radius:10px;padding:13px 14px;color:var(--subtle);font-size:16px}
+.reviews{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.review{background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:20px}
+.rhead{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.rhead .av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:600}
+.rhead b{font-weight:600;font-size:15px}
+.rhead small{color:var(--subtle);font-size:13px;display:block}
+.sent{margin-left:auto;font-size:13px;font-weight:600;padding:4px 10px;border-radius:999px;border:1px solid}
+.sent.pos{color:var(--pos);border-color:rgba(79,201,138,.4)}
+.sent.mix{color:var(--muted);border-color:var(--line)}
+.review p{color:#d4d8e0;font-size:15px}
+.row{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
+.m .pst{position:relative;aspect-ratio:2/3;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+.m .pst img{width:100%;height:100%;object-fit:cover;display:block}
+.badge{position:absolute;top:8px;right:8px;display:flex;align-items:center;gap:4px;padding:3px 8px;border-radius:8px;background:rgba(12,14,19,.82);font-size:13px;font-weight:600}
+.badge svg{width:12px;height:12px;fill:var(--rose);stroke:none}
+.badge.new{color:var(--cerl)}
+.save{position:absolute;top:6px;left:6px;width:44px;height:44px;display:grid;place-items:center}
+.save i{width:34px;height:34px;border-radius:50%;background:rgba(12,14,19,.82);display:grid;place-items:center}
+.save svg{width:17px;height:17px}
+.m h4{font-size:15px;font-weight:600;margin-top:10px;line-height:1.3}
+.m p{color:var(--subtle);font-size:14px}
+footer{margin-top:64px;border-top:1px solid var(--line);padding:24px 0 40px;color:var(--subtle);font-size:14px}
+.bar{display:none}
+
+@media (max-width:640px){
+  .wrap{padding:0 16px}
+  .links,.search{display:none}
+  .msearch{display:grid}
+  .top .wrap{flex-direction:column;align-items:flex-start;padding-top:96px;gap:20px}
+  .poster{width:120px}
+  .facts h1{font-size:42px}
+  .actions{display:none}
+  .grid{grid-template-columns:1fr;gap:8px}
+  .cast{display:flex;overflow:hidden}
+  .cast>div{flex:0 0 96px}
+  .reviews{grid-template-columns:1fr}
+  .write{flex-direction:column}
+  .write .btn{width:100%;justify-content:center}
+  .row{display:flex;overflow:hidden}
+  .row .m{flex:0 0 132px}
+  footer{padding-bottom:110px}
+  .bar{display:flex;gap:8px;position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:var(--bg);border-top:1px solid var(--line);z-index:6}
+  .bar .btn.main{flex:1;justify-content:center}
+}
+</style>
+</head>
+<body>
+<header class="b over"><div class="wrap navb"><a class="logo" href="#"><img src="../../../gateway/public/images/brand/kaia-logo-name-transparent.png" alt="KAIA"></a><nav><a href="#">Home</a><a href="#">Movie nights</a><a href="#">Lists</a><a href="#">People</a></nav><div class="r"><a class="ib" href="#" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></a><a class="ib" href="#" aria-label="Notifications"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><i></i></a><span class="av">MM</span></div></div></header>
+
+<main>
+  <div class="top">
+    <img src="https://image.tmdb.org/t/p/w1280/cKvDv2LpwVEqbdXWoQl4XgGN6le.jpg" alt="">
+    <div class="wrap">
+      <div class="poster"><img src="https://image.tmdb.org/t/p/w342/78lPtwv72eTNqFW9COBYI0dWDJa.jpg" alt="Poster of Iron Man"></div>
+      <div class="facts">
+        <h1 class="display">Iron Man</h1>
+        <div class="meta"><span class="tmdb"><svg viewBox="0 0 24 24"><path d="m12 2 3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg>7.7 on TMDB</span><span>4.2 from 18 KAIA members</span><span>2008</span><span>2h 6m</span></div>
+        <div class="chips"><a class="chip" href="#">Action</a><a class="chip" href="#">Adventure</a><a class="chip" href="#">Science Fiction</a></div>
+        <div class="actions">
+          <a class="btn main" href="#"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Add to watchlist</a>
+          <div class="rate">Your rating<div class="stars"><span class="on"><svg viewBox="0 0 24 24"><path d="m12 2 3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg></span><span class="on"><svg viewBox="0 0 24 24"><path d="m12 2 3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg></span><span class="on"><svg viewBox="0 0 24 24"><path d="m12 2 3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg></span><span class="on"><svg viewBox="0 0 24 24"><path d="m12 2 3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg></span><span><svg viewBox="0 0 24 24"><path d="m12 2 3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg></span></div></div>
+          <a class="btn quiet" href="#"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Watched</a>
+          <a class="btn quiet icononly" href="#" aria-label="Add to list"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></a>
+          <a class="btn quiet icononly" href="#" aria-label="Discussion"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="grid">
+      <div>
+        <h2>Overview</h2>
+        <p class="overview">After being held captive in an Afghan cave, billionaire engineer Tony Stark creates a unique weaponized suit of armor to fight evil.</p>
+        <div class="trailer"><img src="https://image.tmdb.org/t/p/w1280/cKvDv2LpwVEqbdXWoQl4XgGN6le.jpg" alt=""><div class="play"><i><svg viewBox="0 0 24 24"><path d="M7 4v16l13-8z"/></svg></i>Play trailer<small>Loads YouTube when you press play</small></div></div>
+      </div>
+      <aside>
+        <div class="box">
+          <h3>Director</h3>
+          <a class="person" href="#"><img src="https://image.tmdb.org/t/p/w185/8MtRRnEHaBSw8Ztdl8saXiw1egP.jpg" alt=""><div><b>Jon Favreau</b><small>Director</small></div></a>
+        </div>
+        <div class="box">
+          <h3>Details</h3>
+          <dl><dt>Released</dt><dd>2 May 2008</dd><dt>Runtime</dt><dd>2h 6m</dd><dt>Discussion</dt><dd><a href="#" style="color:var(--cerl);font-weight:600">12 messages</a></dd></dl>
+        </div>
+        <div class="box lists">
+          <h3>In lists</h3>
+          <a href="#"><span class="stack"><img src="https://image.tmdb.org/t/p/w342/78lPtwv72eTNqFW9COBYI0dWDJa.jpg" alt=""><img src="https://image.tmdb.org/t/p/w342/qJ2tW6WMUDux911r6m7haRef0WH.jpg" alt=""><img src="https://image.tmdb.org/t/p/w342/bjiS5ipwxb9JFy3XRRN4OAilSeX.jpg" alt=""></span><span><b>Best superhero films</b><small>14 movies</small></span></a>
+          <a href="#"><span class="stack"><img src="https://image.tmdb.org/t/p/w342/iOb2fjXLbpJgyQXe46n1WtGCnaa.jpg" alt=""><img src="https://image.tmdb.org/t/p/w342/78lPtwv72eTNqFW9COBYI0dWDJa.jpg" alt=""></span><span><b>Weekend rewatches</b><small>9 movies</small></span></a>
+        </div>
+      </aside>
+    </div>
+
+    <section>
+      <h2>Cast</h2>
+      <div class="cast">
+        <div><img src="https://image.tmdb.org/t/p/w185/5qHNjhtjMD4YWH3UP0rm4tKwxCL.jpg" alt=""><b>Robert Downey Jr.</b><small>Tony Stark</small></div>
+        <div><img src="https://image.tmdb.org/t/p/w185/eZ6uRZOYWZAyjNmWpDKGdLL6WUC.jpg" alt=""><b>Terrence Howard</b><small>Rhodey</small></div>
+        <div><img src="https://image.tmdb.org/t/p/w185/xms1RAY6q7Lzp7wNeRCB0kzhucn.jpg" alt=""><b>Jeff Bridges</b><small>Obadiah Stane</small></div>
+        <div><img src="https://image.tmdb.org/t/p/w185/ylN4A7fnnNXvHURENl5sQI8Jbib.jpg" alt=""><b>Gwyneth Paltrow</b><small>Pepper Potts</small></div>
+        <div><img src="https://image.tmdb.org/t/p/w185/g3a1O9lOTZvrwQupUtg4Fc3CdTd.jpg" alt=""><b>Leslie Bibb</b><small>Christine Everhart</small></div>
+        <div><img src="https://image.tmdb.org/t/p/w185/6fuJ9D50bYuMAhrlEgVqzgqF0LU.jpg" alt=""><b>Shaun Toub</b><small>Yinsen</small></div>
+        <div><img src="https://image.tmdb.org/t/p/w185/eVYiHKj9OGRn3MeRqJuwROFqIkg.jpg" alt=""><b>Faran Tahir</b><small>Raza</small></div>
+        <div><img src="https://image.tmdb.org/t/p/w185/7t2uHG5m4CN2lyYnGfZO54Hn3O0.jpg" alt=""><b>Clark Gregg</b><small>Agent Coulson</small></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Reviews</h2>
+      <p class="sub">18 reviews, mostly positive.</p>
+      <div class="write"><span class="field">What did you think? (10 to 2000 characters)</span><a class="btn quiet" href="#">Post review</a></div>
+      <div class="reviews">
+        <div class="review"><div class="rhead"><span class="av" style="background:#1f3b4d;color:#9fd8f2">LK</span><div><b>Lina K.</b><small>3 days ago</small></div><span class="sent pos">Positive</span></div><p>Still the best origin story in the series. Downey carries every scene, and the cave sequence holds up.</p></div>
+        <div class="review"><div class="rhead"><span class="av" style="background:#3a2140;color:#ffc4e2">SH</span><div><b>Sami H.</b><small>1 week ago</small></div><span class="sent mix">Neutral</span></div><p>Great first hour, then the final fight feels rushed. Worth it for the workshop scenes alone.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Similar movies</h2>
+      <div class="row">
+        <div class="m"><div class="pst"><img src="https://image.tmdb.org/t/p/w342/bjiS5ipwxb9JFy3XRRN4OAilSeX.jpg" alt=""><span class="badge"><svg viewBox="0 0 24 24"><path d="m12 2 3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg>8.5</span><span class="save"><i><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg></i></span></div><h4>Spider-Man: Brand New Day</h4><p>2026</p></div>
+        <div class="m"><div class="pst"><img src="https://image.tmdb.org/t/p/w342/qJ2tW6WMUDux911r6m7haRef0WH.jpg" alt=""><span class="badge"><svg viewBox="0 0 24 24"><path d="m12 2 3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg>8.5</span><span class="save"><i><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg></i></span></div><h4>The Dark Knight</h4><p>2008</p></div>
+        <div class="m"><div class="pst"><img src="https://image.tmdb.org/t/p/w342/1zqWkLwC1zLBBBtIWzmkmWeMWnT.jpg" alt=""><span class="badge new">New</span><span class="save"><i><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg></i></span></div><h4>Avengers: Doomsday</h4><p>Out 16 Dec</p></div>
+        <div class="m"><div class="pst"><img src="https://image.tmdb.org/t/p/w342/iOb2fjXLbpJgyQXe46n1WtGCnaa.jpg" alt=""><span class="badge"><svg viewBox="0 0 24 24"><path d="m12 2 3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg>8.6</span><span class="save"><i><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg></i></span></div><h4>Project Hail Mary</h4><p>2026</p></div>
+        <div class="m"><div class="pst"><img src="https://image.tmdb.org/t/p/w342/rstcAnBeCkxNQjNp3YXrF6IP1tW.jpg" alt=""><span class="badge"><svg viewBox="0 0 24 24"><path d="m12 2 3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg>6.4</span><span class="save"><i><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg></i></span></div><h4>Kalki 2898-AD</h4><p>2024</p></div>
+        <div class="m"><div class="pst"><img src="https://image.tmdb.org/t/p/w342/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg" alt=""><span class="badge"><svg viewBox="0 0 24 24"><path d="m12 2 3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg>8.0</span><span class="save"><i><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg></i></span></div><h4>The Odyssey</h4><p>2026</p></div>
+      </div>
+    </section>
+  </div>
+  <footer><div class="wrap">Â© 2026 KAIA. This product uses the TMDB API but is not endorsed or certified by TMDB.</div></footer>
+</main>
+
+<div class="bar">
+  <a class="btn main" href="#"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Add to watchlist</a>
+  <a class="btn quiet icononly" href="#" aria-label="Rate"><svg viewBox="0 0 24 24"><path d="m12 2 3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg></a>
+  <a class="btn quiet icononly" href="#" aria-label="Watched"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></a>
+  <a class="btn quiet icononly" href="#" aria-label="More actions"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></a>
+</div>
+</body>
+</html>
