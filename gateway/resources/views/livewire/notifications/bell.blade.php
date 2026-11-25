@@ -30,7 +30,7 @@
             <div class="flex items-center justify-between border-b border-white/10 px-4 py-3">
                 <p class="text-sm font-semibold text-white">Notifications</p>
                 @if ($count)
-                    <button type="button" wire:click="markAllAsRead" class="text-xs font-medium text-cerulean hover:text-white">Mark all as read</button>
+                    <button type="button" wire:click="markAllAsRead" wire:loading.attr="disabled" wire:target="markAllAsRead" class="text-xs font-medium text-cerulean hover:text-white">Mark all as read</button>
                 @endif
             </div>
 

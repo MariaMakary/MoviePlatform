@@ -21,7 +21,7 @@
 
             <x-input label="Email" name="email" type="email" wire:model="email" autocomplete="email" maxlength="255" required autofocus />
 
-            <x-button type="submit" class="w-full" wire:loading.attr="disabled">Send me a link</x-button>
+            <x-button type="submit" class="w-full" wire:loading.attr="disabled" wire:target="send">Send me a link</x-button>
         </form>
     @endif
 

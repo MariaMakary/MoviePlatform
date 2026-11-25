@@ -13,7 +13,7 @@
             @foreach ($genres as $genre)
                 @php($active = ($selected['id'] ?? null) === $genre['id'])
                 <li wire:key="genre-chip-{{ $genre['id'] }}">
-                    <button type="button" wire:click="select('{{ $genre['id'] }}')" aria-pressed="{{ $active ? 'true' : 'false' }}"
+                    <button type="button" wire:click="select('{{ $genre['id'] }}')" wire:loading.attr="disabled" wire:target="select('{{ $genre['id'] }}')" aria-pressed="{{ $active ? 'true' : 'false' }}"
                             @class(['inline-flex rounded-full border px-4 py-2 text-sm font-medium transition focus-visible:ring-2 focus-visible:ring-cerulean focus-visible:outline-none',
                                     'border-cerulean bg-cerulean text-white' => $active,
                                     'border-white/15 bg-white/5 text-gray-100 hover:border-cerulean/60 hover:bg-cerulean/15 hover:text-white' => ! $active])>

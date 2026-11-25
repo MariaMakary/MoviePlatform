@@ -18,7 +18,7 @@
         <x-input label="Password" name="password" type="password" wire:model="password" autocomplete="new-password" minlength="8" required />
         <x-input label="Confirm password" name="password_confirmation" type="password" wire:model="password_confirmation" autocomplete="new-password" required />
 
-        <x-button type="submit" class="w-full" wire:loading.attr="disabled">Sign up</x-button>
+        <x-button type="submit" class="w-full" wire:loading.attr="disabled" wire:target="register">Sign up</x-button>
     </form>
 
     <p class="text-center text-sm text-gray-400">

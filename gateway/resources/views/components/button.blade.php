@@ -18,10 +18,26 @@
         .'focus-visible:ring-2 focus-visible:ring-cerulean focus-visible:ring-offset-2 focus-visible:ring-offset-jet focus-visible:outline-none '
         .'disabled:pointer-events-none disabled:opacity-50 '
         .$variants[$variant].' '.$sizes[$size];
+
+    $target = $attributes->get('wire:target') ?? $attributes->get('wire:click');
+    $target = $target && ! str_starts_with($target, '$dispatch') ? $target : null;
+
+    if ($target) {
+        $attributes = $attributes->merge(['wire:target' => $target]);
+
+        if (! $attributes->has('wire:loading.attr')) {
+            $attributes = $attributes->merge(['wire:loading.attr' => 'disabled']);
+        }
+    }
 @endphp
 
 @if ($href)
     <a href="{{ $href }}" {{ $attributes->class($classes) }}>{{ $slot }}</a>
 @else
-    <button type="{{ $type }}" {{ $attributes->class($classes) }}>{{ $slot }}</button>
+    <button type="{{ $type }}" {{ $attributes->class($classes) }}>
+        @if ($target)
+            <svg wire:loading wire:target="{{ $target }}" class="h-4 w-4 shrink-0 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4Z"/></svg>
+        @endif
+        {{ $slot }}
+    </button>
 @endif

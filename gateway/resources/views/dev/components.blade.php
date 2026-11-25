@@ -107,6 +107,7 @@
                 <x-button href="#" variant="secondary">Link button</x-button>
                 <x-button disabled>Disabled</x-button>
             </div>
+            <p class="text-sm text-gray-400">A button with <code>wire:click</code> (or a <code>wire:target</code>) shows a spinner and is disabled while that action runs. A submit button needs <code>wire:target="&lt;the form's method&gt;"</code>.</p>
         </section>
 
         <section class="space-y-4">
@@ -146,6 +147,25 @@
             <x-service-unavailable />
             <p class="text-sm text-gray-400"><code>compact</code>: one line, for a small part of the page such as a button.</p>
             <x-service-unavailable service="Engagement" compact />
+        </section>
+
+        <section class="space-y-4">
+            <h2 class="text-lg font-semibold text-white"><code>&lt;x-search-spinner target="q" /&gt;</code></h2>
+            <p class="text-sm text-gray-400">Inside a <code>relative</code> wrapper, after a live search input with <code>pr-10</code>: spins at the right edge while <code>target</code> loads.</p>
+            <div class="relative max-w-sm">
+                <input type="search" placeholder="Search…" class="block w-full rounded-lg border border-white/10 bg-white/5 py-2 pr-10 pl-3 text-sm text-white placeholder-gray-500">
+                <svg class="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 animate-spin text-gray-400" fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4Z"/></svg>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <h2 class="text-lg font-semibold text-white"><code>&lt;x-error-page code="404" title="…" message="…"&gt;</code></h2>
+            <p class="text-sm text-gray-400">Used by <code>resources/views/errors/*</code> (403, 404, 419, 429, 500, 503). The slot adds buttons next to "Back to home".</p>
+            <div class="rounded-2xl border border-white/10">
+                <x-error-page code="404" title="Page not found" message="This page does not exist, or it was moved or deleted.">
+                    <x-button href="#" variant="ghost">Search movies</x-button>
+                </x-error-page>
+            </div>
         </section>
 
         <section class="space-y-4">

@@ -1,7 +1,7 @@
 {{-- One notification, in the bell dropdown ($compact) and on the notifications page. Clicking marks it read and opens its link. --}}
 @php($unread = $notification['read_at'] === null)
 
-<button type="button" wire:click="open('{{ $notification['id'] }}')" wire:key="notification-{{ $notification['id'] }}"
+<button type="button" wire:click="open('{{ $notification['id'] }}')" wire:loading.attr="disabled" wire:target="open('{{ $notification['id'] }}')" wire:key="notification-{{ $notification['id'] }}"
         @class(['flex w-full items-start gap-3 text-left transition hover:bg-white/5', 'px-4 py-3' => $compact, 'rounded-xl px-5 py-4' => ! $compact, 'bg-cerulean/10' => $unread])>
     <span @class(['mt-1.5 h-2 w-2 shrink-0 rounded-full', 'bg-neon-rose' => $unread, 'bg-transparent' => ! $unread])
           aria-hidden="true"></span>

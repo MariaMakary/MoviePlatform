@@ -23,8 +23,11 @@
     <div class="flex flex-wrap items-center justify-between gap-3">
         <div class="w-full sm:w-72 sm:max-w-full">
             <label for="q" class="sr-only">Search by title</label>
-            <input id="q" type="search" wire:model.live.debounce.400ms="q" placeholder="Search by title…" maxlength="100"
-                   class="block w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-gray-500 focus:ring-[1.5px] focus:ring-neon-rose/75 focus:outline-none">
+            <div class="relative">
+                <input id="q" type="search" wire:model.live.debounce.400ms="q" placeholder="Search by title…" maxlength="100"
+                       class="block w-full rounded-lg border border-white/10 bg-white/5 py-2 pl-3 pr-10 text-sm text-white placeholder-gray-500 focus:ring-[1.5px] focus:ring-neon-rose/75 focus:outline-none">
+                <x-search-spinner target="q" />
+            </div>
         </div>
         @unless ($this->isUnavailable('movies'))
             <p class="text-sm text-gray-400">{{ $meta['total'] }} {{ $meta['total'] === 1 ? 'movie' : 'movies' }}</p>

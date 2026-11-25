@@ -11,8 +11,11 @@
 
     <div class="max-w-md">
         <label for="lists-search" class="sr-only">Search lists by title</label>
-        <input id="lists-search" type="search" wire:model.live.debounce.300ms="q" placeholder="Search lists by title…" autocomplete="off" maxlength="150"
-               class="block w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-gray-500 focus:ring-[1.5px] focus:ring-neon-rose/75 focus:outline-none">
+        <div class="relative">
+            <input id="lists-search" type="search" wire:model.live.debounce.300ms="q" placeholder="Search lists by title…" autocomplete="off" maxlength="150"
+                   class="block w-full rounded-lg border border-white/10 bg-white/5 py-2 pl-3 pr-10 text-sm text-white placeholder-gray-500 focus:ring-[1.5px] focus:ring-neon-rose/75 focus:outline-none">
+            <x-search-spinner target="q" />
+        </div>
     </div>
 
     <div wire:loading.class="opacity-50" class="space-y-6 transition">

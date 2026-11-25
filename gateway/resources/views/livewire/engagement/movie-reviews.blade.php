@@ -16,7 +16,7 @@
         {{-- Writing: only for a logged-in user without a review of this movie --}}
         @if (! $user)
             <p class="rounded-2xl border border-dashed border-white/15 px-4 py-3 text-sm text-gray-400">
-                <button type="button" wire:click="logIn" class="font-semibold text-cerulean hover:underline">Log in</button> to write a review.
+                <button type="button" wire:click="logIn" wire:loading.attr="disabled" wire:target="logIn" class="font-semibold text-cerulean hover:underline">Log in</button> to write a review.
             </p>
         @elseif (! $mine)
             <form wire:submit="write" class="space-y-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4">

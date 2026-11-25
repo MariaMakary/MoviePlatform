@@ -25,6 +25,8 @@
 
     @if ($this->isUnavailable('genres'))
         <x-service-unavailable :service="$unavailable['genres']" :retry="true" />
+    @elseif ($genres === [])
+        <x-empty-state title="No genres yet" description="Genres show up here once Catalog has synced them from TMDB." />
     @else
         <form wire:submit="save" class="space-y-4">
             <fieldset>
