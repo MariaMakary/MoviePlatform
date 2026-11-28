@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KAIA admin dashboard mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Saira+Semi+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mockup-base.css">
+<link rel="stylesheet" href="admin-base.css">
+<style>
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.stat .k{color:var(--muted);font-size:14px;font-weight:500}
+.stat .v{font:700 40px/1.1 'Saira Semi Condensed';margin-top:6px}
+.stat .d{color:var(--subtle);font-size:13px;margin-top:4px}
+.stat .d b{color:var(--ok);font-weight:600}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+.chart{width:100%;height:auto;margin-top:12px;display:block}
+.chart text{fill:var(--subtle);font:12px 'Instrument Sans'}
+.ph2{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.total{font:700 22px 'Saira Semi Condensed'}
+.donut{display:flex;align-items:center;gap:26px;margin-top:14px}
+.donut svg{width:170px;height:170px;flex:none}
+.legend{list-style:none;padding:0;display:grid;gap:12px;flex:1}
+.legend li{display:grid;grid-template-columns:12px 1fr auto;gap:10px;align-items:center;font-size:15px}
+.legend .sw{width:12px;height:12px;border-radius:3px}
+.legend .n{font-weight:600;font-variant-numeric:tabular-nums}
+.legend .n small{color:var(--muted);font-weight:500;margin-left:6px}
+.bars{list-style:none;padding:0;display:grid;gap:11px;margin-top:14px}
+.bars li{display:grid;grid-template-columns:84px 1fr 44px;gap:12px;align-items:center;font-size:14px}
+.bars .t{height:12px;border-radius:6px;background:var(--s2);overflow:hidden}
+.bars .t i{display:block;height:100%;border-radius:6px;background:var(--cer)}
+.bars .c{color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.rank{list-style:none;padding:0;margin-top:12px;display:grid;gap:12px}
+.rank li{display:flex;align-items:center;gap:12px}
+.rank .i{width:16px;text-align:right;color:var(--subtle);font-size:13px}
+.rank img{width:34px;height:50px;border-radius:5px;object-fit:cover}
+.rank .who{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:600}
+.rank b{display:block;font-weight:600;font-size:15px}
+.rank span{color:var(--muted);font-size:13px}
+@media (max-width:1100px){.stats{grid-template-columns:repeat(2,1fr)}.grid3{grid-template-columns:1fr}}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}.stat .v{font-size:32px}.donut{gap:16px}.donut svg{width:130px;height:130px}}
+</style>
+</head>
+<body>
+<div class="atop">
+  <button class="menu" aria-label="Admin menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  <a class="logo" href="#"><img src="../../../gateway/public/images/brand/kaia-logo-name-transparent.png" alt="KAIA"></a>
+  <span class="tag">Admin</span>
+  <div class="r"><a class="back" href="#"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg><span>Back to KAIA</span></a><span class="av">MM</span></div>
+</div>
+<div class="shell">
+  <nav class="side" aria-label="Admin">
+    <a class="on" href="#"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Dashboard</a>
+    <a href="#"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>Movies</a>
+    <a href="#"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12Z"/></svg>Reviews</a>
+    <a href="#"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M16 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-5-6.7"/></svg>Users</a>
+    <div class="sep"></div>
+    <a href="#"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>System status</a>
+  </nav>
+  <main class="main">
+    <div class="ph"><div><h1>Dashboard</h1><p>Last 30 days. Each block loads from its own service.</p></div></div>
+
+    <div class="stats">
+      <div class="panel stat"><div class="k">Users</div><div class="v">248</div><div class="d"><b>+18</b> this month · 3 admins · 2 blocked</div></div>
+      <div class="panel stat"><div class="k">Reviews</div><div class="v">1,204</div><div class="d"><b>+96</b> this month</div></div>
+      <div class="panel stat"><div class="k">Ratings</div><div class="v">3,871</div><div class="d"><b>+312</b> this month</div></div>
+      <div class="panel stat"><div class="k">Movie nights</div><div class="v">42</div><div class="d">31 finalized · 318 chat messages this week</div></div>
+    </div>
+
+    <div class="grid2">
+      <section class="panel"><div class="ph2"><h2>Signups per day</h2><span class="total">18</span></div><p class="sub">Straight lines between days, a point for each day</p><svg class="chart" id="signups" viewBox="0 0 560 190" aria-label="Signups per day"></svg></section>
+      <section class="panel"><div class="ph2"><h2>User activity per day</h2><span class="total">2,141</span></div><p class="sub">Ratings, reviews, watches and lists</p><svg class="chart" id="activity" viewBox="0 0 560 190" aria-label="User activity per day"></svg></section>
+    </div>
+
+    <div class="grid2">
+      <section class="panel"><h2>Review sentiment</h2><p class="sub">Every slice has its own colour and its number written next to it</p>
+        <div class="donut">
+          <svg viewBox="0 0 42 42" aria-hidden="true">
+            <circle cx="21" cy="21" r="15.9" fill="none" stroke="#1e222c" stroke-width="6"/>
+            <circle cx="21" cy="21" r="15.9" fill="none" stroke="#4fc98a" stroke-width="6" stroke-dasharray="51 49" stroke-dashoffset="25"/>
+            <circle cx="21" cy="21" r="15.9" fill="none" stroke="#3eb1de" stroke-width="6" stroke-dasharray="26 74" stroke-dashoffset="74"/>
+            <circle cx="21" cy="21" r="15.9" fill="none" stroke="#ff2d95" stroke-width="6" stroke-dasharray="17 83" stroke-dashoffset="48"/>
+            <circle cx="21" cy="21" r="15.9" fill="none" stroke="#5f6779" stroke-width="6" stroke-dasharray="6 94" stroke-dashoffset="31"/>
+            <text x="21" y="20" text-anchor="middle" style="font:700 7px 'Saira Semi Condensed';fill:#f3f4f7">1,204</text>
+            <text x="21" y="25.5" text-anchor="middle" style="font:3px 'Instrument Sans';fill:#a2a9b8">reviews</text>
+          </svg>
+          <ul class="legend">
+            <li><span class="sw" style="background:#4fc98a"></span>Positive<span class="n">612<small>51%</small></span></li>
+            <li><span class="sw" style="background:#3eb1de"></span>Neutral<span class="n">318<small>26%</small></span></li>
+            <li><span class="sw" style="background:#ff2d95"></span>Negative<span class="n">201<small>17%</small></span></li>
+            <li><span class="sw" style="background:#5f6779"></span>Not analyzed<span class="n">73<small>6%</small></span></li>
+          </ul>
+        </div>
+      </section>
+      <section class="panel"><h2>Popular genres</h2><p class="sub">Watches and ratings</p>
+        <ul class="bars">
+          <li>Action<span class="t"><i style="width:100%"></i></span><span class="c">842</span></li>
+          <li>Drama<span class="t"><i style="width:81%"></i></span><span class="c">684</span></li>
+          <li>Sci-Fi<span class="t"><i style="width:66%"></i></span><span class="c">559</span></li>
+          <li>Comedy<span class="t"><i style="width:54%"></i></span><span class="c">451</span></li>
+          <li>Thriller<span class="t"><i style="width:40%"></i></span><span class="c">338</span></li>
+          <li>Horror<span class="t"><i style="width:27%"></i></span><span class="c">224</span></li>
+        </ul>
+      </section>
+    </div>
+
+    <div class="grid3">
+      <section class="panel"><h2>Most watched</h2>
+        <ol class="rank">
+          <li><span class="i">1</span><img src="https://image.tmdb.org/t/p/w185/qJ2tW6WMUDux911r6m7haRef0WH.jpg" alt=""><div><b>The Dark Knight</b><span>148 watches</span></div></li>
+          <li><span class="i">2</span><img src="https://image.tmdb.org/t/p/w185/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg" alt=""><div><b>Inception</b><span>131 watches</span></div></li>
+          <li><span class="i">3</span><img src="https://image.tmdb.org/t/p/w185/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg" alt=""><div><b>Interstellar</b><span>117 watches</span></div></li>
+        </ol>
+      </section>
+      <section class="panel"><h2>Highest rated</h2><p class="sub">3 or more ratings</p>
+        <ol class="rank">
+          <li><span class="i">1</span><img src="https://image.tmdb.org/t/p/w185/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg" alt=""><div><b>Interstellar</b><span>4.82 ★ · 64 ratings</span></div></li>
+          <li><span class="i">2</span><img src="https://image.tmdb.org/t/p/w185/qJ2tW6WMUDux911r6m7haRef0WH.jpg" alt=""><div><b>The Dark Knight</b><span>4.77 ★ · 91 ratings</span></div></li>
+          <li><span class="i">3</span><img src="https://image.tmdb.org/t/p/w185/rstcAnBeCkxNQjNp3YXrF6IP1tW.jpg" alt=""><div><b>Kalki 2898-AD</b><span>4.51 ★ · 12 ratings</span></div></li>
+        </ol>
+      </section>
+      <section class="panel"><h2>Most active users</h2>
+        <ol class="rank">
+          <li><span class="i">1</span><span class="who" style="background:#1f3b4d;color:#9fd8f2">LK</span><div><b>Lina K.</b><span>214 activities</span></div></li>
+          <li><span class="i">2</span><span class="who" style="background:#3a2140;color:#ffc4e2">KB</span><div><b>Karim B.</b><span>167 activities</span></div></li>
+          <li><span class="i">3</span><span class="who" style="background:#2b3a24;color:#c9eab0">NA</span><div><b>Nour A.</b><span>142 activities</span></div></li>
+        </ol>
+      </section>
+    </div>
+  </main>
+</div>
+<script>
+function line(id, values, max, color) {
+  const svg = document.getElementById(id), w = 560, h = 190, l = 30, b = 22, t = 8;
+  const x = i => l + i * (w - l - 8) / (values.length - 1), y = v => t + (h - t - b) * (1 - v / max);
+  let s = '';
+  [0, .5, 1].forEach(f => { const yy = y(max * f); s += `<line x1="${l}" x2="${w}" y1="${yy}" y2="${yy}" stroke="#2b3140" stroke-width="1"/><text x="${l - 6}" y="${yy + 4}" text-anchor="end">${Math.round(max * f)}</text>`; });
+  ['30 Oct', '13 Nov', '27 Nov'].forEach((d, i) => { s += `<text x="${x(i * (values.length - 1) / 2)}" y="${h - 4}" text-anchor="${['start', 'middle', 'end'][i]}">${d}</text>`; });
+  const pts = values.map((v, i) => `${x(i)},${y(v)}`).join(' ');
+  s += `<polygon points="${l},${y(0)} ${pts} ${x(values.length - 1)},${y(0)}" fill="${color}" opacity=".12"/>`;
+  s += `<polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>`;
+  values.forEach((v, i) => { s += `<circle cx="${x(i)}" cy="${y(v)}" r="2.6" fill="${color}"/>`; });
+  svg.innerHTML = s;
+}
+line('signups', [0,1,0,2,1,0,0,1,3,1,0,1,0,0,2,1,1,0,0,1,0,2,0,1,0,0,1,0,0,1], 4, '#3eb1de');
+line('activity', [52,61,48,70,66,59,81,95,72,64,58,77,69,74,88,102,79,63,60,71,84,90,76,68,73,81,97,110,86,74], 120, '#3eb1de');
+</script>
+</body>
+</html>
