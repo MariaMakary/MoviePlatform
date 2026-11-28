@@ -97,3 +97,12 @@ Route::get('/dev/components', function () {
 })->name('dev.components');
 
 Route::get('/dev/services', ServiceStatus::class)->name('dev.services');
+
+Route::get('/dev/api', function () {
+    abort_unless(app()->isLocal(), 404);
+
+    return view('dev.api', [
+        'title' => 'API docs',
+        'services' => ['identity', 'catalog', 'engagement', 'social', 'intelligence', 'notification'],
+    ]);
+})->name('dev.api');
