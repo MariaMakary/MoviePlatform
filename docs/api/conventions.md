@@ -174,3 +174,29 @@ Creates or updates the current user's rating of a movie (one rating per user and
 - Query parameters go in the same table as body fields, with the rule `query`.
 - List endpoints show one item in `data` and the `meta` block (section 5).
 - Leave out **Events** when the endpoint publishes none.
+
+## 12. Swagger (OpenAPI)
+
+Every service serves its API as an OpenAPI 3 file with a Swagger UI page, on its own port:
+`http://127.0.0.1:800X/docs/`. The Gateway's `/dev/api` page (local only) links all six.
+
+- **The contract stays `docs/api/<service>.md`** (golden rule 6). `public/docs/openapi.yaml` describes the same
+  endpoints, and both are updated in the same PR. If they disagree, the `.md` file is right and the YAML is fixed.
+- Files, per service:
+
+| File | What it is |
+|---|---|
+| `public/docs/index.html` | The Swagger UI page. The same file in every service, loaded from jsDelivr with a pinned version and SRI hashes, so there is no composer package. Copy it unchanged when the version is upgraded in all six. |
+| `public/docs/openapi.yaml` | The service's endpoints. Starts with `/api/health` and the shared `components`. |
+
+- `php -S … -t public` serves both as static files, so they work even when the database is down.
+- Shared parts already in every `openapi.yaml`, reuse them with `$ref` instead of repeating:
+  - `securitySchemes`: `bearerAuth` (user JWT, the default for every operation) and `serviceToken`
+    (`X-Service-Token`, for `/api/internal/*`). A guest route sets `security: []`, an internal route
+    `security: [{serviceToken: []}]`.
+  - `schemas`: `Error` (section 6) and `Meta` (section 5).
+  - `responses`: `Unauthenticated` (401), `Forbidden` (403), `NotFound` (404), `ValidationFailed` (422).
+- Each operation has a `tags` entry for its resource (like the `.md` groups), a `summary`, the request body or query
+  parameters with the same rules as the `.md` table, and one `example` per response that copies the `.md` example.
+- **Try it out:** log in through `POST /api/login` on Identity's page, copy the token, then click
+  **Authorize** on any service's page. The token is kept when the page reloads, and lasts 30 minutes (section 7).
