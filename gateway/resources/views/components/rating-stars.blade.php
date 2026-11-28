@@ -8,7 +8,7 @@
 @endphp
 
 <span role="img" aria-label="{{ $label }} out of {{ $max }} stars" {{ $attributes->class('relative inline-flex shrink-0') }}>
-    <span class="flex text-white/20" aria-hidden="true">
+    <span class="flex text-line-strong" aria-hidden="true">
         @for ($i = 0; $i < $max; $i++)
             <x-icons.star :class="$starSize" />
         @endfor

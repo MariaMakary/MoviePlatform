@@ -24,10 +24,10 @@ function theme() {
     return {
         cerulean: style.getPropertyValue('--color-cerulean').trim(),
         rose: style.getPropertyValue('--color-neon-rose').trim(),
-        text: 'rgba(255, 255, 255, 0.7)',
-        grid: 'rgba(255, 255, 255, 0.08)',
-        neutral: 'rgba(255, 255, 255, 0.55)',
-        muted: 'rgba(255, 255, 255, 0.2)',
+        text: style.getPropertyValue('--color-muted').trim(),
+        grid: style.getPropertyValue('--color-line').trim(),
+        neutral: style.getPropertyValue('--color-subtle').trim(),
+        muted: style.getPropertyValue('--color-line-strong').trim(),
     };
 }
 

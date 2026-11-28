@@ -1,7 +1,7 @@
 <section aria-labelledby="{{ $section }}-title" class="space-y-4">
     <div>
-        <h2 id="{{ $section }}-title" class="text-xl font-bold text-white sm:text-2xl">{{ $title }}</h2>
-        <p class="text-sm text-gray-400">{{ $subtitle }}</p>
+        <h2 id="{{ $section }}-title" class="text-xl font-bold text-fg sm:text-2xl">{{ $title }}</h2>
+        <p class="text-sm text-muted">{{ $subtitle }}</p>
     </div>
 
     @if ($movies[$section] === [] && $this->isUnavailable($section))

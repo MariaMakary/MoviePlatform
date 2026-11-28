@@ -2,8 +2,8 @@
     $label = ! $loggedIn ? 'Log in to add' : ($inWatchlist ? 'In watchlist' : 'Add to watchlist');
     $filled = $loggedIn && $inWatchlist;
     $classes = $compact
-        ? 'inline-flex h-9 w-9 items-center justify-center rounded-full bg-jet/80 text-gray-100 ring-1 ring-white/15 backdrop-blur transition hover:bg-jet hover:text-white'
-        : 'inline-flex items-center gap-2 rounded-lg bg-white/5 px-3 py-2 text-sm font-semibold text-gray-100 ring-1 ring-white/10 transition hover:bg-white/10';
+        ? 'inline-flex h-9 w-9 items-center justify-center rounded-full bg-jet/80 text-fg ring-1 ring-line-strong backdrop-blur transition hover:bg-jet hover:text-fg'
+        : 'inline-flex items-center gap-2 rounded-lg bg-surface-1 px-3 py-2 text-sm font-semibold text-fg ring-1 ring-line transition hover:bg-surface-2';
 @endphp
 
 <div class="inline-flex flex-col items-start gap-1">

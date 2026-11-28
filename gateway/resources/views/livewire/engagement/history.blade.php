@@ -1,8 +1,8 @@
 <div class="space-y-8">
     <div>
-        <h1 class="text-2xl font-bold tracking-tight text-white">History</h1>
+        <h1 class="text-2xl font-bold tracking-tight text-fg">History</h1>
         @if (! $this->isUnavailable('history') && $total > 0)
-            <p class="text-sm text-gray-400">{{ $total }} {{ Str::plural('movie', $total) }} watched</p>
+            <p class="text-sm text-muted">{{ $total }} {{ Str::plural('movie', $total) }} watched</p>
         @endif
     </div>
 
@@ -17,13 +17,13 @@
     @else
         @foreach ($months as $month => $items)
             <section wire:key="month-{{ $month }}" aria-labelledby="month-{{ $loop->index }}" class="space-y-4">
-                <h2 id="month-{{ $loop->index }}" class="text-xl font-bold text-white">{{ $month }}</h2>
+                <h2 id="month-{{ $loop->index }}" class="text-xl font-bold text-fg">{{ $month }}</h2>
 
                 <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
                     @foreach ($items as $item)
                         <div wire:key="history-{{ $item['entry']['id'] }}" class="space-y-1">
                             <x-movie-card :movie="$item['movie']" :href="route('movies.show', $item['movie']['id'])" />
-                            <p class="px-0.5 text-xs text-gray-400">Watched <x-date :value="$item['entry']['watched_at']" format="j M Y" /></p>
+                            <p class="px-0.5 text-xs text-muted">Watched <x-date :value="$item['entry']['watched_at']" format="j M Y" /></p>
                         </div>
                     @endforeach
                 </div>
@@ -31,7 +31,7 @@
         @endforeach
 
         @if ($lastPage > 1)
-            <nav class="flex items-center justify-between text-sm text-gray-400" aria-label="Pagination">
+            <nav class="flex items-center justify-between text-sm text-muted" aria-label="Pagination">
                 <x-button variant="ghost" size="sm" wire:click="goToPage({{ $page - 1 }})" :disabled="$page <= 1">Previous</x-button>
                 <span>Page {{ $page }} of {{ $lastPage }}</span>
                 <x-button variant="ghost" size="sm" wire:click="goToPage({{ $page + 1 }})" :disabled="$page >= $lastPage">Next</x-button>

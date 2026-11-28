@@ -262,22 +262,22 @@ function popup(cinema) {
     el.append(
         element('strong', 'block text-sm', cinema.name),
         element('span', 'block', cinema.address ?? 'No address listed'),
-        element('span', 'block text-gray-500', `${formatDistance(cinema.distance)} away`),
+        element('span', 'block text-subtle', `${formatDistance(cinema.distance)} away`),
     );
 
     return el;
 }
 
 function listItem(cinema, onSelect) {
-    const button = element('button', 'w-full px-4 py-3 text-left transition hover:bg-white/5 focus-visible:bg-white/5 focus-visible:outline-none');
+    const button = element('button', 'w-full px-4 py-3 text-left transition hover:bg-surface-2 focus-visible:bg-surface-2 focus-visible:outline-none');
     button.type = 'button';
 
     const heading = element('span', 'flex items-baseline justify-between gap-3');
     heading.append(
-        element('span', 'font-medium text-white', cinema.name),
-        element('span', 'shrink-0 text-xs text-gray-400', formatDistance(cinema.distance)),
+        element('span', 'font-medium text-fg', cinema.name),
+        element('span', 'shrink-0 text-xs text-muted', formatDistance(cinema.distance)),
     );
-    button.append(heading, element('span', 'mt-0.5 block text-sm text-gray-400', cinema.address ?? 'No address listed'));
+    button.append(heading, element('span', 'mt-0.5 block text-sm text-muted', cinema.address ?? 'No address listed'));
     button.addEventListener('click', onSelect);
 
     const item = element('li', '');

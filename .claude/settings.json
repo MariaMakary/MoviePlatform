@@ -1,12 +1,4 @@
 {
-  "extraKnownMarketplaces": {
-    "claude-plugins-official": {
-      "source": {
-        "source": "github",
-        "repo": "anthropics/claude-plugins-official"
-      }
-    }
-  },
   "enabledPlugins": {
     "php-lsp@claude-plugins-official": true,
     "pr-review-toolkit@claude-plugins-official": true,
@@ -14,6 +6,19 @@
     "security-guidance@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,
     "playwright@claude-plugins-official": true,
-    "feature-dev@claude-plugins-official": true
+    "feature-dev@claude-plugins-official": true,
+    "mobbin@anthropic-plugin-directory": true,
+    "figma@claude-plugins-official": true,
+    "design-superpowers@anthropic-plugin-directory": true,
+    "ui-ux-pro-max@ui-ux-pro-max-skill": true,
+    "bencium-controlled-ux-designer@bencium-marketplace": true
+  },
+  "extraKnownMarketplaces": {
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
+    }
   }
 }

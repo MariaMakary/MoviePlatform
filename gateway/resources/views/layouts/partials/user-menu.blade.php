@@ -5,7 +5,7 @@
     <div class="flex items-center gap-3">
         <a href="{{ route('profile') }}" class="flex items-center gap-3 rounded-lg hover:opacity-85" aria-label="My profile">
             <x-avatar :name="$user['name']" :src="$user['avatar']" size="sm" />
-            <span @class(['max-w-40 truncate text-sm font-medium text-white', 'hidden 2xl:inline' => $compact ?? false])>{{ $user['name'] }}</span>
+            <span @class(['max-w-40 truncate text-sm font-medium text-fg', 'hidden 2xl:inline' => $compact ?? false])>{{ $user['name'] }}</span>
         </a>
         <form method="POST" action="{{ route('logout') }}">
             @csrf

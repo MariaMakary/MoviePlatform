@@ -4,7 +4,7 @@
     $variants = [
         'primary' => 'bg-neon-rose text-jet hover:bg-neon-rose/85',
         'secondary' => 'bg-cerulean text-white hover:bg-cerulean/85',
-        'ghost' => 'bg-white/5 text-gray-100 ring-1 ring-white/10 hover:bg-white/10',
+        'ghost' => 'bg-surface-1 text-fg ring-1 ring-line hover:bg-surface-2',
         'danger' => 'bg-red-600 text-white hover:bg-red-500',
     ];
 

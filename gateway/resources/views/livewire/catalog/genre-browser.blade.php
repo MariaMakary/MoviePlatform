@@ -1,7 +1,7 @@
 <section id="browse-genres" aria-labelledby="browse-genres-title" class="space-y-4">
     <div>
-        <h2 id="browse-genres-title" class="text-xl font-bold text-white sm:text-2xl">Browse by genre</h2>
-        <p class="text-sm text-gray-400">Pick a genre to see its most popular movies, then scroll sideways for more.</p>
+        <h2 id="browse-genres-title" class="text-xl font-bold text-fg sm:text-2xl">Browse by genre</h2>
+        <p class="text-sm text-muted">Pick a genre to see its most popular movies, then scroll sideways for more.</p>
     </div>
 
     @if ($this->isUnavailable('genres'))
@@ -16,7 +16,7 @@
                     <button type="button" wire:click="select('{{ $genre['id'] }}')" wire:loading.attr="disabled" wire:target="select('{{ $genre['id'] }}')" aria-pressed="{{ $active ? 'true' : 'false' }}"
                             @class(['inline-flex rounded-full border px-4 py-2 text-sm font-medium transition focus-visible:ring-2 focus-visible:ring-cerulean focus-visible:outline-none',
                                     'border-cerulean bg-cerulean text-white' => $active,
-                                    'border-white/15 bg-white/5 text-gray-100 hover:border-cerulean/60 hover:bg-cerulean/15 hover:text-white' => ! $active])>
+                                    'border-line-strong bg-surface-1 text-fg hover:border-cerulean/60 hover:bg-cerulean/15 hover:text-fg' => ! $active])>
                         {{ $genre['name'] }}
                     </button>
                 </li>

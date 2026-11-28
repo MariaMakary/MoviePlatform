@@ -16,7 +16,7 @@ class RecommendedRow extends Component
 
     public function placeholder(): string
     {
-        return '<div class="h-72 animate-pulse rounded-2xl bg-white/[0.03]" aria-hidden="true"></div>';
+        return '<div class="h-72 animate-pulse rounded-2xl bg-surface-1" aria-hidden="true"></div>';
     }
 
     public function render(AuthSession $auth, IntelligenceClient $intelligence, CatalogClient $catalog): View

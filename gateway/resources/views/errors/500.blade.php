@@ -6,11 +6,11 @@
     <title>Something went wrong · {{ config('app.name') }}</title>
     <link rel="icon" type="image/png" href="{{ asset('images/brand/kaia-favicon.png') }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet">
+    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700|saira-semi-condensed:600,700" rel="stylesheet">
     @vite(['resources/css/app.css'])
 </head>
-<body class="flex min-h-full flex-col bg-jet font-sans text-gray-100 antialiased">
-    <header class="border-b border-white/10">
+<body class="flex min-h-full flex-col bg-jet font-sans text-fg antialiased">
+    <header class="border-b border-line">
         <div class="mx-auto flex h-16 max-w-7xl items-center px-4 sm:px-6 lg:px-8">
             <x-logo />
         </div>

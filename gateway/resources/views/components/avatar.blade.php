@@ -9,7 +9,7 @@
 @if ($src)
     <img src="{{ $src }}" alt="{{ $name }}" {{ $attributes->class(['shrink-0 rounded-full object-cover ring-2 ring-jet', $sizes[$size]]) }}>
 @else
-    <span role="img" aria-label="{{ $name }}" {{ $attributes->class(['inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-white ring-2 ring-jet select-none', $sizes[$size], $background]) }}>
+    <span role="img" aria-label="{{ $name }}" {{ $attributes->class(['inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-fg ring-2 ring-jet select-none', $sizes[$size], $background]) }}>
         <span aria-hidden="true">{{ $initials ?: '?' }}</span>
     </span>
 @endif
