@@ -16,7 +16,7 @@
 
 <div class="flex flex-col gap-6 md:flex-row md:gap-8">
     <aside class="md:w-56 md:shrink-0">
-        <p class="mb-2 px-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">Admin</p>
+        <p class="mb-2 px-3 text-xs font-semibold tracking-wider text-subtle uppercase">Admin</p>
         <nav class="flex gap-1 overflow-x-auto md:flex-col" aria-label="Admin">
             @foreach ($links as $link)
                 <x-nav-link :href="$link['href']" :active="$link['active']">{{ $link['label'] }}</x-nav-link>
@@ -25,7 +25,7 @@
     </aside>
 
     <div class="min-w-0 flex-1 space-y-6">
-        <h1 class="text-2xl font-bold text-white">{{ $title }}</h1>
+        <h1 class="text-2xl font-bold text-fg">{{ $title }}</h1>
 
         {{ $slot }}
     </div>

@@ -1,7 +1,7 @@
 <section id="similar-section" class="space-y-4" aria-labelledby="similar-title">
     <div>
-        <h2 id="similar-title" class="text-xl font-bold text-white">Similar movies</h2>
-        <p class="text-sm text-gray-400">If you liked this one.</p>
+        <h2 id="similar-title" class="text-xl font-bold text-fg">Similar movies</h2>
+        <p class="text-sm text-muted">If you liked this one.</p>
     </div>
 
     @if ($this->isUnavailable('similar'))

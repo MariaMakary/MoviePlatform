@@ -3,9 +3,9 @@
 <li class="flex items-center gap-4 py-4">
     <x-avatar :name="$user['name']" :src="$user['avatar']" />
     <div class="min-w-0 flex-1">
-        <a href="{{ route('users.show', $user['id']) }}" class="block truncate font-semibold text-white hover:underline">{{ $user['name'] }}</a>
+        <a href="{{ route('users.show', $user['id']) }}" class="block truncate font-semibold text-fg hover:underline">{{ $user['name'] }}</a>
         @if ($user['bio'])
-            <p class="truncate text-sm text-gray-400">{{ $user['bio'] }}</p>
+            <p class="truncate text-sm text-muted">{{ $user['bio'] }}</p>
         @endif
     </div>
     @if ($following !== null)

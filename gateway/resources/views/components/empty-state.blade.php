@@ -1,7 +1,7 @@
 @props(['title', 'description' => null])
 
-<div {{ $attributes->class('flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/15 px-6 py-12 text-center') }}>
-    <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-cerulean/15 text-cerulean" aria-hidden="true">
+<div {{ $attributes->class('flex flex-col items-center justify-center rounded-2xl border border-dashed border-line-strong px-6 py-12 text-center') }}>
+    <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-cerulean/15 text-cerulean-light" aria-hidden="true">
         @isset($icon)
             {{ $icon }}
         @else
@@ -9,10 +9,10 @@
         @endisset
     </div>
 
-    <h3 class="text-base font-semibold text-white">{{ $title }}</h3>
+    <h3 class="text-base font-semibold text-fg">{{ $title }}</h3>
 
     @if ($description)
-        <p class="mt-1 max-w-sm text-sm text-gray-400">{{ $description }}</p>
+        <p class="mt-1 max-w-sm text-sm text-muted">{{ $description }}</p>
     @endif
 
     @if (! $slot->isEmpty())

@@ -1,8 +1,8 @@
 <div class="space-y-6">
     <div>
-        <h1 class="text-2xl font-bold tracking-tight text-white">My watchlist</h1>
+        <h1 class="text-2xl font-bold tracking-tight text-fg">My watchlist</h1>
         @if (! $this->isUnavailable('watchlist') && $total > 0)
-            <p class="text-sm text-gray-400">{{ $total }} {{ Str::plural('movie', $total) }} to watch</p>
+            <p class="text-sm text-muted">{{ $total }} {{ Str::plural('movie', $total) }} to watch</p>
         @endif
     </div>
 
@@ -41,7 +41,7 @@
         </div>
 
         @if ($lastPage > 1)
-            <nav class="flex items-center justify-between text-sm text-gray-400" aria-label="Pagination">
+            <nav class="flex items-center justify-between text-sm text-muted" aria-label="Pagination">
                 <x-button variant="ghost" size="sm" wire:click="goToPage({{ $page - 1 }})" :disabled="$page <= 1">Previous</x-button>
                 <span>Page {{ $page }} of {{ $lastPage }}</span>
                 <x-button variant="ghost" size="sm" wire:click="goToPage({{ $page + 1 }})" :disabled="$page >= $lastPage">Next</x-button>

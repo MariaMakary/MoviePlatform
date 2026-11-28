@@ -1,7 +1,7 @@
 <div class="mx-auto max-w-3xl space-y-6">
     <div>
-        <h1 class="text-2xl font-bold tracking-tight text-white">Feed</h1>
-        <p class="text-sm text-gray-400">What the people you follow rated, reviewed, watched and listed.</p>
+        <h1 class="text-2xl font-bold tracking-tight text-fg">Feed</h1>
+        <p class="text-sm text-muted">What the people you follow rated, reviewed, watched and listed.</p>
     </div>
 
     @if ($this->isUnavailable('feed'))
@@ -20,7 +20,7 @@
         </ul>
 
         @if ($lastPage > 1)
-            <nav class="flex items-center justify-between text-sm text-gray-400" aria-label="Pagination">
+            <nav class="flex items-center justify-between text-sm text-muted" aria-label="Pagination">
                 <x-button variant="ghost" size="sm" wire:click="goToPage({{ $page - 1 }})" :disabled="$page <= 1">Previous</x-button>
                 <span>Page {{ $page }} of {{ $lastPage }}</span>
                 <x-button variant="ghost" size="sm" wire:click="goToPage({{ $page + 1 }})" :disabled="$page >= $lastPage">Next</x-button>

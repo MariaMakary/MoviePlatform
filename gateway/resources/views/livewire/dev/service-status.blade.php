@@ -1,8 +1,8 @@
 <div class="space-y-6">
     <header class="flex flex-wrap items-end justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-white">Services</h1>
-            <p class="mt-1 text-sm text-gray-400">
+            <h1 class="text-2xl font-bold text-fg">Services</h1>
+            <p class="mt-1 text-sm text-muted">
                 Calls <code>GET /api/health</code> on every service through its client. A stopped service shows
                 <code class="text-neon-rose">&lt;x-service-unavailable /&gt;</code> and the rest of the page keeps working.
                 Only available when <code class="text-neon-rose">APP_ENV=local</code>.
@@ -13,10 +13,10 @@
 
     <div class="grid gap-4 md:grid-cols-2">
         @foreach ($health as $service => $status)
-            <section wire:key="service-{{ $service }}" class="space-y-3 rounded-2xl border border-white/10 p-4">
+            <section wire:key="service-{{ $service }}" class="space-y-3 rounded-2xl border border-line p-4">
                 <div class="flex items-center justify-between gap-2">
-                    <h2 class="font-semibold text-white">{{ Str::headline($service) }}</h2>
-                    <code class="text-xs text-gray-500">{{ config("services.{$service}.url") }}</code>
+                    <h2 class="font-semibold text-fg">{{ Str::headline($service) }}</h2>
+                    <code class="text-xs text-subtle">{{ config("services.{$service}.url") }}</code>
                 </div>
 
                 @if ($this->isUnavailable($service))
@@ -27,9 +27,9 @@
                             <div @class([
                                 'rounded-md px-2 py-1',
                                 'bg-neon-rose/15 text-pink-100' => in_array($value, ['fail', 'degraded'], true),
-                                'bg-cerulean/15 text-sky-100' => ! in_array($value, ['fail', 'degraded'], true),
+                                'bg-cerulean/15 text-cerulean-light' => ! in_array($value, ['fail', 'degraded'], true),
                             ])>
-                                <dt class="inline text-gray-400">{{ $key }}</dt>
+                                <dt class="inline text-muted">{{ $key }}</dt>
                                 <dd class="inline font-semibold">{{ is_scalar($value) ? $value : json_encode($value) }}</dd>
                             </div>
                         @endforeach

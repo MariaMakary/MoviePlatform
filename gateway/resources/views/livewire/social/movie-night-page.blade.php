@@ -1,56 +1,56 @@
 @use('MoviePlatform\Common\MovieNights\ParticipantStatus')
 
 <div class="mx-auto max-w-3xl space-y-6">
-    <a href="{{ route('movie-nights.index') }}" class="text-sm text-gray-400 hover:text-white hover:underline">&larr; My movie nights</a>
+    <a href="{{ route('movie-nights.index') }}" class="text-sm text-muted hover:text-fg hover:underline">&larr; My movie nights</a>
 
     @if ($this->isUnavailable('night'))
         <x-service-unavailable :service="$unavailable['night']" :retry="true" />
     @elseif ($night)
-        <section class="space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+        <section class="space-y-4 rounded-2xl border border-line bg-surface-1 p-6">
             <div class="flex flex-wrap items-start justify-between gap-3">
-                <h1 class="min-w-0 text-2xl font-bold tracking-tight wrap-anywhere text-white">{{ $night['title'] }}</h1>
+                <h1 class="min-w-0 text-2xl font-bold tracking-tight wrap-anywhere text-fg">{{ $night['title'] }}</h1>
                 @include('livewire.social.partials.status-badges', ['night' => $night, 'userId' => $userId])
             </div>
 
             <dl class="grid gap-3 text-sm sm:grid-cols-2">
                 <div>
-                    <dt class="text-gray-400">When</dt>
-                    <dd class="font-medium text-white"><x-date :value="$night['scheduled_at']" format="l j F Y, H:i" /></dd>
+                    <dt class="text-muted">When</dt>
+                    <dd class="font-medium text-fg"><x-date :value="$night['scheduled_at']" format="l j F Y, H:i" /></dd>
                 </div>
                 <div>
-                    <dt class="text-gray-400">Host</dt>
-                    <dd class="flex items-center gap-2 font-medium text-white">
+                    <dt class="text-muted">Host</dt>
+                    <dd class="flex items-center gap-2 font-medium text-fg">
                         @if ($host)
                             <x-avatar :name="$host['name']" :src="$host['avatar']" size="xs" />
                             {{ $night['host_id'] === $userId ? 'You' : $host['name'] }}
                         @elseif ($night['host_id'] === $userId)
                             You
                         @else
-                            <span class="text-gray-400">Unknown</span>
+                            <span class="text-muted">Unknown</span>
                         @endif
                     </dd>
                 </div>
                 @if ($night['location'])
                     <div>
-                        <dt class="text-gray-400">Where</dt>
-                        <dd class="font-medium text-white">{{ $night['location'] }}</dd>
+                        <dt class="text-muted">Where</dt>
+                        <dd class="font-medium text-fg">{{ $night['location'] }}</dd>
                     </div>
                 @endif
                 @if ($night['meeting_link'] && \Illuminate\Support\Str::startsWith($night['meeting_link'], ['https://', 'http://']))
                     <div>
-                        <dt class="text-gray-400">Online</dt>
-                        <dd><a href="{{ $night['meeting_link'] }}" target="_blank" rel="noopener noreferrer" class="font-medium break-all text-cerulean hover:underline">{{ $night['meeting_link'] }}</a></dd>
+                        <dt class="text-muted">Online</dt>
+                        <dd><a href="{{ $night['meeting_link'] }}" target="_blank" rel="noopener noreferrer" class="font-medium break-all text-cerulean-light hover:underline">{{ $night['meeting_link'] }}</a></dd>
                     </div>
                 @endif
             </dl>
 
             @if ($night['description'])
-                <p class="text-sm whitespace-pre-line wrap-anywhere text-gray-200">{{ $night['description'] }}</p>
+                <p class="text-sm whitespace-pre-line wrap-anywhere text-fg">{{ $night['description'] }}</p>
             @endif
 
             @if ($canAnswer)
-                <div class="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4">
-                    <p class="text-sm text-gray-200">
+                <div class="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
+                    <p class="text-sm text-fg">
                         @if ($myStatus === ParticipantStatus::Accepted)
                             You're going. Changed your mind?
                         @elseif ($myStatus === ParticipantStatus::Declined)
@@ -77,8 +77,8 @@
             @endif
 
             @if ($canManage)
-                <div class="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4">
-                    <p class="text-sm text-gray-200">
+                <div class="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
+                    <p class="text-sm text-fg">
                         @if ($leaders === [])
                             Add a movie to the shortlist to finalize the night.
                         @else
@@ -94,22 +94,22 @@
         </section>
 
         @if ($cancelled)
-            <div role="status" class="rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-5 text-center">
-                <p class="font-semibold text-white">This movie night was cancelled.</p>
-                <p class="mt-1 text-sm text-gray-400">The host called it off, so there's no voting and nothing to join.</p>
+            <div role="status" class="rounded-2xl border border-line bg-surface-1 px-6 py-5 text-center">
+                <p class="font-semibold text-fg">This movie night was cancelled.</p>
+                <p class="mt-1 text-sm text-muted">The host called it off, so there's no voting and nothing to join.</p>
             </div>
         @endif
 
         @if ($finalized)
             <section aria-labelledby="final-title" class="space-y-5 rounded-2xl border border-neon-rose/30 bg-neon-rose/[0.04] p-6">
-                <h2 id="final-title" class="text-xl font-bold text-white sm:text-2xl">The movie</h2>
+                <h2 id="final-title" class="text-xl font-bold text-fg sm:text-2xl">The movie</h2>
 
                 @if ($this->isUnavailable('winner'))
                     <x-service-unavailable compact :service="$unavailable['winner']" :retry="true" />
                 @elseif ($winner)
                     @php($runtime = $winner['runtime'] ? intdiv($winner['runtime'], 60).'h '.($winner['runtime'] % 60).'m' : null)
                     <div class="flex gap-4">
-                        <a href="{{ route('movies.show', $winner['id']) }}" class="w-24 shrink-0 overflow-hidden rounded-xl bg-white/5 ring-1 ring-white/10 sm:w-28">
+                        <a href="{{ route('movies.show', $winner['id']) }}" class="w-24 shrink-0 overflow-hidden rounded-xl bg-surface-1 ring-1 ring-line sm:w-28">
                             @if ($winner['poster_url'])
                                 <img src="{{ $winner['poster_url'] }}" alt="" class="aspect-2/3 h-full w-full object-cover">
                             @else
@@ -117,18 +117,18 @@
                             @endif
                         </a>
                         <div class="min-w-0 space-y-1">
-                            <a href="{{ route('movies.show', $winner['id']) }}" class="text-lg font-semibold text-white hover:underline">{{ $winner['title'] }}</a>
-                            <p class="text-sm text-gray-300">
+                            <a href="{{ route('movies.show', $winner['id']) }}" class="text-lg font-semibold text-fg hover:underline">{{ $winner['title'] }}</a>
+                            <p class="text-sm text-muted">
                                 {{ $winner['year'] ?? '' }}
                                 @if ($runtime)
                                     @if ($winner['year']) <span aria-hidden="true">·</span> @endif {{ $runtime }}
                                 @endif
                             </p>
-                            <p class="text-sm font-medium text-cerulean">Won with {{ $winnerVotes }} {{ \Illuminate\Support\Str::plural('vote', $winnerVotes) }}</p>
+                            <p class="text-sm font-medium text-cerulean-light">Won with {{ $winnerVotes }} {{ \Illuminate\Support\Str::plural('vote', $winnerVotes) }}</p>
                         </div>
                     </div>
                 @else
-                    <p class="text-sm text-gray-400">The winning movie is no longer in the catalog.</p>
+                    <p class="text-sm text-muted">The winning movie is no longer in the catalog.</p>
                 @endif
 
                 <div class="flex flex-wrap items-center gap-2">
@@ -145,14 +145,14 @@
                 </div>
 
                 <div class="space-y-2">
-                    <h3 class="text-sm font-semibold text-gray-200">Going ({{ $attendees->count() }})</h3>
+                    <h3 class="text-sm font-semibold text-fg">Going ({{ $attendees->count() }})</h3>
                     @if ($this->isUnavailable('people'))
                         <x-service-unavailable compact :service="$unavailable['people']" />
                     @endif
                     <ul class="flex flex-wrap gap-2">
                         @foreach ($attendees as $attendee)
                             @php($person = $people->get($attendee['user_id']))
-                            <li wire:key="attendee-{{ $attendee['user_id'] }}" class="flex items-center gap-2 rounded-full bg-white/5 py-1 pr-3 pl-1 text-sm text-white ring-1 ring-white/10">
+                            <li wire:key="attendee-{{ $attendee['user_id'] }}" class="flex items-center gap-2 rounded-full bg-surface-1 py-1 pr-3 pl-1 text-sm text-fg ring-1 ring-line">
                                 <x-avatar :name="$person['name'] ?? '?'" :src="$person['avatar'] ?? null" size="xs" />
                                 {{ $attendee['user_id'] === $userId ? 'You' : ($person['name'] ?? 'Someone') }}
                             </li>
@@ -163,8 +163,8 @@
         @endif
 
         @if ($canInvite)
-            <form wire:submit="invite" class="space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-                <h2 class="text-lg font-semibold text-white">Invite more people</h2>
+            <form wire:submit="invite" class="space-y-4 rounded-2xl border border-line bg-surface-1 p-6">
+                <h2 class="text-lg font-semibold text-fg">Invite more people</h2>
 
                 @if ($this->isUnavailable('invite'))
                     <p role="alert" class="rounded-lg border border-neon-rose/40 bg-neon-rose/10 px-3 py-2 text-sm text-pink-100">
@@ -177,7 +177,7 @@
                 @error('form') <p role="alert" class="text-sm text-neon-rose">{{ $message }}</p> @enderror
 
                 <div class="flex justify-end">
-                    <x-button type="submit" wire:loading.attr="disabled" wire:target="invite" :disabled="$invitees === []">Send invitations</x-button>
+                    <x-button type="submit" variant="secondary" wire:loading.attr="disabled" wire:target="invite" :disabled="$invitees === []">Send invitations</x-button>
                 </div>
             </form>
         @endif
@@ -196,21 +196,21 @@
                     @if ($this->isUnavailable('leaders'))
                         <x-service-unavailable compact :service="$unavailable['leaders']" />
                     @elseif (count($leaders) === 1)
-                        <p><span class="font-semibold text-white">{{ $leaders[0]['title'] }}</span> wins with {{ $leaders[0]['votes'] }} {{ \Illuminate\Support\Str::plural('vote', $leaders[0]['votes']) }}.</p>
+                        <p><span class="font-semibold text-fg">{{ $leaders[0]['title'] }}</span> wins with {{ $leaders[0]['votes'] }} {{ \Illuminate\Support\Str::plural('vote', $leaders[0]['votes']) }}.</p>
                     @else
                         <p>It's a tie. Pick the movie for the night:</p>
                         <fieldset class="space-y-2">
                             <legend class="sr-only">Tied movies</legend>
                             @foreach ($leaders as $leader)
-                                <label wire:key="leader-{{ $leader['id'] }}" class="flex cursor-pointer items-center gap-3 rounded-lg bg-white/5 px-3 py-2 ring-1 ring-white/10 has-[:checked]:ring-cerulean">
+                                <label wire:key="leader-{{ $leader['id'] }}" class="flex cursor-pointer items-center gap-3 rounded-lg bg-surface-1 px-3 py-2 ring-1 ring-line has-[:checked]:ring-cerulean">
                                     <input type="radio" name="winner" value="{{ $leader['id'] }}" x-model="choice" class="text-cerulean focus:ring-cerulean">
-                                    <span class="flex-1 text-white">{{ $leader['title'] }}</span>
-                                    <span class="text-xs text-gray-400">{{ $leader['votes'] }} {{ \Illuminate\Support\Str::plural('vote', $leader['votes']) }}</span>
+                                    <span class="flex-1 text-fg">{{ $leader['title'] }}</span>
+                                    <span class="text-xs text-muted">{{ $leader['votes'] }} {{ \Illuminate\Support\Str::plural('vote', $leader['votes']) }}</span>
                                 </label>
                             @endforeach
                         </fieldset>
                     @endif
-                    <p class="text-gray-400">Voting closes and everyone going is told which movie won. This can't be undone.</p>
+                    <p class="text-muted">Voting closes and everyone going is told which movie won. This can't be undone.</p>
 
                     <div class="flex justify-end gap-2 pt-2">
                         <x-button variant="ghost" x-on:click="$dispatch('close-modal', 'finalize-night')">Not yet</x-button>

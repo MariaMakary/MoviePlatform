@@ -107,7 +107,21 @@ resources/js/                  Echo (Reverb), Leaflet, Chart.js (admin-charts.js
   `<x-service-unavailable>`, never nothing.
 - Blade directives such as `@js()` are not compiled inside a component tag's attributes (`<x-button wire:click="…">`):
   the browser gets the raw text. Pass a string to JavaScript there with `{{ \Illuminate\Support\Js::from($value) }}`.
-- Colors: use the theme tokens `jet`, `cerulean` and `neon-rose` (`bg-cerulean`, `text-neon-rose`…), never new hex values.
+- **Colors** (Cinema dark, task 1342): only the theme tokens in `resources/css/app.css`, never raw greys
+  (`text-gray-400`), `white/5`, `white/10` or new hex values. Swatches are on `/dev/components`.
+
+  | Token | Use |
+  |---|---|
+  | `jet` | page background |
+  | `surface-1` / `surface-2` | cards and inputs / menus, modals and hover |
+  | `line` / `line-strong` | dividers and card borders / input borders (3:1 on the background) |
+  | `fg` / `muted` / `subtle` | main text / secondary text / meta and large text only |
+  | `cerulean` | blue fills (selected chip, active tab, checkbox) with `text-white`; never small text on the background |
+  | `cerulean-light` | links, focus and small blue text (`text-cerulean-light`) |
+  | `neon-rose` | the **one** main button per screen (`<x-button>`, the default `primary`) with `text-jet`, errors |
+
+  Every other button on the screen is `variant="secondary"` (blue) or `ghost`. Titles (`h1`–`h3`) use the display
+  font Saira Semi Condensed automatically (`font-display`); everything else stays Instrument Sans.
 - Full-page Livewire components use `layouts/app.blade.php` automatically (`config/livewire.php`); set the tab title
   with `#[Title('…')]`. Flash messages: `session()->flash('success' | 'error' | 'info', '…')`, shown by `x-flash` in the
   layout as a toast at the top right that disappears by itself (3 seconds, errors 5; hovering keeps it open). They show

@@ -2,8 +2,8 @@
     @if ($loggedIn)
         <section aria-labelledby="recommended-title" class="space-y-4">
             <div>
-                <h2 id="recommended-title" class="text-xl font-bold text-white sm:text-2xl">Recommended for you</h2>
-                <p class="text-sm text-gray-400">Picks based on what you rate and watch.</p>
+                <h2 id="recommended-title" class="text-xl font-bold text-fg sm:text-2xl">Recommended for you</h2>
+                <p class="text-sm text-muted">Picks based on what you rate and watch.</p>
             </div>
 
             @if ($this->isUnavailable('recommendations'))
@@ -18,7 +18,7 @@
                         <x-movie-row.item wire:key="recommended-{{ $item['card']['id'] }}">
                             <x-movie-card :movie="$item['card']" :href="route('movies.show', $item['card']['id'])" />
                             @if ($item['reason'])
-                                <p class="mt-1 line-clamp-2 px-0.5 text-xs text-cerulean">{{ $item['reason'] }}</p>
+                                <p class="mt-1 line-clamp-2 px-0.5 text-xs text-cerulean-light">{{ $item['reason'] }}</p>
                             @endif
                         </x-movie-row.item>
                     @endforeach

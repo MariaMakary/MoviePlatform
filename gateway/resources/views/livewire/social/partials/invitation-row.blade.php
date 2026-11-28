@@ -6,8 +6,8 @@
             <x-avatar :name="$host['name']" :src="$host['avatar']" size="md" />
         @endif
         <div class="min-w-0 space-y-0.5">
-            <a href="{{ route('movie-nights.show', $night['id']) }}" class="block truncate font-semibold text-white hover:underline">{{ $night['title'] }}</a>
-            <p class="text-sm text-gray-300">
+            <a href="{{ route('movie-nights.show', $night['id']) }}" class="block truncate font-semibold text-fg hover:underline">{{ $night['title'] }}</a>
+            <p class="text-sm text-muted">
                 {{ $host ? $host['name'].' invited you' : "You're invited" }} · <x-date :value="$night['scheduled_at']" format="D j M Y, H:i" />
             </p>
         </div>
