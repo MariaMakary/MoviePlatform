@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KAIA cinemas mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Saira+Semi+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mockup-base.css">
+<style>
+.top{padding:32px 0 18px}
+.top h1{font-size:40px;line-height:1}
+.top p{color:var(--muted);margin-top:6px;display:flex;align-items:center;gap:8px}
+.top p svg{width:16px;height:16px;color:var(--cerl)}
+.tools{display:flex;gap:10px;margin-bottom:16px}
+.field{flex:1;max-width:460px;display:flex;align-items:center;gap:10px;height:44px;padding:0 14px;border:1px solid #5f6779;border-radius:10px;background:var(--s1);color:var(--subtle);font-size:15px}
+.layout{display:grid;grid-template-columns:1fr 380px;gap:16px;height:620px}
+.map{position:relative;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#11151c}
+.map svg.tiles{position:absolute;inset:0;width:100%;height:100%}
+.pin{position:absolute;transform:translate(-50%,-100%);display:grid;place-items:center}
+.pin span{width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--cer);border:2px solid #0c0e13;display:grid;place-items:center}
+.pin b{transform:rotate(45deg);font-size:13px;color:#fff}
+.pin.sel span{width:40px;height:40px;background:var(--rose)}
+.pin.sel b{color:#0c0e13;font-size:15px}
+.me{position:absolute;width:16px;height:16px;border-radius:50%;background:var(--cerl);border:3px solid #fff;box-shadow:0 0 0 10px rgba(62,177,222,.18);transform:translate(-50%,-50%)}
+.pop{position:absolute;transform:translate(-50%,calc(-100% - 52px));width:230px;background:var(--s2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px}
+.pop b{display:block;font-size:15px}
+.pop span{color:var(--muted)}
+.zoom{position:absolute;right:12px;top:12px;display:grid;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--s1)}
+.zoom a{width:44px;height:44px;display:grid;place-items:center;color:var(--text);font-size:20px}
+.zoom a+a{border-top:1px solid var(--line)}
+.attr{position:absolute;right:0;bottom:0;background:rgba(12,14,19,.8);color:var(--subtle);font-size:11px;padding:3px 8px;border-top-left-radius:8px}
+.list{border:1px solid var(--line);border-radius:14px;background:var(--s1);display:flex;flex-direction:column;overflow:hidden}
+.list .h{padding:14px 18px;border-bottom:1px solid var(--line)}
+.list .h h2{font-size:20px}
+.list .h p{color:var(--muted);font-size:14px}
+.list ol{list-style:none;padding:0;overflow:auto}
+.list li{display:flex;gap:14px;padding:14px 18px;border-bottom:1px solid var(--line);position:relative}
+.list li .n{width:28px;height:28px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700;background:var(--cer);color:#fff}
+.list li b{display:block;font-weight:600}
+.list li .a{color:var(--muted);font-size:14px}
+.list li .d{margin-left:auto;color:var(--muted);font-size:14px;white-space:nowrap}
+.list li.sel{background:var(--s2)}
+.list li.sel::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--rose)}
+.list li.sel .n{background:var(--rose);color:#0c0e13}
+.list li .dir{display:inline-flex;align-items:center;gap:6px;margin-top:8px;color:var(--cerl);font-size:14px;font-weight:600}
+.navb .ghost{height:40px;padding:0 14px;border-radius:10px;display:inline-flex;align-items:center;font-weight:600;font-size:15px;border:1px solid var(--line)}
+.navb .signup{height:40px;padding:0 14px;border-radius:10px;display:inline-flex;align-items:center;font-weight:600;font-size:15px;background:var(--rose);color:var(--bg)}
+@media (max-width:900px){.layout{grid-template-columns:1fr;height:auto}.map{height:360px}.list{max-height:none}}
+@media (max-width:640px){.top h1{font-size:32px}.tools{flex-wrap:wrap}.tools .btn{width:100%}.field{max-width:none}.navb .ghost{display:none}.pop{display:none}}
+</style>
+</head>
+<body>
+<header class="b"><div class="wrap navb"><a class="logo" href="#"><img src="../../../gateway/public/images/brand/kaia-logo-name-transparent.png" alt="KAIA"></a><nav><a href="#">Home</a><a href="#">Lists</a><a href="#">Movie nights</a><a class="on" href="#">Cinemas</a></nav><div class="r"><a class="ib" href="#" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></a><a class="ghost" href="#">Log in</a><a class="signup" href="#">Sign up</a></div></div></header>
+
+<main class="wrap">
+  <div class="top"><h1>Cinemas near me</h1><p><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Near Achrafieh, Beirut · 5 cinemas within 5 km</p></div>
+  <div class="tools"><div class="field"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>City, area or address</div><a class="btn blue" href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>Use my location</a></div>
+
+  <div class="layout">
+    <div class="map" role="region" aria-label="Map of cinemas near you">
+      <svg class="tiles" viewBox="0 0 800 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <rect width="800" height="620" fill="#141922" stroke="none"/>
+        <path d="M0 0h190c-20 80 10 150-30 230s-40 170-90 250S20 580 0 620Z" fill="#0d1620" stroke="none"/>
+        <path d="M640 380c60 20 120 10 160-10v250H600c10-80 0-160 40-240Z" fill="#17201a" stroke="none"/>
+        <g stroke="#262e3b" stroke-width="10" fill="none" stroke-linecap="round">
+          <path d="M150 90C300 120 450 100 800 140"/><path d="M120 320C330 300 520 330 800 300"/><path d="M60 520C260 470 520 500 800 470"/>
+          <path d="M330 0C350 200 300 400 360 620"/><path d="M560 0C540 180 600 420 560 620"/>
+        </g>
+        <g stroke="#1f2631" stroke-width="4" fill="none">
+          <path d="M200 200C330 210 480 190 700 220"/><path d="M180 420C360 400 520 420 760 390"/><path d="M450 0C440 160 470 300 440 620"/><path d="M250 0C270 140 230 300 250 620"/><path d="M680 0C660 200 700 360 690 620"/>
+          <path d="M260 60l120 110M500 240l120 120M300 360l110 140M600 60l-80 130"/>
+        </g>
+        <g fill="#5a6273" font-family="Instrument Sans" font-size="13"><text x="60" y="150">Mediterranean Sea</text><text x="380" y="270">Achrafieh</text><text x="600" y="110">Sin el Fil</text><text x="210" y="380">Downtown</text><text x="640" y="520">Horsh Beirut</text></g>
+      </svg>
+      <span class="me" style="left:52%;top:46%"></span>
+      <div class="pin" style="left:61%;top:38%"><span><b>2</b></span></div>
+      <div class="pin" style="left:33%;top:57%"><span><b>3</b></span></div>
+      <div class="pin" style="left:79%;top:22%"><span><b>4</b></span></div>
+      <div class="pin" style="left:24%;top:31%"><span><b>5</b></span></div>
+      <div class="pin sel" style="left:47%;top:39%"><span><b>1</b></span></div>
+      <div class="pop" style="left:47%;top:39%"><b>Grand Cinemas ABC Achrafieh</b><span>ABC Mall, Alfred Naccache St · 0.6 km</span></div>
+      <div class="zoom"><a href="#" aria-label="Zoom in">+</a><a href="#" aria-label="Zoom out">−</a></div>
+      <div class="attr">© OpenStreetMap contributors © CARTO</div>
+    </div>
+
+    <aside class="list" aria-labelledby="cinemas-heading">
+      <div class="h"><h2 id="cinemas-heading">Cinemas within 5 km</h2><p>Click one to find it on the map</p></div>
+      <ol>
+        <li class="sel"><span class="n">1</span><div><b>Grand Cinemas ABC Achrafieh</b><span class="a">ABC Mall, Alfred Naccache St</span><a class="dir" href="#"><svg viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M3 11l18-8-8 18-2-8z"/></svg>Directions</a></div><span class="d">0.6 km</span></li>
+        <li><span class="n">2</span><div><b>Empire Sodeco</b><span class="a">Sodeco Square, Damascus Rd</span></div><span class="d">1.2 km</span></li>
+        <li><span class="n">3</span><div><b>Cinema City Beirut Souks</b><span class="a">Beirut Souks, Downtown</span></div><span class="d">2.4 km</span></li>
+        <li><span class="n">4</span><div><b>VOX Cinemas City Centre</b><span class="a">City Centre Beirut, Hazmieh</span></div><span class="d">3.9 km</span></li>
+        <li><span class="n">5</span><div><b>Metropolis Empire Sofil</b><span class="a">Sofil Center, Achrafieh</span></div><span class="d">4.6 km</span></li>
+      </ol>
+    </aside>
+  </div>
+  <div style="height:48px"></div>
+</main>
+</body>
+</html>

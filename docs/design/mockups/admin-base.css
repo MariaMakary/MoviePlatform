@@ -1,0 +1,37 @@
+.atop{position:sticky;top:0;z-index:5;height:60px;display:flex;align-items:center;gap:14px;padding:0 24px;background:var(--bg);border-bottom:1px solid var(--line)}
+.atop .logo img{height:30px;width:auto;display:block}
+.atop .tag{font:600 13px 'Instrument Sans';color:var(--cerl);border:1px solid rgba(62,177,222,.4);border-radius:999px;padding:2px 10px}
+.atop .r{margin-left:auto;display:flex;align-items:center;gap:14px}
+.atop .back{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 12px;border-radius:10px;color:var(--muted);font-weight:500;font-size:15px}
+.atop .av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:600;color:#fff;background:linear-gradient(135deg,#ff2d95,#007ba7)}
+.atop .menu{display:none;background:none;font:inherit;cursor:pointer;width:44px;height:44px;place-items:center;border-radius:10px;color:var(--text);border:1px solid var(--line)}
+.shell{display:grid;grid-template-columns:232px 1fr;min-height:calc(100vh - 60px)}
+.side{border-right:1px solid var(--line);padding:20px 12px;display:flex;flex-direction:column;gap:2px}
+.side a{display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:10px;color:var(--muted);font-weight:500;font-size:15px;position:relative}
+.side a svg{width:19px;height:19px}
+.side a.on{background:var(--s2);color:var(--text)}
+.side a.on::before{content:"";position:absolute;left:-12px;top:10px;bottom:10px;width:3px;border-radius:0 3px 3px 0;background:var(--cerl)}
+.side .sep{height:1px;background:var(--line);margin:12px 8px}
+.main{padding:28px 32px 48px;min-width:0}
+.ph{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.ph h1{font-size:34px;line-height:1.05}
+.ph p{color:var(--muted);font-size:15px;margin-top:4px}
+.panel{background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.panel h2{font-size:19px;line-height:1.2}
+.panel .sub{color:var(--subtle);font-size:13px}
+.badge{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--line);color:var(--muted)}
+.badge i{width:7px;height:7px;border-radius:50%;background:currentColor}
+.badge.ok{color:var(--ok);border-color:rgba(79,201,138,.4)}
+.badge.bad{color:#ff7ab8;border-color:rgba(255,45,149,.45)}
+.badge.warn{color:var(--warn);border-color:rgba(246,196,83,.4)}
+.badge.blue{color:var(--cerl);border-color:rgba(62,177,222,.4)}
+.btn.sm{height:36px;padding:0 14px;font-size:14px}
+@media (max-width:760px){
+  .atop{padding:0 16px}
+  .atop .back span,.atop .tag{display:none}
+  .atop .menu{display:grid}
+  .shell{grid-template-columns:1fr}
+  .side{display:none}
+  .main{padding:20px 16px 40px}
+  .ph h1{font-size:28px}
+}

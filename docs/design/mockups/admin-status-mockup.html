@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KAIA admin system status mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Saira+Semi+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mockup-base.css">
+<link rel="stylesheet" href="admin-base.css">
+<style>
+.summary{display:flex;align-items:center;gap:16px;padding:16px 20px;margin-bottom:16px;border-left:3px solid var(--warn)}
+.summary b{font:700 22px 'Saira Semi Condensed'}
+.summary p{color:var(--muted);font-size:14px}
+.summary .btn{margin-left:auto}
+.svc{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.s .head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.s .url{color:var(--subtle);font-size:13px;margin-top:2px}
+.s dl{display:grid;grid-template-columns:1fr auto;gap:10px 12px;margin-top:16px;font-size:15px}
+.s dt{color:var(--muted)}
+.s dd{margin:0;font-weight:600;display:flex;align-items:center;gap:7px}
+.s dd i{width:8px;height:8px;border-radius:50%}
+.ok i{background:var(--ok)}.fail i{background:var(--rose)}
+.fail{color:#ff7ab8}
+.s .note{margin-top:14px;padding:10px 12px;border-radius:10px;background:var(--s2);color:var(--muted);font-size:14px}
+.s.down{border-color:rgba(255,45,149,.45)}
+.s.deg{border-color:rgba(246,196,83,.4)}
+@media (max-width:1100px){.svc{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.svc{grid-template-columns:1fr}.summary{flex-wrap:wrap}.summary .btn{margin-left:0;width:100%}}
+</style>
+</head>
+<body>
+<div class="atop">
+  <button class="menu" aria-label="Admin menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  <a class="logo" href="#"><img src="../../../gateway/public/images/brand/kaia-logo-name-transparent.png" alt="KAIA"></a>
+  <span class="tag">Admin</span>
+  <div class="r"><a class="back" href="#"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg><span>Back to KAIA</span></a><span class="av">MM</span></div>
+</div>
+<div class="shell">
+  <nav class="side" aria-label="Admin">
+    <a href="#"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Dashboard</a>
+    <a href="#"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>Movies</a>
+    <a href="#"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12Z"/></svg>Reviews</a>
+    <a href="#"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M16 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-5-6.7"/></svg>Users</a>
+    <div class="sep"></div>
+    <a class="on" href="#"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>System status</a>
+  </nav>
+  <main class="main">
+    <div class="ph"><div><h1>System status</h1><p>Each service's own health check: its database and its RabbitMQ connection.</p></div></div>
+
+    <div class="panel summary"><div><b>4 of 6 services healthy</b><p>Checked at 08:21. Notification is down and Intelligence can't reach RabbitMQ.</p></div><a class="btn blue" href="#"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/></svg>Check again</a></div>
+
+    <div class="svc">
+      <section class="panel s"><div class="head"><h2>Identity</h2><span class="badge ok"><i></i>Up</span></div><p class="url">127.0.0.1:8001</p><dl><dt>Database</dt><dd class="ok"><i></i>ok</dd><dt>RabbitMQ</dt><dd class="ok"><i></i>ok</dd><dt>Answered in</dt><dd>38 ms</dd></dl></section>
+      <section class="panel s"><div class="head"><h2>Catalog</h2><span class="badge ok"><i></i>Up</span></div><p class="url">127.0.0.1:8002</p><dl><dt>Database</dt><dd class="ok"><i></i>ok</dd><dt>RabbitMQ</dt><dd class="ok"><i></i>ok</dd><dt>Answered in</dt><dd>44 ms</dd></dl></section>
+      <section class="panel s"><div class="head"><h2>Engagement</h2><span class="badge ok"><i></i>Up</span></div><p class="url">127.0.0.1:8003</p><dl><dt>Database</dt><dd class="ok"><i></i>ok</dd><dt>RabbitMQ</dt><dd class="ok"><i></i>ok</dd><dt>Answered in</dt><dd>51 ms</dd></dl></section>
+      <section class="panel s"><div class="head"><h2>Social</h2><span class="badge ok"><i></i>Up</span></div><p class="url">127.0.0.1:8004</p><dl><dt>Database</dt><dd class="ok"><i></i>ok</dd><dt>RabbitMQ</dt><dd class="ok"><i></i>ok</dd><dt>Answered in</dt><dd>47 ms</dd></dl></section>
+      <section class="panel s deg"><div class="head"><h2>Intelligence</h2><span class="badge warn"><i></i>Degraded</span></div><p class="url">127.0.0.1:8005</p><dl><dt>Database</dt><dd class="ok"><i></i>ok</dd><dt>RabbitMQ</dt><dd class="fail"><i></i>fail</dd><dt>Answered in</dt><dd>2,104 ms</dd></dl><p class="note">It answers, but can't publish or receive events. Recommendations may be out of date.</p></section>
+      <section class="panel s down"><div class="head"><h2>Notification</h2><span class="badge bad"><i></i>Down</span></div><p class="url">127.0.0.1:8006</p><dl><dt>Database</dt><dd class="subtle">unknown</dd><dt>RabbitMQ</dt><dd class="subtle">unknown</dd><dt>Answered in</dt><dd class="subtle">no answer</dd></dl><p class="note">No connection. Start it with <code>composer run dev</code> in services/notification.</p></section>
+    </div>
+  </main>
+</div>
+</body>
+</html>

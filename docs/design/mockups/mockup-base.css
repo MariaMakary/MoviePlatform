@@ -62,3 +62,4 @@ header.b:not(.over) .navb .ib{background:transparent}
 .navb .ib i{position:absolute;top:11px;right:12px;width:8px;height:8px;border-radius:50%;background:var(--rose);box-shadow:0 0 0 2px var(--bg)}
 .navb .av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:600;color:#fff;background:linear-gradient(135deg,#ff2d95,#007ba7)}
 @media (max-width:640px){.navb nav{display:none}.navb{gap:12px}}
+svg text{stroke:none}

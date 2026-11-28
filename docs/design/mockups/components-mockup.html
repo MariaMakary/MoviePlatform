@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KAIA shared pieces mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Saira+Semi+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mockup-base.css">
+<style>
+main{padding-bottom:64px}
+.block{margin-top:40px}
+.block>h2{font-size:26px}
+.block>p{color:var(--muted);font-size:15px;margin:2px 0 16px;max-width:760px}
+.row{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.label{color:var(--subtle);font-size:13px;margin-bottom:8px}
+.menu{width:280px;background:var(--s2);border:1px solid var(--line);border-radius:14px;padding:6px;margin-left:auto}
+.menu .me{display:flex;align-items:center;gap:12px;padding:10px 12px 12px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.menu .me .av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:600;font-size:14px;color:#fff;background:linear-gradient(135deg,#ff2d95,#007ba7)}
+.menu .me b{display:block}
+.menu .me span{color:var(--muted);font-size:13px}
+.menu a{display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:10px;color:var(--text);font-size:15px}
+.menu a svg{width:18px;height:18px;color:var(--muted)}
+.menu a.hl{background:var(--s1)}
+.menu a.pub{color:var(--cerl)}
+.menu a.pub svg{color:var(--cerl)}
+.menu .sep{height:1px;background:var(--line);margin:6px 4px}
+.menu .tag{margin-left:auto;font-size:12px;color:var(--subtle)}
+.headwrap{position:relative;border:1px solid var(--line);border-radius:14px;overflow:hidden;padding-bottom:18px;width:100%;max-width:760px}
+.headwrap header.b{position:static}
+.headwrap .menu{margin:8px 16px 0 auto}
+.toasts{display:grid;gap:12px;width:380px}
+.toast{display:flex;gap:12px;align-items:flex-start;background:var(--s2);border:1px solid var(--line);border-radius:12px;padding:12px 6px 12px 14px;position:relative;overflow:hidden}
+.toast::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px}
+.toast.ok::before{background:var(--ok)}.toast.info::before{background:var(--cerl)}.toast.err::before{background:var(--rose)}
+.toast .ic{width:22px;height:22px;flex:none;margin-top:1px}
+.toast.ok .ic{color:var(--ok)}.toast.info .ic{color:var(--cerl)}.toast.err .ic{color:#ff7ab8}
+.toast b{display:block;font-weight:600;font-size:15px}
+.toast span{color:var(--muted);font-size:14px}
+.toast .x{margin-left:auto;width:44px;height:44px;flex:none;display:grid;place-items:center;border-radius:10px;color:var(--muted);margin-top:-10px}
+.toast .bar{position:absolute;left:0;bottom:0;height:2px;background:var(--line);width:100%}
+.toast .bar i{display:block;height:100%;width:60%;background:var(--subtle)}
+.cards{display:grid;grid-template-columns:repeat(5,180px);gap:20px}
+.mc .p{position:relative;aspect-ratio:2/3;border-radius:12px;overflow:hidden;background:var(--s2);border:1px solid var(--line)}
+.mc .p img{width:100%;height:100%;object-fit:cover;display:block}
+.mc .r{position:absolute;left:8px;top:8px;display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 8px;border-radius:8px;background:rgba(12,14,19,.85);font-size:13px;font-weight:600}
+.mc .r svg{width:13px;height:13px;fill:var(--warn);stroke:none}
+.mc .new{position:absolute;left:8px;top:8px;height:26px;padding:0 8px;border-radius:8px;background:rgba(12,14,19,.85);font-size:12px;font-weight:600;color:var(--cerl);display:inline-flex;align-items:center}
+.mc .bm{position:absolute;right:6px;top:6px;width:44px;height:44px;display:grid;place-items:center}
+.mc .bm span{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(12,14,19,.85)}
+.mc .bm svg{width:17px;height:17px}
+.mc .bm.on svg{fill:var(--cerl);stroke:var(--cerl)}
+.mc .ph{position:absolute;inset:0;display:grid;place-items:center;color:var(--line)}
+.mc .ph svg{width:34px;height:34px}
+.mc .nop{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:12px;background:linear-gradient(160deg,var(--s2),var(--s1))}
+.mc .nop b{font:700 18px/1.15 'Saira Semi Condensed'}
+.mc h3{font:600 15px/1.3 'Instrument Sans';letter-spacing:0;margin-top:8px}
+.mc .y{color:var(--subtle);font-size:13px}
+.mc .cap{margin-top:8px;color:var(--cerl);font-size:13px;font-weight:600}
+@media (max-width:1100px){.cards{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:640px){.cards{grid-template-columns:repeat(2,1fr)}.toasts{width:100%}.menu{margin-left:0;width:100%}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="block" style="margin-top:32px">
+    <h1 style="font-size:40px">Shared pieces</h1>
+    <p class="muted">The avatar menu, toasts and movie card states used on every page.</p>
+  </div>
+
+  <div class="block">
+    <h2>Avatar menu <span class="subtle" style="font:500 15px 'Instrument Sans'">1337, 1330</span></h2>
+    <p>Opens from the avatar on the right of the header. Everything that left the top bar lives here. On phones the "You" tab opens the same list as a full-width sheet.</p>
+    <div class="headwrap">
+      <header class="b"><div class="navb" style="padding:0 20px"><a class="logo" href="#"><img src="../../../gateway/public/images/brand/kaia-logo-name-transparent.png" alt="KAIA"></a><nav><a href="#">Home</a><a href="#">Movie nights</a><a href="#">Lists</a><a href="#">People</a></nav><div class="r"><a class="ib" href="#" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></a><a class="ib" href="#" aria-label="Notifications"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><i></i></a><span class="av" style="box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--cerl)">MM</span></div></div></header>
+      <div class="menu" role="menu">
+        <div class="me"><span class="av">MM</span><div><b>Maria M.</b><span>maria@example.com</span></div></div>
+        <a class="pub" href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>View public profile</a>
+        <div class="sep"></div>
+        <a class="hl" href="#"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Feed</a>
+        <a href="#"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Watchlist</a>
+        <a href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>History</a>
+        <a href="#"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12Z"/></svg>Discussions</a>
+        <a href="#"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Cinemas near me</a>
+        <div class="sep"></div>
+        <a href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>Profile and settings</a>
+        <a href="#"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Privacy</a>
+        <a href="#"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>Admin<span class="tag">admins only</span></a>
+        <div class="sep"></div>
+        <a href="#"><svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>Log out</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>Toasts <span class="subtle" style="font:500 15px 'Instrument Sans'">1363</span></h2>
+    <p>Top right, on <code>surface-2</code> with a coloured edge, no glow. Success and info close by themselves (the thin bar shows the time left). An error stays until you close it. The close button is 44 × 44.</p>
+    <div class="toasts">
+      <div class="toast ok" role="status"><svg class="ic" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></svg><div><b>Added to your watchlist</b><span>Interstellar</span></div><a class="x" href="#" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></a><span class="bar"><i></i></span></div>
+      <div class="toast info" role="status"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><div><b>Invitation sent</b><span>Lina K. and 2 others</span></div><a class="x" href="#" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></a><span class="bar"><i style="width:35%"></i></span></div>
+      <div class="toast err" role="alert"><svg class="ic" viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg><div><b>Couldn't save your rating</b><span>Engagement isn't responding. Try again in a moment.</span></div><a class="x" href="#" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></a></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>Movie card <span class="subtle" style="font:500 15px 'Instrument Sans'">1339, 1327, 1344</span></h2>
+    <p>One component everywhere (rows, search, similar, recommendations), always with the rating and the bookmark. A movie with no votes shows a "New" badge instead of ★ 0.0. While a poster loads, the box keeps its size and shows a quiet film icon (no shimmer).</p>
+    <div class="cards">
+      <div class="mc"><div class="label">Rated</div><div class="p"><img src="https://image.tmdb.org/t/p/w342/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg" alt=""><span class="r"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>8.5</span><span class="bm"><span><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span></span></div><h3>Interstellar</h3><div class="y">2014</div></div>
+      <div class="mc"><div class="label">In your watchlist</div><div class="p"><img src="https://image.tmdb.org/t/p/w342/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg" alt=""><span class="r"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>8.4</span><span class="bm on"><span><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span></span></div><h3>Inception</h3><div class="y">2010</div></div>
+      <div class="mc"><div class="label">No votes yet</div><div class="p"><img src="https://image.tmdb.org/t/p/w342/bjiS5ipwxb9JFy3XRRN4OAilSeX.jpg" alt=""><span class="new">New</span><span class="bm"><span><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span></span></div><h3>Spider-Man: Brand New Day</h3><div class="y">2026</div></div>
+      <div class="mc"><div class="label">Poster loading</div><div class="p"><span class="ph"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18M8 5v4M16 5v4"/></svg></span><span class="r"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>8.5</span><span class="bm"><span><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span></span></div><h3>The Dark Knight</h3><div class="y">2008</div></div>
+      <div class="mc"><div class="label">No poster</div><div class="p"><span class="nop"><b>A locally added movie with a long title</b></span><span class="bm"><span><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span></span></div><h3>A locally added movie with a…</h3><div class="y">2026</div></div>
+    </div>
+  </div>
+</main>
+</body>
+</html>
